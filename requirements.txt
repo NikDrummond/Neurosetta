@@ -1,0 +1,7 @@
+pymaid>=0.1
+numpy>=1.16.3
+pandas>=0.24.1
+setuptools>=41.0.1
+scipy>=1.3.0
+tqdm>=4.31.0
+fafbseg>=0.2.1
