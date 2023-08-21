@@ -29,8 +29,9 @@ class Node_table(Stone):
 
 class Neuron_mesh(Stone):
 
-    def __init__(self,name,mesh):
-        self.mesh = mesh
+    def __init__(self,name,vertices, faces):
+        self.vertices = vertices
+        self.faces = faces
 
         super().__init__(name)
 

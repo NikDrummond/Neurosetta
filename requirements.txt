@@ -1,6 +1,6 @@
 setuptools>=41.0.1
 numba>=0.56.4
 graph-tool>=2.48
-vaex>=4.16.0
 numpy>=1.16.3
 vedo
+pandas
