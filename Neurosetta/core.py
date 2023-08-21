@@ -14,21 +14,27 @@ class Stone(object):
         self.id = id
 
 class Tree_graph(Stone):
-
+    """
+    Tree graph
+    """
     def __init__(self,name,graph):
         self.graph = graph
 
         super().__init__(name)
 
 class Node_table(Stone):
-
+    """
+    SWC like node table
+    """
     def __init__(self,name,nodes):
         self.nodes = nodes
 
         super().__init__(name)
 
 class Neuron_mesh(Stone):
-
+    """
+    A mesh
+    """
     def __init__(self,name,vertices, faces):
         self.vertices = vertices
         self.faces = faces
@@ -92,6 +98,9 @@ def _node_inds(g,df):
     return inds
 
 def graph_from_table(df):
+    """
+    From a node table, generate a graph-tool graph
+    """
 
     if isinstance(df,Node_table):
         df = df.nodes.copy()
