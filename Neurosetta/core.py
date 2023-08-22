@@ -50,10 +50,10 @@ def read_swc(file_path,output = 'Table'):
     name = os.path.splitext(os.path.basename(file_path))[0]
     df = table_from_swc(file_path)
 
-    if output == 'Table':
+    if output.casefold() == 'Table'.casefold():
         return Node_table(name = name, nodes = df)
 
-    elif output == 'Graph':
+    elif output.casefold() == 'Graph'.casefold():
         g = graph_from_table(df)
         return Tree_graph(name = name, graph = g)
 
@@ -152,7 +152,7 @@ def graph_from_table(df):
     return g
 
 # graph to node table
-def graph_to_table(g, output = 'Table'):
+def graph_to_table(g, output = 'Neurosetta'):
     """
     Convert Tree Graph to swc like table
     """
@@ -194,7 +194,7 @@ def graph_to_table(g, output = 'Table'):
                 'radius':radius,
                 'parent_id':parents}).sort_values('node_id').reset_index(drop = True)
 
-    if output == 'Neurosetta':
+    if output.casefold() == 'Neurosetta'.casefold():
         return Node_table(name = name, nodes = df)
-    elif output == 'Table':
+    elif output.casefold() == 'Table'.casefold():
         return df
