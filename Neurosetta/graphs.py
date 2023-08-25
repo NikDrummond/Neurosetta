@@ -4,7 +4,7 @@ import numpy as np
 from .core import Tree_graph
 
 
-def g_has_property(g_property, g, t=None):
+def g_has_property(g_property:str, g:gt.Graph, t:str | bool = None)->bool:
     """
     Check if a property is within a graph
     """
@@ -23,7 +23,7 @@ def g_has_property(g_property, g, t=None):
 # function to get node coordinates from a graph
 
 
-def g_vert_coords(g, subset=None):
+def g_vert_coords(g: gt.Graph, subset: str | bool =None) -> np.array[float]:
     """
     return spatial coordinates of verticies in an np.array
     """
@@ -52,7 +52,7 @@ def g_vert_coords(g, subset=None):
     return coords
 
 
-def get_g_distances(g, inplace=False, name="weight"):
+def get_g_distances(g: gt.Graph, inplace:bool =False, name:str ="weight") -> None | gt.PropertyMap
     """
     create edge property map of edge lengths for a graph with corrdinates vertex property
     """
@@ -81,7 +81,7 @@ def get_g_distances(g, inplace=False, name="weight"):
         return eprop_w
 
 
-def g_leaf_inds(g):
+def g_leaf_inds(g: gt.Graph) -> np.array[int]:
     """
     Returns a numpy array of leaf node indicies
     """
@@ -89,7 +89,7 @@ def g_leaf_inds(g):
     return np.where(g.degree_property_map("total").a == 1)[0]
 
 
-def g_branch_inds(g):
+def g_branch_inds(g: gt.Graph) -> np.array[int]:
     """
     Returns a numpy array of leaf node indicies
     """
@@ -97,7 +97,7 @@ def g_branch_inds(g):
     return np.where(g.degree_property_map("total").a > 2)[0]
 
 
-def g_root_ind(g):
+def g_root_ind(g: gt.Graph) -> int:
     """
     Return integer of root node index
     """
