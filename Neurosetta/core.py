@@ -42,9 +42,7 @@ class Neuron_mesh(Stone):
     A mesh
     """
 
-    def __init__(
-        self, name: str, vertices: np.Array[float], faces: np.array[int]
-    ) -> None:
+    def __init__(self, name: str, vertices: np.ndarray[float], faces: np.ndarray[int]) -> None:
         self.vertices = vertices
         self.faces = faces
 
@@ -170,9 +168,7 @@ def graph_from_table(df: pd.DataFrame) -> gt.Graph:
 
 
 # graph to node table
-def graph_to_table(
-    g: gt.Graph, output: str = "Neurosetta"
-) -> pd.DataFrame | Node_table:
+def graph_to_table(g: gt.Graph, output: str = "Neurosetta") -> pd.DataFrame | Node_table:
     """
     Convert Tree Graph to swc like table
     """

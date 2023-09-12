@@ -40,7 +40,7 @@ def plot3d(N, radius: bool = False, **kwargs) -> vd.Plotter:
         vd.show(mesh).close()
 
 
-def _vd_tree_st_end(N: Tree_graph) -> tuple[np.array[float], np.array[float]]:
+def _vd_tree_st_end(N: Tree_graph) -> tuple[np.ndarray[float], np.ndarray[float]]:
     # get all edges
     edges = N.graph.get_edges()
     # get dimensions of our spatial embedding
@@ -58,7 +58,7 @@ def _vd_tree_st_end(N: Tree_graph) -> tuple[np.array[float], np.array[float]]:
     return start_pts, end_pts
 
 
-def _vd_nodes_st_end(N: Node_table) -> tuple[np.array[float], np.array[float]]:
+def _vd_nodes_st_end(N: Node_table) -> tuple[np.ndarray[float], np.ndarray[float]]:
     # node ids
     node_ids = N.nodes["node_id"].values
     # this by node ids - np.array
