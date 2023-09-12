@@ -1,6 +1,7 @@
 import graph_tool.all as gt
 import numpy as np
 from scipy.spatial.distance import squareform, pdist
+import hdbscan
 
 
 from .core import Tree_graph
@@ -98,6 +99,18 @@ def g_branch_inds(g: gt.Graph) -> np.ndarray[int]:
     # graph leaf inds - includes soma
     return np.where(g.degree_property_map("total").a > 2)[0]
 
+def g_lb_inds(g: gt.Graph, return_types:bool = False) -> np.ndarray[int]:
+    """
+    Returns indicies of all leaf and branch nodes
+
+    Note: only usefull if you want them all together and don't care which is which
+    """
+    l_inds = g_leaf_inds(g)
+    b_inds = g_branch_inds(g)
+
+    inds = np.unique(np.concatenate([l_inds,b_inds]))
+    return inds
+
 
 def g_root_ind(g: gt.Graph) -> int:
     """
@@ -163,3 +176,37 @@ def dist_mat(g:gt.Graph,inds:np.array,method:str = 'Euclidean', flatten:bool = F
         
     return dist
     
+
+def HDBSCAN_g(g:gt.Graph, nodes:str = 'both', metric:str = 'Path Length', min_cluster = 20, output:str = 'labels', verbose:bool = True):
+    """
+    Compute HDBSCAN clustering on a neuron
+    """
+    # get node inds
+    if nodes == 'both':
+        inds = g_lb_inds(g)
+    elif nodes == 'leaves':
+        inds = g_leaf_inds(g)
+    elif nodes == 'branches':
+        inds = g_branch_inds(g)
+
+    # get coordinates
+    coords = g_vert_coords(g,inds)
+
+    # path length distance matrix
+    dist = dist_mat(g,inds,method = metric)
+
+    # run hdbscan
+    hdb = hdbscan.HDBSCAN(min_cluster_size = min_cluster,
+                metric = 'precomputed')
+    hdb.fit(dist)
+
+    if verbose:
+        print('Number clusters:' + str(len(np.unique(hdb.labels_[hdb.labels_ != -1]))))
+        print('Number noise points: ' + str(len(hdb.labels_[hdb.labels_ == -1])))
+
+    if output == 'labels':
+        return hdb.labels_
+    elif output == 'label_inds':
+        return hdb.labels_, inds
+    elif output == 'all':
+        return hdb
