@@ -26,7 +26,7 @@ def g_has_property(g_property:str, g:gt.Graph, t:str | bool = None)->bool:
 # function to get node coordinates from a graph
 
 
-def g_vert_coords(g: gt.Graph, subset: str | bool =None) -> np.ndarray[float]:
+def g_vert_coords(g: gt.Graph, subset: str | bool = None) -> np.ndarray[float]:
     """
     return spatial coordinates of verticies in an np.array
     """
@@ -209,4 +209,4 @@ def HDBSCAN_g(g:gt.Graph, nodes:str = 'both', metric:str = 'Path Length', min_cl
     elif output == 'label_inds':
         return hdb.labels_, inds
     elif output == 'all':
-        return hdb
+        return hdb, inds
