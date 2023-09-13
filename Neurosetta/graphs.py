@@ -2,6 +2,7 @@ import graph_tool.all as gt
 import numpy as np
 from scipy.spatial.distance import squareform, pdist
 import hdbscan
+from typing import List
 
 
 from .core import Tree_graph
@@ -210,3 +211,98 @@ def HDBSCAN_g(g:gt.Graph, nodes:str = 'both', metric:str = 'Path Length', min_cl
         return hdb.labels_, inds
     elif output == 'all':
         return hdb, inds
+    
+def random_nodes(n:int = 1, g:gt.Graph = None, subset:np.ndarray[int] = None, exclude:np.ndarray[int] | int = None) -> int|np.ndarray[int]:
+    """
+    Return n random nodes from a graph.
+
+    Parameters
+    ----------
+
+    n:
+
+
+    g:
+
+
+    subset:
+
+
+    exclude:
+
+
+    Returns
+    -------
+
+    random_sample:
+    
+    """
+
+    if (g is None) and (subset is None) and (exclude is None):
+        raise AttributeError ('No data provided to get a sample from!')
+    elif (g is None) and (subset is None) and (exclude is not None):
+        raise AttributeError ('No data provided to get a sample from!')
+
+    if g is not None:
+        assert isinstance(g,gt.Graph)
+
+
+    # figure out our nodes - either a subset, or all ndoes in g
+    
+    # if a subset is provided, this takes priority
+    if subset is not None: 
+        sample = subset
+    # if just the graph was provided, get all node
+    elif (g is not None) and (subset is None):
+        sample = g.get_vertices()
+
+    # figure out if we want to exclude stuff
+    if exclude is not None:
+        # subtract exclude from sample
+        sample = np.setdiff1d(sample,exclude)
+    # generate random sample!
+    sample = np.random.choice(sample, size = n)
+
+    return sample
+
+def path_vertex_set(g:gt.Graph,source: int, target: int | np.ndarray[int] | List, weight:None | str | gt.EdgePropertyMap = None) -> List[np.ndarray[int]]:
+    """
+    Given a source node, return vertex path to target. If multiple targets, return list of paths 
+    """
+
+
+    # if weight string is provided, try to calculate the weights
+    if isinstance(weight,str) :
+        # check if graph edges have this property
+        if not g_has_property(weight,g,t = 'e'):
+            print('Provided weight not a graph property, ignoring!')
+            weight = None
+
+        # copy graph
+    g2 = g.copy()
+    # if copy is directed, change that
+    if g2.is_directed():
+        g2.set_directed(False)
+
+    # if only one target node            
+    if isinstance(target,  np.integer):
+        if weight is None:
+            path = gt.shortest_path(g2, source, target)[0]
+        else:    
+            path = gt.shortest_path(g2, source, target, weights = g2.ep[weight])[0] 
+
+        # convert to indicies
+        path = [g.vertex_index[i] for i in path]
+
+    elif (isinstance(target,List)) | (isinstance(target,np.ndarray)):
+        if weight is None:
+            path = [gt.shortest_path(g2, source, i)[0] for i in target]
+        else:
+            path = [gt.shortest_path(g2, source, i, weights = g2.ep[weight])[0] for i in target]
+        path = [[g.vertex_index[i] for i in j] for j in path]
+
+    return path    
+
+    
+
+
