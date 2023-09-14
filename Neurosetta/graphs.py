@@ -3,9 +3,11 @@ import numpy as np
 from scipy.spatial.distance import squareform, pdist
 import hdbscan
 from typing import List
+import vedo as vd
 
 
-from .core import Tree_graph
+from .core import Tree_graph, Node_table
+from .sets import Sfamily_intersect, Sfamily_XOR
 
 
 def g_has_property(g_property:str, g:gt.Graph, t:str | bool = None)->bool:
@@ -278,7 +280,7 @@ def path_vertex_set(g:gt.Graph,source: int, target: int | np.ndarray[int] | List
             print('Provided weight not a graph property, ignoring!')
             weight = None
 
-        # copy graph
+    # copy graph
     g2 = g.copy()
     # if copy is directed, change that
     if g2.is_directed():
@@ -301,8 +303,101 @@ def path_vertex_set(g:gt.Graph,source: int, target: int | np.ndarray[int] | List
             path = [gt.shortest_path(g2, source, i, weights = g2.ep[weight])[0] for i in target]
         path = [[g.vertex_index[i] for i in j] for j in path]
 
-    return path    
+    return path   
 
-    
+def find_point(coords, point):
+    """
+    return the index of the row in coords which matches the point
+    """
+    return np.where(np.isclose(coords,point).sum(axis = 1) == coords.shape[1])[0][0]
+
+
+def NP_segment(g:gt.Graph | Tree_graph| Node_table, mesh:vd.Mesh, invert:bool = False) -> gt.Graph | Tree_graph | Node_table:
+    """
+    Segments a neuron to a partition of the graph where the leaves are only inside (or outside - see inverse) of the provided mesh
+
+    NOTE Rough version!
+    """
+
+    if not isinstance(g,gt.Graph):
+        raise AttributeError('Currently only supports gt.Graph as input')
+
+    # get leaf inds
+    l_inds = g_leaf_inds(g)
+
+    # leaf coords
+    l_coords = g_vert_coords(g,l_inds)
+
+    # coords of points in the mesh
+    #in_leaves = mesh.inside_points(l_coords).points()
+    # if using whole brain mesh...
+    in_leaves = mesh.inside_points(l_coords, invert = invert).points()
+
+    # find the index of these points in l_coords
+    rem_inds = [find_point(l_coords, i) for i in in_leaves]
+
+    # subset of l_inds which is these points
+    dend_inds = l_inds[rem_inds]
+
+    # 1) Pick a leaf node that is NOT in the mesh (use this as anchor)
+
+    # get a random node leaf node that isn't in our exclude set
+
+    rand_leaf = random_nodes(subset = l_inds, exclude = dend_inds)[0]
+
+    # 2) For each leaf IN the mesh, get path to the above node.
+
+    # 3) Collect this family of sets
+
+    # dend_inds are the indicies in the graph of verticies in the dendrites
+
+    # add weight property
+    get_g_distances(g, inplace = True)
+
+    # get 
+    paths = path_vertex_set(g,source = rand_leaf,target = dend_inds, weight = 'weight')
+
+    # 4) Take their intersection
+    to_keep = Sfamily_intersect(paths)
+
+    # find the rnew root
+    # 5) Subset the intersection to only branch nodes
+    b_inds = g_branch_inds(g)
+    b_inds = np.intersect1d(to_keep,b_inds)
+
+    # 7) if multiple, find which is FURTHEST from anchor node = ROOT
+    g2 = g.copy()
+    g2.set_directed(False)
+
+    dists = gt.shortest_distance(g = g2,
+                                source = rand_leaf,
+                                target = b_inds,
+                                weights = g2.ep['weight'])
+
+    root = b_inds[np.where(dists == dists.max())][0]      
+
+    # get the nodes we will keep
+    # 8) Symetrical difference of fmaily of path sets, + ROOT node (the root should already be in)
+    to_keep = Sfamily_XOR(paths) 
+
+    # add the root
+    to_keep = np.append(to_keep,root)
+
+    # copy the original graph
+    g2 = g.copy()
+    # set up a mask of the nodes we want to keep
+    mask_dat = np.zeros_like(g2.get_vertices())
+    mask_dat[to_keep] = 1
+    dend_mask = g2.new_vp("bool")
+    dend_mask.a = mask_dat
+
+    # activate the mask and purge what isn't in it 
+    g2.set_vertex_filter(dend_mask)
+    g2.purge_vertices()
+
+    # convert to NR graph or Table
+
+    # return
+    return g2
 
 
