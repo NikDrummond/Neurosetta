@@ -222,3 +222,13 @@ def graph_to_table(g: gt.Graph, output: str = "Neurosetta") -> pd.DataFrame | No
         return Node_table(name=name, nodes=df)
     elif output.casefold() == "Table".casefold():
         return df
+
+def write_swc(N:Node_table | Tree_graph, fpath: str) -> None:
+    """
+    Write Neuron to swc
+    """
+    if isinstance(N, Tree_graph):
+        N = graph_to_table(N)
+
+    np.savetxt(fpath,N.nodes,
+            header = 'SWC Generated using Neurosetta \n Columns \n' + str(N.nodes.columns))
