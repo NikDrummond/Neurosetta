@@ -50,10 +50,24 @@ class Neuron_mesh(Stone):
 
 
 # read swc
-def read_swc(file_path: str, output: str = "Table") -> Tree_graph | Node_table:
+
+def read_swc(path: str, output: str = 'Table') -> List | Tree_graph | Node_table:
     """
-    Read in swc file and return table/graph output
-    """
+    Read in swc file(s) and return table/graph output
+    """    
+    
+    if os.path.isdir(path):
+        files = os.listdir(path)
+        files = [f for f in files if f.endswith('.swc') ]
+        N = [_read_swc(path + f, output = output) for f in files]
+
+    else:
+        N = _read_swc(path, output = output)
+
+    return N
+
+
+def _read_swc(file_path: str, output: str = "Table") -> Tree_graph | Node_table:
 
     name = os.path.splitext(os.path.basename(file_path))[0]
     df = table_from_swc(file_path)

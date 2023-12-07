@@ -29,7 +29,7 @@ def g_has_property(g_property:str, g:gt.Graph, t:str | bool = None)->bool:
 # function to get node coordinates from a graph
 
 
-def g_vert_coords(g: gt.Graph, subset: str | bool = None) -> np.ndarray[float]:
+def g_vert_coords(g: gt.Graph, subset: List | bool = None) -> np.ndarray[float]:
     """
     return spatial coordinates of verticies in an np.array
     """
@@ -53,6 +53,9 @@ def g_vert_coords(g: gt.Graph, subset: str | bool = None) -> np.ndarray[float]:
     if subset is None:
         coords = np.array([g.vp["coordinates"][i] for i in g.get_vertices()])
     else:
+        # if subset is just a single int, convert to a list
+        if isinstance(subset,(int,np.integer)):
+            subset = [subset]
         coords = np.array([g.vp["coordinates"][i] for i in subset])
 
     return coords
