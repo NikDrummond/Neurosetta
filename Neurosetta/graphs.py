@@ -10,7 +10,7 @@ from .core import Tree_graph, Node_table
 from .sets import Sfamily_intersect, Sfamily_XOR
 
 
-def g_has_property(g_property:str, g:gt.Graph, t:str | bool = None)->bool:
+def g_has_property(g_property: str, g: gt.Graph, t: str | bool = None) -> bool:
     """
     Check if a property is within a graph
     """
@@ -54,14 +54,16 @@ def g_vert_coords(g: gt.Graph, subset: List | bool = None) -> np.ndarray[float]:
         coords = np.array([g.vp["coordinates"][i] for i in g.get_vertices()])
     else:
         # if subset is just a single int, convert to a list
-        if isinstance(subset,(int,np.integer)):
+        if isinstance(subset, (int, np.integer)):
             subset = [subset]
         coords = np.array([g.vp["coordinates"][i] for i in subset])
 
     return coords
 
 
-def get_g_distances(g: gt.Graph, inplace:bool =False, name:str ="weight") -> None | gt.PropertyMap:
+def get_g_distances(
+    g: gt.Graph, inplace: bool = False, name: str = "weight"
+) -> None | gt.PropertyMap:
     """
     create edge property map of edge lengths for a graph with corrdinates vertex property
     """
@@ -105,7 +107,8 @@ def g_branch_inds(g: gt.Graph) -> np.ndarray[int]:
     # graph leaf inds - includes soma
     return np.where(g.degree_property_map("total").a > 2)[0]
 
-def g_lb_inds(g: gt.Graph, return_types:bool = False) -> np.ndarray[int]:
+
+def g_lb_inds(g: gt.Graph, return_types: bool = False) -> np.ndarray[int]:
     """
     Returns indicies of all leaf and branch nodes
 
@@ -114,7 +117,7 @@ def g_lb_inds(g: gt.Graph, return_types:bool = False) -> np.ndarray[int]:
     l_inds = g_leaf_inds(g)
     b_inds = g_branch_inds(g)
 
-    inds = np.unique(np.concatenate([l_inds,b_inds]))
+    inds = np.unique(np.concatenate([l_inds, b_inds]))
     return inds
 
 
@@ -124,17 +127,19 @@ def g_root_ind(g: gt.Graph) -> int:
     """
     return np.where(g.degree_property_map("in").a == 0)[0][0]
 
-def _edist_mat(g:gt.Graph,inds:list, flatten:bool = False) -> np.ndarray[float]:
+
+def _edist_mat(g: gt.Graph, inds: list, flatten: bool = False) -> np.ndarray[float]:
     """
     Return Euclidean distance matrix between nodes, specified by inds
     """
-    coords = np.array([g.vp['coordinates'][i] for i in inds])
+    coords = np.array([g.vp["coordinates"][i] for i in inds])
     e_dist = pdist(coords)
     if not flatten:
         e_dist = squareform(e_dist)
     return e_dist
 
-def _gdist_mat(g:gt.Graph,inds:list,flatten:bool = False) -> np.ndarray[float]:
+
+def _gdist_mat(g: gt.Graph, inds: list, flatten: bool = False) -> np.ndarray[float]:
     """
     return path length distance matrix
     """
@@ -144,20 +149,22 @@ def _gdist_mat(g:gt.Graph,inds:list,flatten:bool = False) -> np.ndarray[float]:
         g.set_directed(False)
 
     # add edge wieghts based on distance
-    eprop_w = g.new_ep('double')
+    eprop_w = g.new_ep("double")
     # get length of each edge
-    eprop_w.a = [np.linalg.norm(g.vp['coordinates'][i[0]].a - g.vp['coordinates'][i[1]].a) for i in g.iter_edges()]
+    eprop_w.a = [
+        np.linalg.norm(g.vp["coordinates"][i[0]].a - g.vp["coordinates"][i[1]].a)
+        for i in g.iter_edges()
+    ]
 
     # generate path length distance matrix
-    g_dist = np.zeros((len(inds),len(inds)))
+    g_dist = np.zeros((len(inds), len(inds)))
     for i in range(len(inds)):
-        g_dist[i] = gt.shortest_distance(g = g, 
-                                        source = inds[i], 
-                                        target = inds, 
-                                        weights = eprop_w)
-        
+        g_dist[i] = gt.shortest_distance(
+            g=g, source=inds[i], target=inds, weights=eprop_w
+        )
+
     # make symetric - I am gratutiously assuming it isn't only because of floating point errors
-    g_dist = np.tril(g_dist) + np.triu(g_dist.T,1)
+    g_dist = np.tril(g_dist) + np.triu(g_dist.T, 1)
 
     # swap back if we changed the graph to directed
     if directed:
@@ -168,56 +175,71 @@ def _gdist_mat(g:gt.Graph,inds:list,flatten:bool = False) -> np.ndarray[float]:
 
     return g_dist
 
-def dist_mat(g:gt.Graph,inds:np.array,method:str = 'Euclidean', flatten:bool = False) -> np.ndarray[float]:
+
+def dist_mat(
+    g: gt.Graph, inds: np.array, method: str = "Euclidean", flatten: bool = False
+) -> np.ndarray[float]:
     """
     Generate pairwise distance matrix for graph
     """
-    if g_has_property('coordinates',g,'v'):
-        if method == 'Euclidean':
-            dist = _edist_mat(g,inds,flatten)
-        elif method == 'Path Length':
-            dist = _gdist_mat(g,inds,flatten)
+    if g_has_property("coordinates", g, "v"):
+        if method == "Euclidean":
+            dist = _edist_mat(g, inds, flatten)
+        elif method == "Path Length":
+            dist = _gdist_mat(g, inds, flatten)
         else:
-            raise AttributeError('Method not recognised')
-        
-    return dist
-    
+            raise AttributeError("Method not recognised")
 
-def HDBSCAN_g(g:gt.Graph, nodes:str = 'both', metric:str = 'Path Length', min_cluster = 20, output:str = 'labels', verbose:bool = True):
+    return dist
+
+
+def HDBSCAN_g(
+    g: gt.Graph,
+    nodes: str = "both",
+    metric: str = "Path Length",
+    min_cluster=20,
+    output: str = "labels",
+    verbose: bool = True,
+):
     """
     Compute HDBSCAN clustering on a neuron
     """
     # get node inds
-    if nodes == 'both':
+    if nodes == "both":
         inds = g_lb_inds(g)
-    elif nodes == 'leaves':
+    elif nodes == "leaves":
         inds = g_leaf_inds(g)
-    elif nodes == 'branches':
+    elif nodes == "branches":
         inds = g_branch_inds(g)
 
     # get coordinates
-    coords = g_vert_coords(g,inds)
+    coords = g_vert_coords(g, inds)
 
     # path length distance matrix
-    dist = dist_mat(g,inds,method = metric)
+    dist = dist_mat(g, inds, method=metric)
 
     # run hdbscan
-    hdb = hdbscan.HDBSCAN(min_cluster_size = min_cluster,
-                metric = 'precomputed')
+    hdb = hdbscan.HDBSCAN(min_cluster_size=min_cluster, metric="precomputed")
     hdb.fit(dist)
 
     if verbose:
-        print('Number clusters:' + str(len(np.unique(hdb.labels_[hdb.labels_ != -1]))))
-        print('Number noise points: ' + str(len(hdb.labels_[hdb.labels_ == -1])))
+        print("Number clusters:" + str(len(np.unique(hdb.labels_[hdb.labels_ != -1]))))
+        print("Number noise points: " + str(len(hdb.labels_[hdb.labels_ == -1])))
 
-    if output == 'labels':
+    if output == "labels":
         return hdb.labels_
-    elif output == 'label_inds':
+    elif output == "label_inds":
         return hdb.labels_, inds
-    elif output == 'all':
+    elif output == "all":
         return hdb, inds
-    
-def random_nodes(n:int = 1, g:gt.Graph = None, subset:np.ndarray[int] = None, exclude:np.ndarray[int] | int = None) -> int|np.ndarray[int]:
+
+
+def random_nodes(
+    n: int = 1,
+    g: gt.Graph = None,
+    subset: np.ndarray[int] = None,
+    exclude: np.ndarray[int] | int = None,
+) -> int | np.ndarray[int]:
     """
     Return n random nodes from a graph.
 
@@ -240,22 +262,21 @@ def random_nodes(n:int = 1, g:gt.Graph = None, subset:np.ndarray[int] = None, ex
     -------
 
     random_sample:
-    
+
     """
 
     if (g is None) and (subset is None) and (exclude is None):
-        raise AttributeError ('No data provided to get a sample from!')
+        raise AttributeError("No data provided to get a sample from!")
     elif (g is None) and (subset is None) and (exclude is not None):
-        raise AttributeError ('No data provided to get a sample from!')
+        raise AttributeError("No data provided to get a sample from!")
 
     if g is not None:
-        assert isinstance(g,gt.Graph)
-
+        assert isinstance(g, gt.Graph)
 
     # figure out our nodes - either a subset, or all ndoes in g
-    
+
     # if a subset is provided, this takes priority
-    if subset is not None: 
+    if subset is not None:
         sample = subset
     # if just the graph was provided, get all node
     elif (g is not None) and (subset is None):
@@ -264,23 +285,28 @@ def random_nodes(n:int = 1, g:gt.Graph = None, subset:np.ndarray[int] = None, ex
     # figure out if we want to exclude stuff
     if exclude is not None:
         # subtract exclude from sample
-        sample = np.setdiff1d(sample,exclude)
+        sample = np.setdiff1d(sample, exclude)
     # generate random sample!
-    sample = np.random.choice(sample, size = n)
+    sample = np.random.choice(sample, size=n)
 
     return sample
 
-def path_vertex_set(g:gt.Graph,source: int, target: int | np.ndarray[int] | List, weight:None | str | gt.EdgePropertyMap = None) -> List[np.ndarray[int]]:
-    """
-    Given a source node, return vertex path to target. If multiple targets, return list of paths 
-    """
 
+def path_vertex_set(
+    g: gt.Graph,
+    source: int,
+    target: int | np.ndarray[int] | List,
+    weight: None | str | gt.EdgePropertyMap = None,
+) -> List[np.ndarray[int]]:
+    """
+    Given a source node, return vertex path to target. If multiple targets, return list of paths
+    """
 
     # if weight string is provided, try to calculate the weights
-    if isinstance(weight,str) :
+    if isinstance(weight, str):
         # check if graph edges have this property
-        if not g_has_property(weight,g,t = 'e'):
-            print('Provided weight not a graph property, ignoring!')
+        if not g_has_property(weight, g, t="e"):
+            print("Provided weight not a graph property, ignoring!")
             weight = None
 
     # copy graph
@@ -289,52 +315,58 @@ def path_vertex_set(g:gt.Graph,source: int, target: int | np.ndarray[int] | List
     if g2.is_directed():
         g2.set_directed(False)
 
-    # if only one target node            
-    if isinstance(target,  np.integer):
+    # if only one target node
+    if isinstance(target, np.integer):
         if weight is None:
             path = gt.shortest_path(g2, source, target)[0]
-        else:    
-            path = gt.shortest_path(g2, source, target, weights = g2.ep[weight])[0] 
+        else:
+            path = gt.shortest_path(g2, source, target, weights=g2.ep[weight])[0]
 
         # convert to indicies
         path = [g.vertex_index[i] for i in path]
 
-    elif (isinstance(target,List)) | (isinstance(target,np.ndarray)):
+    elif (isinstance(target, List)) | (isinstance(target, np.ndarray)):
         if weight is None:
             path = [gt.shortest_path(g2, source, i)[0] for i in target]
         else:
-            path = [gt.shortest_path(g2, source, i, weights = g2.ep[weight])[0] for i in target]
+            path = [
+                gt.shortest_path(g2, source, i, weights=g2.ep[weight])[0]
+                for i in target
+            ]
         path = [[g.vertex_index[i] for i in j] for j in path]
 
-    return path   
+    return path
+
 
 def find_point(coords, point):
     """
     return the index of the row in coords which matches the point
     """
-    return np.where(np.isclose(coords,point).sum(axis = 1) == coords.shape[1])[0][0]
+    return np.where(np.isclose(coords, point).sum(axis=1) == coords.shape[1])[0][0]
 
 
-def NP_segment(g:gt.Graph | Tree_graph| Node_table, mesh:vd.Mesh, invert:bool = False) -> gt.Graph | Tree_graph | Node_table:
+def NP_segment(
+    g: gt.Graph | Tree_graph | Node_table, mesh: vd.Mesh, invert: bool = False
+) -> gt.Graph | Tree_graph | Node_table:
     """
     Segments a neuron to a partition of the graph where the leaves are only inside (or outside - see inverse) of the provided mesh
 
     NOTE Rough version!
     """
 
-    if not isinstance(g,gt.Graph):
-        raise AttributeError('Currently only supports gt.Graph as input')
+    if not isinstance(g, gt.Graph):
+        raise AttributeError("Currently only supports gt.Graph as input")
 
     # get leaf inds
     l_inds = g_leaf_inds(g)
 
     # leaf coords
-    l_coords = g_vert_coords(g,l_inds)
+    l_coords = g_vert_coords(g, l_inds)
 
     # coords of points in the mesh
-    #in_leaves = mesh.inside_points(l_coords).points()
+    # in_leaves = mesh.inside_points(l_coords).points()
     # if using whole brain mesh...
-    in_leaves = mesh.inside_points(l_coords, invert = invert).points()
+    in_leaves = mesh.inside_points(l_coords, invert=invert).points()
 
     # find the index of these points in l_coords
     rem_inds = [find_point(l_coords, i) for i in in_leaves]
@@ -346,7 +378,7 @@ def NP_segment(g:gt.Graph | Tree_graph| Node_table, mesh:vd.Mesh, invert:bool = 
 
     # get a random node leaf node that isn't in our exclude set
 
-    rand_leaf = random_nodes(subset = l_inds, exclude = dend_inds)[0]
+    rand_leaf = random_nodes(subset=l_inds, exclude=dend_inds)[0]
 
     # 2) For each leaf IN the mesh, get path to the above node.
 
@@ -355,10 +387,10 @@ def NP_segment(g:gt.Graph | Tree_graph| Node_table, mesh:vd.Mesh, invert:bool = 
     # dend_inds are the indicies in the graph of verticies in the dendrites
 
     # add weight property
-    get_g_distances(g, inplace = True)
+    get_g_distances(g, inplace=True)
 
-    # get 
-    paths = path_vertex_set(g,source = rand_leaf,target = dend_inds, weight = 'weight')
+    # get
+    paths = path_vertex_set(g, source=rand_leaf, target=dend_inds, weight="weight")
 
     # 4) Take their intersection
     to_keep = Sfamily_intersect(paths)
@@ -366,25 +398,24 @@ def NP_segment(g:gt.Graph | Tree_graph| Node_table, mesh:vd.Mesh, invert:bool = 
     # find the rnew root
     # 5) Subset the intersection to only branch nodes
     b_inds = g_branch_inds(g)
-    b_inds = np.intersect1d(to_keep,b_inds)
+    b_inds = np.intersect1d(to_keep, b_inds)
 
     # 7) if multiple, find which is FURTHEST from anchor node = ROOT
     g2 = g.copy()
     g2.set_directed(False)
 
-    dists = gt.shortest_distance(g = g2,
-                                source = rand_leaf,
-                                target = b_inds,
-                                weights = g2.ep['weight'])
+    dists = gt.shortest_distance(
+        g=g2, source=rand_leaf, target=b_inds, weights=g2.ep["weight"]
+    )
 
-    root = b_inds[np.where(dists == dists.max())][0]      
+    root = b_inds[np.where(dists == dists.max())][0]
 
     # get the nodes we will keep
     # 8) Symetrical difference of fmaily of path sets, + ROOT node (the root should already be in)
-    to_keep = Sfamily_XOR(paths) 
+    to_keep = Sfamily_XOR(paths)
 
     # add the root
-    to_keep = np.append(to_keep,root)
+    to_keep = np.append(to_keep, root)
 
     # copy the original graph
     g2 = g.copy()
@@ -394,7 +425,7 @@ def NP_segment(g:gt.Graph | Tree_graph| Node_table, mesh:vd.Mesh, invert:bool = 
     dend_mask = g2.new_vp("bool")
     dend_mask.a = mask_dat
 
-    # activate the mask and purge what isn't in it 
+    # activate the mask and purge what isn't in it
     g2.set_vertex_filter(dend_mask)
     g2.purge_vertices()
 
@@ -402,5 +433,3 @@ def NP_segment(g:gt.Graph | Tree_graph| Node_table, mesh:vd.Mesh, invert:bool = 
 
     # return
     return g2
-
-

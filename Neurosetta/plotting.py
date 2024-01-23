@@ -93,11 +93,14 @@ def _vd_tree_lines(N: Tree_graph, **kwargs) -> vd.Lines:
     return lns
 
 
-def _vd_tree_cyl(N: Tree_graph, **kwargs) -> List[vd.Cylinder]:
+def _vd_tree_cyl(N: Tree_graph, radius_prop:str = 'radius',**kwargs) -> List[vd.Cylinder]:
+    
     start_pts, end_pts = _vd_tree_st_end(N)
-
     # create a list of cylinders
-    radii = N.graph.vp["radius"].a
+    if isinstance(radius_prop,str):
+        radii = N.graph.vp[radius_prop].a
+    elif isinstance(radius_prop,gt.VertexPropertyMap):
+        radii = radius_prop.a
     # radii = radii[bool_ind]
     # create list of cylinders
     tubes = [

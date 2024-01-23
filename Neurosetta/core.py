@@ -100,6 +100,7 @@ def table_from_swc(file_path: str) -> pd.DataFrame:
             "radius": np.float64,
             "parent_id": np.int32,
         },
+        index_col=False
     )
 
     # check for duplicate node ids
@@ -114,7 +115,7 @@ def _node_inds(g: gt.Graph, df: pd.DataFrame) -> List[int]:
     """
     Given a graph, with ids as a vp, and a df with the same set of ides, find the order of indicies to order things going from the table to the graph
 
-    This is important whenver adding an attribute to nodes in a graph
+    This is important whenever adding an attribute to nodes in a graph
     """
     # node id orders - this is the order of nodes in the graph, which match the node ids in the table
     ids = g.vp["ids"].a
