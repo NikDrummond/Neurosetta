@@ -340,9 +340,7 @@ def path_vertex_set(
 
 def find_point(coords, point):
     """
-    return the index of the row in coords which matches the coordinates of a point (approximately).
-    
-    Only returns first point
+    return the index of the row in coords which matches the point ()
     """
     return np.where(np.isclose(coords, point).sum(axis=1) != 0)[0][0]
 
