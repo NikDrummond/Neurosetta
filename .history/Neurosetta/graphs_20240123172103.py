@@ -349,29 +349,7 @@ def find_point(coords, point):
 
     return np.where(np.isclose(coords, point).sum(axis=1) != 0)[0][0]
 
-def nearest_vertex(coords:np.ndarray, point:np.ndarray,return_dist:bool = False) -> int | tuple:
-    """
-    Use instead of find_point!
-    """
 
-    binary_array = np.isclose(coords, point)
-
-    # if there is an exact match
-    if len(np.where(binary_array.sum(axis = 1) == 3)[0]):
-        nearest_v = np.where(binary_array.sum(axis = 1) == 3)[0][0]
-        dist = 0
-    # if there is no exact match, fall back to a KDTree
-    else:
-        all_coords = np.vstack((coords,point))
-        tree = KDTree(all_coords)
-        nearest_v = tree.query(all_coords[-1], k = [2])
-        dist = nearest_v[0][0]
-        nearest_v = nearest_v[1][0]
-        
-    if return_dist:
-        return (nearest_v, dist)
-    else:
-        return nearest_v    
 
 
 def NP_segment(

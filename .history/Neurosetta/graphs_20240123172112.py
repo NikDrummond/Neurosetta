@@ -351,7 +351,7 @@ def find_point(coords, point):
 
 def nearest_vertex(coords:np.ndarray, point:np.ndarray,return_dist:bool = False) -> int | tuple:
     """
-    Use instead of find_point!
+    Use instead of find_point
     """
 
     binary_array = np.isclose(coords, point)
