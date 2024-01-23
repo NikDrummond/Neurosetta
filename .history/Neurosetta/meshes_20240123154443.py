@@ -20,10 +20,5 @@ def point_inside(mesh:vd.mesh.Mesh,points:np.ndarray | vd.Points,invert:bool = F
     inds = mesh.inside_points(points,invert = invert, return_ids = True)
     # change returned values to True
     s[inds] = True
-    if len(s) == 1:
-        if s[0]:
-            return True
-        else:
-            return False
-    else:    
-        return s
+    if len(s)
+    return s
