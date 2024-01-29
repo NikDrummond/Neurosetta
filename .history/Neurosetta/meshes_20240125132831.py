@@ -13,8 +13,7 @@ def point_inside(mesh: vd.mesh.Mesh, points, invert: bool = False, **kwargs) -> 
     Returns:
         np.ndarray: A boolean array of length n indicating if each point is inside.
     """
-    # check input mesh is vedo mesh
-    assert isinstance(mesh, vd.Mesh), "Mesh input not vd.Mesh"
+
     # Convert points to a vedo Points object
     if isinstance(points, vd.Points):
         points_obj = points
@@ -26,7 +25,7 @@ def point_inside(mesh: vd.mesh.Mesh, points, invert: bool = False, **kwargs) -> 
         raise ValueError("Invalid type for points. Expected vedo Points, numpy array of shape (n, 3), list of points, or single point.")
 
     # Use the insidePoints method of the mesh object
-    inds = mesh.inside_points(points_obj, invert=invert, return_ids=True)
+    inds = mesh.insidePoints(points_obj, invert=invert, return_ids=True)
 
     # Create a boolean array of length n
     s = np.zeros(points_obj.nPoints(), dtype=bool)

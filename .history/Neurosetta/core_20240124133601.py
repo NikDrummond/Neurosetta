@@ -1,40 +1,4 @@
-import os
 
-import graph_tool.all as gt
-import numpy as np
-import pandas as pd
-from typing import List
-
-# Main core class
-
-
-class Stone(object):
-    # Constructor
-    def __init__(self, name: str) -> None:
-        self.name = name
-        self.id = id
-
-
-class Tree_graph(Stone):
-    """
-    Tree graph
-    """
-
-    def __init__(self, name: str, graph: gt.Graph) -> None:
-        self.graph = graph
-
-        super().__init__(name)
-
-
-class Node_table(Stone):
-    """
-    SWC like node table
-    """
-
-    def __init__(self, name: str, nodes: pd.DataFrame) -> None:
-        self.nodes = nodes
-
-        super().__init__(name)
 
 
 class Neuron_mesh(Stone):
@@ -42,7 +6,9 @@ class Neuron_mesh(Stone):
     A mesh
     """
 
-    def __init__(self, name: str, vertices: np.ndarray[float], faces: np.ndarray[int]) -> None:
+    def __init__(
+        self, name: str, vertices: np.ndarray[float], faces: np.ndarray[int]
+    ) -> None:
         self.vertices = vertices
         self.faces = faces
 
@@ -51,24 +17,24 @@ class Neuron_mesh(Stone):
 
 # read swc
 
-def read_swc(path: str, output: str = 'Table') -> List | Tree_graph | Node_table:
+
+def read_swc(path: str, output: str = "Table") -> List | Tree_graph | Node_table:
     """
     Read in swc file(s) and return table/graph output
-    """    
-    
+    """
+
     if os.path.isdir(path):
         files = os.listdir(path)
-        files = [f for f in files if f.endswith('.swc') ]
-        N = [_read_swc(path + f, output = output) for f in files]
+        files = [f for f in files if f.endswith(".swc")]
+        N = [_read_swc(path + f, output=output) for f in files]
 
     else:
-        N = _read_swc(path, output = output)
+        N = _read_swc(path, output=output)
 
     return N
 
 
 def _read_swc(file_path: str, output: str = "Table") -> Tree_graph | Node_table:
-
     name = os.path.splitext(os.path.basename(file_path))[0]
     df = table_from_swc(file_path)
 
@@ -100,7 +66,7 @@ def table_from_swc(file_path: str) -> pd.DataFrame:
             "radius": np.float64,
             "parent_id": np.int32,
         },
-        index_col=False
+        index_col=False,
     )
 
     # check for duplicate node ids
@@ -183,7 +149,9 @@ def graph_from_table(df: pd.DataFrame) -> gt.Graph:
 
 
 # graph to node table
-def graph_to_table(g: gt.Graph, output: str = "Neurosetta") -> pd.DataFrame | Node_table:
+def graph_to_table(
+    g: gt.Graph, output: str = "Neurosetta"
+) -> pd.DataFrame | Node_table:
     """
     Convert Tree Graph to swc like table
     """
@@ -238,12 +206,16 @@ def graph_to_table(g: gt.Graph, output: str = "Neurosetta") -> pd.DataFrame | No
     elif output.casefold() == "Table".casefold():
         return df
 
-def write_swc(N:Node_table | Tree_graph, fpath: str) -> None:
+
+def write_swc(N: Node_table | Tree_graph, fpath: str) -> None:
     """
     Write Neuron to swc
     """
     if isinstance(N, Tree_graph):
         N = graph_to_table(N)
 
-    np.savetxt(fpath,N.nodes,
-            header = 'SWC Generated using Neurosetta \n Columns \n' + str(N.nodes.columns))
+    np.savetxt(
+        fpath,
+        N.nodes,
+        header="SWC Generated using Neurosetta \n Columns \n" + str(N.nodes.columns),
+    )

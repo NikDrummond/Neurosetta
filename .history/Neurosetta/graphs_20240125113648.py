@@ -1,6 +1,5 @@
 import graph_tool.all as gt
 import numpy as np
-from scipy.spatial import KDTree
 from scipy.spatial.distance import squareform, pdist
 import hdbscan
 from typing import List
@@ -349,14 +348,14 @@ def find_point(coords, point):
 
     return np.where(np.isclose(coords, point).sum(axis=1) != 0)[0][0]
 
-def nearest_vertex(N:np.ndarray | Tree_graph, point:np.ndarray,return_dist:bool = False) -> int | tuple:
+def nearest_vertex(coords:np.ndarray | Tree_graph, point:np.ndarray,return_dist:bool = False) -> int | tuple:
     """
     Find the index of the vertex in coords closest to the given point.
 
     Parameters
     ----------
-    N : np.ndarray | nr.Tree_graph
-        Array of vertex coordinates or neuron tree graph
+    coords : np.ndarray
+        Array of vertex coordinates.
     point : np.ndarray
         Coordinates of the query point.
     return_dist : bool, optional
@@ -369,12 +368,19 @@ def nearest_vertex(N:np.ndarray | Tree_graph, point:np.ndarray,return_dist:bool 
     dist : float, optional
         Distance to nearest vertex.
     """
+    """
+    Given set of corrdinates and a point, find the nearest neighboring vertex.
 
-    if isinstance(N, Tree_graph):
-        coords = g_vert_coords(N)
-    else:
-        coords = N
-    
+    Parameters
+    ----------
+    coords:     np.ndarray
+
+
+    Returns
+    -------
+    """
+
+    if isinstance
 
     binary_array = np.isclose(coords, point)
 

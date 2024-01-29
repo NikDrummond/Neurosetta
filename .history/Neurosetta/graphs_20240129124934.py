@@ -1,7 +1,7 @@
 import graph_tool.all as gt
 import numpy as np
-from scipy.spatial import KDTree
 from scipy.spatial.distance import squareform, pdist
+
 import hdbscan
 from typing import List
 import vedo as vd

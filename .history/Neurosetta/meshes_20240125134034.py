@@ -14,7 +14,7 @@ def point_inside(mesh: vd.mesh.Mesh, points, invert: bool = False, **kwargs) -> 
         np.ndarray: A boolean array of length n indicating if each point is inside.
     """
     # check input mesh is vedo mesh
-    assert isinstance(mesh, vd.Mesh), "Mesh input not vd.Mesh"
+    
     # Convert points to a vedo Points object
     if isinstance(points, vd.Points):
         points_obj = points

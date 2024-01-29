@@ -1,6 +1,5 @@
 import graph_tool.all as gt
 import numpy as np
-from scipy.spatial import KDTree
 from scipy.spatial.distance import squareform, pdist
 import hdbscan
 from typing import List
@@ -274,7 +273,7 @@ def random_nodes(
     if g is not None:
         assert isinstance(g, gt.Graph)
 
-    # figure out our nodes - either a subset, or all nodes in g
+    # figure out our nodes - either a subset, or all ndoes in g
 
     # if a subset is provided, this takes priority
     if subset is not None:
@@ -291,6 +290,7 @@ def random_nodes(
     sample = np.random.choice(sample, size=n)
 
     return sample
+
 
 def path_vertex_set(
     g: gt.Graph,
@@ -349,47 +349,33 @@ def find_point(coords, point):
 
     return np.where(np.isclose(coords, point).sum(axis=1) != 0)[0][0]
 
-def nearest_vertex(N:np.ndarray | Tree_graph, point:np.ndarray,return_dist:bool = False) -> int | tuple:
+def nearest_vertex(coords:np.ndarray, point:np.ndarray,return_dist:bool = False) -> int | tuple:
     """
-    Find the index of the vertex in coords closest to the given point.
+    Given set of corrdinates and a point, find the nearest neighboring vertex.
 
     Parameters
     ----------
-    N : np.ndarray | nr.Tree_graph
-        Array of vertex coordinates or neuron tree graph
-    point : np.ndarray
-        Coordinates of the query point.
-    return_dist : bool, optional
-        If True, return distance to nearest neighbor.
+    coords:     np.ndarray
+
 
     Returns
     -------
-    nearest_v : int
-        Index of nearest vertex.
-    dist : float, optional
-        Distance to nearest vertex.
     """
-
-    if isinstance(N, Tree_graph):
-        coords = g_vert_coords(N)
-    else:
-        coords = N
-    
 
     binary_array = np.isclose(coords, point)
 
     # if there is an exact match
-    if len(np.where(binary_array.sum(axis=1) == 3)[0]):
-        nearest_v = np.where(binary_array.sum(axis=1) == 3)[0][0]
+    if len(np.where(binary_array.sum(axis = 1) == 3)[0]):
+        nearest_v = np.where(binary_array.sum(axis = 1) == 3)[0][0]
         dist = 0
     # if there is no exact match, fall back to a KDTree
     else:
-        all_coords = np.vstack((coords, point))
+        all_coords = np.vstack((coords,point))
         tree = KDTree(all_coords)
-        nearest_v = tree.query(all_coords[-1], k=[2])
+        nearest_v = tree.query(all_coords[-1], k = [2])
         dist = nearest_v[0][0]
         nearest_v = nearest_v[1][0]
-
+        
     if return_dist:
         return (nearest_v, dist)
     else:

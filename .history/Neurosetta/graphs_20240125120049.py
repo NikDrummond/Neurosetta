@@ -1,6 +1,5 @@
 import graph_tool.all as gt
 import numpy as np
-from scipy.spatial import KDTree
 from scipy.spatial.distance import squareform, pdist
 import hdbscan
 from typing import List
@@ -369,6 +368,7 @@ def nearest_vertex(N:np.ndarray | Tree_graph, point:np.ndarray,return_dist:bool 
     dist : float, optional
         Distance to nearest vertex.
     """
+
 
     if isinstance(N, Tree_graph):
         coords = g_vert_coords(N)

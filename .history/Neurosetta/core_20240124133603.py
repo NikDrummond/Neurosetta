@@ -1,40 +1,105 @@
 import os
-
 import graph_tool.all as gt
 import numpy as np
 import pandas as pd
-from typing import List
+from typing import List, Optional
 
-# Main core class
+class Stone:
+    """Base class for Stone objects."""
 
-
-class Stone(object):
-    # Constructor
     def __init__(self, name: str) -> None:
-        self.name = name
-        self.id = id
+        """
+        Initialize a Stone object with the given name.
+
+        Args:
+            name (str): The name of the Stone object.
+        """
+        self._name = name
+        self._id = None
+
+    @property
+    def name(self) -> str:
+        """Return the name of the Stone object."""
+        return self._name
+
+    @name.setter
+    def name(self, value: str) -> None:
+        """Set the name of the Stone object."""
+        if not isinstance(value, str):
+            raise TypeError("Name must be a string.")
+        self._name = value
+
+    @property
+    def id(self) -> Optional[int]:
+        """Return the id of the Stone object."""
+        return self._id
+
+    @id.setter
+    def id(self, value: Optional[int]) -> None:
+        """Set the id of the Stone object."""
+        if value is not None and not isinstance(value, int):
+            raise TypeError("ID must be an integer or None.")
+        self._id = value
+
+    def __repr__(self) -> str:
+        """Return a string representation of the Stone object."""
+        return f"<{self.__class__.__name__} name={self._name}, id={self._id}>"
 
 
-class Tree_graph(Stone):
-    """
-    Tree graph
-    """
+class TreeGraph(Stone):
+    """Tree graph class based on graph-tool library."""
 
     def __init__(self, name: str, graph: gt.Graph) -> None:
+        """
+        Initialize a TreeGraph object with the given name and graph.
+
+        Args:
+            name (str): The name of the TreeGraph object.
+            graph (gt.Graph): The graph-tool Graph object.
+        """
         self.graph = graph
 
         super().__init__(name)
 
+        self._check_graph(graph)
 
-class Node_table(Stone):
-    """
-    SWC like node table
-    """
+    def _check_graph(self, graph: gt.Graph) -> None:
+        """Check if the input graph is directed and simple."""
+        if not graph.is_directed():
+            raise ValueError("Graph must be directed.")
+        if not graph.is_simple():
+            raise ValueError("Graph must be simple.")
+
+    def __repr__(self) -> str:
+        """Return a string representation of the TreeGraph object."""
+        return f"<{self.__class__.__name__} name={self._name}, id={self._id}, num_vertices={self.graph.num_vertices()}, num_edges={self.graph.num_edges()}>"
+
+
+class NodeTable(Stone):
+    """SWC-like node table class."""
 
     def __init__(self, name: str, nodes: pd.DataFrame) -> None:
+        """
+        Initialize a NodeTable object with the given name and nodes DataFrame.
+
+        Args:
+            name (str): The name of the NodeTable object.
+            nodes (pd.DataFrame): The pandas DataFrame containing the node table.
+        """
         self.nodes = nodes
 
         super().__init__(name)
+
+        self._check_nodes(nodes)
+
+    def _check_nodes(self, nodes: pd.DataFrame) -> None:
+        """Check if the input nodes DataFrame is not empty."""
+        if nodes.empty:
+            raise ValueError("Node table cannot be empty.")
+
+    def __repr__(self) -> str:
+        """Return a string representation of the NodeTable object."""
+        return f"<{self.__class__.__name__} name={self._name}, id={self._id}, num_rows={self.nodes.shape[0]}>"
 
 
 class Neuron_mesh(Stone):
@@ -42,7 +107,9 @@ class Neuron_mesh(Stone):
     A mesh
     """
 
-    def __init__(self, name: str, vertices: np.ndarray[float], faces: np.ndarray[int]) -> None:
+    def __init__(
+        self, name: str, vertices: np.ndarray[float], faces: np.ndarray[int]
+    ) -> None:
         self.vertices = vertices
         self.faces = faces
 
@@ -51,24 +118,24 @@ class Neuron_mesh(Stone):
 
 # read swc
 
-def read_swc(path: str, output: str = 'Table') -> List | Tree_graph | Node_table:
+
+def read_swc(path: str, output: str = "Table") -> List | Tree_graph | Node_table:
     """
     Read in swc file(s) and return table/graph output
-    """    
-    
+    """
+
     if os.path.isdir(path):
         files = os.listdir(path)
-        files = [f for f in files if f.endswith('.swc') ]
-        N = [_read_swc(path + f, output = output) for f in files]
+        files = [f for f in files if f.endswith(".swc")]
+        N = [_read_swc(path + f, output=output) for f in files]
 
     else:
-        N = _read_swc(path, output = output)
+        N = _read_swc(path, output=output)
 
     return N
 
 
 def _read_swc(file_path: str, output: str = "Table") -> Tree_graph | Node_table:
-
     name = os.path.splitext(os.path.basename(file_path))[0]
     df = table_from_swc(file_path)
 
@@ -100,7 +167,7 @@ def table_from_swc(file_path: str) -> pd.DataFrame:
             "radius": np.float64,
             "parent_id": np.int32,
         },
-        index_col=False
+        index_col=False,
     )
 
     # check for duplicate node ids
@@ -183,7 +250,9 @@ def graph_from_table(df: pd.DataFrame) -> gt.Graph:
 
 
 # graph to node table
-def graph_to_table(g: gt.Graph, output: str = "Neurosetta") -> pd.DataFrame | Node_table:
+def graph_to_table(
+    g: gt.Graph, output: str = "Neurosetta"
+) -> pd.DataFrame | Node_table:
     """
     Convert Tree Graph to swc like table
     """
@@ -238,12 +307,16 @@ def graph_to_table(g: gt.Graph, output: str = "Neurosetta") -> pd.DataFrame | No
     elif output.casefold() == "Table".casefold():
         return df
 
-def write_swc(N:Node_table | Tree_graph, fpath: str) -> None:
+
+def write_swc(N: Node_table | Tree_graph, fpath: str) -> None:
     """
     Write Neuron to swc
     """
     if isinstance(N, Tree_graph):
         N = graph_to_table(N)
 
-    np.savetxt(fpath,N.nodes,
-            header = 'SWC Generated using Neurosetta \n Columns \n' + str(N.nodes.columns))
+    np.savetxt(
+        fpath,
+        N.nodes,
+        header="SWC Generated using Neurosetta \n Columns \n" + str(N.nodes.columns),
+    )
