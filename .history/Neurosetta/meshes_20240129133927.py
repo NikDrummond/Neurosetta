@@ -6,8 +6,6 @@ def point_inside(mesh: vd.mesh.Mesh, points, invert: bool = False, **kwargs) -> 
     n being points, d being dimensions, max 3, 
     return an n X 1 boolian array of points inside the mesh.
 
-    Will try to convert an np.array to a vd.Points object within the function. 
-
     Parameters
     ----------
     mesh : vd.mesh.Mesh
@@ -15,13 +13,12 @@ def point_inside(mesh: vd.mesh.Mesh, points, invert: bool = False, **kwargs) -> 
     points : np.ndarray | vd.point.Points
         either an (n x d) array of points or a vd.Points object representing point coordinates
     invert : bool, optional
-        Changes inside / outside behaviour, by default False, so will return true if a point is inside. Setting to True 
-        will return true if a point is outside.
+        Changes inside / outside behaviour, by default False
 
     Returns
     -------
     np.ndarray
-        n X 1 boolian array of points inside (or outside) the mesh.
+        _description_
     """
     # type checks
     # check input mesh is vedo mesh
