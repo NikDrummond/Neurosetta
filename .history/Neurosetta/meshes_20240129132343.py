@@ -2,21 +2,16 @@ import vedo as vd
 import numpy as np
 
 def point_inside(mesh: vd.mesh.Mesh, points, invert: bool = False, **kwargs) -> np.ndarray:
-    """_summary_
+    """Checks if points are inside a mesh.
 
-    Parameters
-    ----------
-    mesh : vd.mesh.Mesh
-        _description_
-    points : _type_
-        _description_
-    invert : bool, optional
-        _description_, by default False
+    Args:
+        mesh (vd.mesh.Mesh): The mesh to check.
+        points: The points to check. Can be a single point, a list of points,
+            or a numpy array of shape (n, 3) where n is the number of points.
+        invert (bool, optional): Invert the check. Defaults to False.
 
-    Returns
-    -------
-    np.ndarray
-        _description_
+    Returns:
+        np.ndarray: A boolean array of length n indicating if each point is inside.
     """
     # type checks
     # check input mesh is vedo mesh

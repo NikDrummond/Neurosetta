@@ -2,22 +2,7 @@ import vedo as vd
 import numpy as np
 
 def point_inside(mesh: vd.mesh.Mesh, points, invert: bool = False, **kwargs) -> np.ndarray:
-    """_summary_
-
-    Parameters
-    ----------
-    mesh : vd.mesh.Mesh
-        _description_
-    points : _type_
-        _description_
-    invert : bool, optional
-        _description_, by default False
-
-    Returns
-    -------
-    np.ndarray
-        _description_
-    """
+    """"""
     # type checks
     # check input mesh is vedo mesh
     assert isinstance(mesh, vd.Mesh), "Mesh input not vd.Mesh"
