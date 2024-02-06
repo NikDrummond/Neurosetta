@@ -160,7 +160,20 @@ def graph_from_table(df: pd.DataFrame) -> gt.Graph:
 
     # add type to nodes - infer from topology rather than from table
     # types
-    infer_node_types(g)
+    out_deg = g.get_out_degrees(g.get_vertices())
+    in_deg = g.get_in_degrees(g.get_vertices())
+    ends = np.where(out_deg == 0)
+    branches = np.where(out_deg > 1)
+    root = np.where(in_deg == 0)
+    node_types = np.zeros_like(g.get_vertices())
+    node_types[ends] = 6
+    node_types[branches] = 5
+    node_types[root] = -1
+
+    # create and add populate property
+    vprop_type = g.new_vp("int")
+    vprop_type.a = node_types
+    g.vp["type"] = vprop_type
 
     # add them
     g.vp["radius"] = vprop_rad
@@ -168,7 +181,7 @@ def graph_from_table(df: pd.DataFrame) -> gt.Graph:
 
     return g
 
-def infer_node_types(g:gt.Graph, array:bool = False) -> np.ndarray:
+def infer_node_types(g:gt.Graph, internal:bool = True,array:bool = False) -> np.ndarray:
     """
 
     Parameters
@@ -200,10 +213,14 @@ def infer_node_types(g:gt.Graph, array:bool = False) -> np.ndarray:
     # create and add populate property
     vprop_type = g.new_vp("int")
     vprop_type.a = node_types
-    g.vp['type'] = vprop_type
+
+    if internal:
+        g.vp['type'] = vprop_type
         
     if array:
         return vprop_type.a
+    else:
+        return vprop_type
 
 
 # graph to node table

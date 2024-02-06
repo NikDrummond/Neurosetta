@@ -7,7 +7,7 @@ from typing import List
 import vedo as vd
 
 
-from .core import Tree_graph, Node_table, infer_node_types
+from .core import Tree_graph, Node_table, infer
 from .sets import Sfamily_intersect, Sfamily_XOR
 
 

@@ -19,8 +19,7 @@ def point_inside(mesh: vd.mesh.Mesh, points, invert: bool = False, **kwargs) -> 
         will return true if a point is outside.
         
     **kwargs : TYPE, optional
-        Additional keyword arguments to pass to the vedo.Mesh.inside_points() function.
-
+        
     Returns
     -------
     np.ndarray
@@ -46,5 +45,3 @@ def point_inside(mesh: vd.mesh.Mesh, points, invert: bool = False, **kwargs) -> 
 
         # Set the corresponding elements of s to True
     s[inds] = True
-
-    return s

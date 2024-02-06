@@ -7,7 +7,7 @@ import vedo as vd
 vd.settings.default_backend = "ipyvtklink"
 
 
-def plot3d(N, radius: bool = False, soma: bool = True, **kwargs) -> vd.Plotter:
+def plot3d(N, radius: bool = False, soma: bool = True**kwargs) -> vd.Plotter:
     """
     simple 3d plot function using vedo
     """

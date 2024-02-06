@@ -160,7 +160,7 @@ def graph_from_table(df: pd.DataFrame) -> gt.Graph:
 
     # add type to nodes - infer from topology rather than from table
     # types
-    infer_node_types(g)
+    
 
     # add them
     g.vp["radius"] = vprop_rad

@@ -7,7 +7,7 @@ from typing import List
 import vedo as vd
 
 
-from .core import Tree_graph, Node_table, infer_node_types
+from .core import Tree_graph, Node_table
 from .sets import Sfamily_intersect, Sfamily_XOR
 
 
@@ -519,6 +519,6 @@ def reroot_tree(g:gt.Graph,root:int):
 
     g2.vp['radius'] = vprop_rad
     # regenerate node types
-    infer_node_types(g2)
+    nr.infer_node_types(g2)
 
     return g2
