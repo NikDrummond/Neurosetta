@@ -548,8 +548,8 @@ def g_reachable_leaves(g: gt.Graph, internalise: bool = False):
     """
     l_inds = g.leaf_inds(g)
     leaf_paths = path_vertex_set(g, source=g_root_ind(g), target=l_inds)
-    vprop_rl = g.new_vp("int")
-    for v in g.iter_vertices():
+    vprop_rl = N.graph.new_vp("int")
+    for v in N.graph.iter_vertices():
         vprop_rl[v] = sum([v in i for i in leaf_paths])
 
     if internalise:

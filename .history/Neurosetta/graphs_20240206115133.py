@@ -525,34 +525,28 @@ def reroot_tree(g:gt.Graph,root:int):
 
 
 
-
-
-
 def g_reachable_leaves(g: gt.Graph, internalise: bool = False):
-    """Returns a vertex property map with the number of reachable leaf nodes from each node.
+    """_summary_
 
     Parameters
     ----------
-    g : gt.Graph
-        The input graph.
-
+    g : _type_
+        _description_
     internalise : bool, optional
-        If True, the reachable leaf count is assigned as a vertex property in the input graph.
-        If False (default), a standalone vertex property map is returned.
+        _description_, by default False
 
     Returns
     -------
-    vprop_rl : gt.VertexPropertyMap
-        A vertex property map containing the reachable leaf count for each node.
-        If internalise=True, this is assigned to the input graph vertex property 'reachable_leaves' instead.
+    _type_
+        _description_
     """
     l_inds = g.leaf_inds(g)
-    leaf_paths = path_vertex_set(g, source=g_root_ind(g), target=l_inds)
-    vprop_rl = g.new_vp("int")
-    for v in g.iter_vertices():
+    leaf_paths = path_vertex_set(N.graph,source = g_root_ind(N.graph), target=l_inds)
+    vprop_rl = N.graph.new_vp('int')
+    for v in N.graph.iter_vertices():
         vprop_rl[v] = sum([v in i for i in leaf_paths])
-
+        
     if internalise:
-        g.vp["reachable_leaves"] = vprop_rl
+        g.vp['reachable_leaves'] =  vprop_rl
     else:
         return vprop_rl     
