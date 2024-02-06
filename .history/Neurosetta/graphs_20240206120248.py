@@ -546,7 +546,7 @@ def g_reachable_leaves(g: gt.Graph, internalise: bool = False):
         A vertex property map containing the reachable leaf count for each node.
         If internalise=True, this is assigned to the input graph vertex property 'reachable_leaves' instead.
     """
-    l_inds = g_leaf_inds(g)
+-leaf_inds(g)
     leaf_paths = path_vertex_set(g, source=g_root_ind(g), target=l_inds)
     vprop_rl = g.new_vp("int")
     for v in g.iter_vertices():
