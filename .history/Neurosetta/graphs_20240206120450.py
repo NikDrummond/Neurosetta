@@ -536,7 +536,7 @@ def g_reachable_leaves(g: gt.Graph, bind: bool = False):
     g : gt.Graph
         The input graph.
 
-    bind : bool, optional
+    internalise : bool, optional
         If True, the reachable leaf count is assigned as a vertex property in the input graph.
         If False (default), a standalone vertex property map is returned.
 
@@ -552,7 +552,7 @@ def g_reachable_leaves(g: gt.Graph, bind: bool = False):
     for v in g.iter_vertices():
         vprop_rl[v] = sum([v in i for i in leaf_paths])
 
-    if bind:
+    if internalise:
         g.vp["reachable_leaves"] = vprop_rl
     else:
         return vprop_rl     

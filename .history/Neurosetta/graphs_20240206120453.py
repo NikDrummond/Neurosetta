@@ -552,7 +552,7 @@ def g_reachable_leaves(g: gt.Graph, bind: bool = False):
     for v in g.iter_vertices():
         vprop_rl[v] = sum([v in i for i in leaf_paths])
 
-    if bind:
+    if internalise:
         g.vp["reachable_leaves"] = vprop_rl
     else:
         return vprop_rl     
