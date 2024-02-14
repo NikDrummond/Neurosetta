@@ -485,6 +485,45 @@ def NP_segment(
     # return
     return g2
 
+def reroot_tree(g:gt.Graph,root:int):
+    """_summary_
+
+    Parameters
+    ----------
+    g : gt.Graph
+        _description_
+    root : int
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
+    # get new edge list - hashing keeps ids
+    g = N.graph.copy()
+    g.set_directed(False)
+    edges = gt.dfs_iterator(g, root_ind, array = True)
+
+    # generate new graph
+    g2 = gt.Graph(edges, hashed = True, hash_type = 'int')
+
+    # get coordinates
+    coords = np.array([g.vp['coordinates'][i] for i in g2.vp['ids'].a])
+    vprop_coords = g2.new_vp('vector<double>')
+    vprop_coords.set_2d_array(coords.T)
+    g2.vp["coordinates"] = vprop_coords
+    # radius information - need to map. 'ids' vp is now the index in the original graph
+    vprop_rad = g2.new_vp('double')
+    vprop_rad.a = g.vp['radius'].a[g2.vp['ids'].a]
+
+    g2.vp['radius'] = vprop_rad
+    # regenerate node types
+    infer_node_types(g2)
+
+    return g2
+
+
 def g_reachable_leaves(g: gt.Graph, bind: bool = False):
     """Returns a vertex property map with the number of reachable leaf nodes from each node.
 
@@ -533,22 +572,3 @@ def downstream_vertices(g:gt.Graph, source:int) -> np.ndarray:
         Vertices downstream from source
     """
     return np.unique(gt.dfs_iterator(g, source, array=True))    
-
-def edge_length(i,g):
-    return g.ep['Path_length'][i]
-    
-def g_cable_length(g:gt.Graph,source:int = 0)->float:
-
-    if not g_has_property('Path_length', g):
-        get_g_distances(g, inplace = True)
-    # if we are going from the root (total cable)
-    if source == 0:
-        cable = sum(g.ep['Path_length'].a)
-    else:
-        # Get cable from sub-tree rooted at source vertex
-        sub_tree = gt.dfs_iterator(g, source = source, array = True)
-        if sub_tree.shape[0] == 0:
-            cable = 0
-        else:    
-            cable = np.apply_along_axis(edge_length, 1, sub_tree, g).sum()
-    return cable

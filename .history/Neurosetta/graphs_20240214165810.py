@@ -539,16 +539,16 @@ def edge_length(i,g):
     
 def g_cable_length(g:gt.Graph,source:int = 0)->float:
 
-    if not g_has_property('Path_length', g):
-        get_g_distances(g, inplace = True)
+    if not g_has_property('Path_length', N.graph):
+        get_g_distances(N.graph, inplace = True)
     # if we are going from the root (total cable)
     if source == 0:
-        cable = sum(g.ep['Path_length'].a)
+        cable = sum(N.graph.ep['Path_length'].a)
     else:
         # Get cable from sub-tree rooted at source vertex
         sub_tree = gt.dfs_iterator(g, source = source, array = True)
         if sub_tree.shape[0] == 0:
             cable = 0
         else:    
-            cable = np.apply_along_axis(edge_length, 1, sub_tree, g).sum()
+            cable = np.apply_along_axis(edge_length, 1, sub_tree, N.graph).sum()
     return cable
