@@ -553,7 +553,7 @@ def g_reachable_leaves(g: gt.Graph, bind: bool = False):
     else:
         return vprop_rl     
     
-def downstream_vertices(g:gt.Graph, source:int) -> np.ndarray:
+def downstream_vertices(g:gt.graph, source:int) -> np.ndarray:
     """Returns an array of unique downstream vertex indices for the given source vertex in graph g.
 
     Performs a depth-first search from the source vertex and collects the visited vertices.

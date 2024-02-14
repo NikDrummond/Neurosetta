@@ -63,7 +63,7 @@ def g_vert_coords(g: gt.Graph, subset: List | bool = None) -> np.ndarray[float]:
 
 
 def get_g_distances(
-    g: gt.Graph, inplace: bool = False, name: str = "Path_length"
+    g: gt.Graph, inplace: bool = False, name: str = "weight"
 ) -> None | gt.PropertyMap:
     """
     create edge property map of edge lengths for a graph with corrdinates vertex property
@@ -553,7 +553,7 @@ def g_reachable_leaves(g: gt.Graph, bind: bool = False):
     else:
         return vprop_rl     
     
-def downstream_vertices(g:gt.Graph, source:int) -> np.ndarray:
+def downstream_vertices(g:gt.graph, source:int) -> np.ndarray:
     """Returns an array of unique downstream vertex indices for the given source vertex in graph g.
 
     Performs a depth-first search from the source vertex and collects the visited vertices.
