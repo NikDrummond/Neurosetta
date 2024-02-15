@@ -2,7 +2,7 @@ import graph_tool.all as gt
 import numpy as np
 import scipy.stats as stats
 from .core import Tree_graph, infer_node_types
-from .graphs import *
+from .graphs import g_root_ind, g_cable_length, downstream_vertices
 
 
 def reroot_tree(N:Tree_graph,root:int, inplace = False):
@@ -128,8 +128,8 @@ def g_edge_error(g:gt.Graph,binom_cut:float = 0.001,prop_cut:float = 0.01, metho
 
     for i in g.iter_edges():
         # reachable leaves from parent and child
-        l_child = g.vp['reachable_leaves'][i[1]]
-        l_parent  = g.vp['reachable_leaves'][i[0]]
+        l_child = N.graph.vp['reachable_leaves'][i[1]]
+        l_parent  = N.graph.vp['reachable_leaves'][i[0]]
         # out degree of parent
         p_out = out_deg[i[0]]
 

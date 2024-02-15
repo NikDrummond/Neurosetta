@@ -106,7 +106,7 @@ def g_branch_inds(g: gt.Graph) -> np.ndarray[int]:
     Returns a numpy array of leaf node indicies
     """
     # graph leaf inds - includes soma
-    return np.where(g.degree_property_map("out").a > 1)[0]
+    return np.where(g.degree_property_map("out").a > 2)[0]
 
 
 def g_lb_inds(g: gt.Graph, return_types: bool = False) -> np.ndarray[int]:

@@ -2,7 +2,7 @@ import graph_tool.all as gt
 import numpy as np
 import scipy.stats as stats
 from .core import Tree_graph, infer_node_types
-from .graphs import *
+from .graphs import g_root_ind, g_cable_length, downstream_vertices
 
 
 def reroot_tree(N:Tree_graph,root:int, inplace = False):
