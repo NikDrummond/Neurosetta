@@ -41,10 +41,8 @@ def reroot_tree(N:Tree_graph,root:int, inplace = False):
     infer_node_types(g2)
 
     if inplace:
-        N = Tree_graph(name = N.name,graph = g2)
-        return N
-    else:
-        return g2
+        N = 
+    return g2
 
 def prune_soma(g):    
     if g.degree_property_map('out')[g_root_ind(g)] != 1:

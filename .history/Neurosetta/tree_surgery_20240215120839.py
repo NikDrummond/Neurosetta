@@ -4,7 +4,7 @@ from .core import Tree_graph, infer_node_types
 from .graphs import g_root_ind, g_cable_length, downstream_vertices
 
 
-def reroot_tree(N:Tree_graph,root:int, inplace = False):
+def reroot_tree(N:nr.Tree_graph,root:int):
     """_summary_
 
     Parameters
@@ -40,11 +40,7 @@ def reroot_tree(N:Tree_graph,root:int, inplace = False):
     # regenerate node types
     infer_node_types(g2)
 
-    if inplace:
-        N = Tree_graph(name = N.name,graph = g2)
-        return N
-    else:
-        return g2
+    return g2
 
 def prune_soma(g):    
     if g.degree_property_map('out')[g_root_ind(g)] != 1:
