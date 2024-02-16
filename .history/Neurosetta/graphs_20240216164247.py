@@ -648,5 +648,5 @@ def g_cable_length(N: Tree_graph | gt.Graph, source: int = 0) -> float:
         if sub_tree.shape[0] == 0:
             cable = 0
         else:
-            cable = np.apply_along_axis(edge_length, 1, sub_tree, g).sum()
+            cable = np.apply_along_axis(_edge_length, 1, sub_tree, g).sum()
     return cable

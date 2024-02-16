@@ -132,13 +132,8 @@ def g_edge_error(
     ValueError
         _description_
     """
-    if isinstance(N, Tree_graph):
-        g =N.graph
-    elif isinstance(N, gt.Graph):
-        g = N
-    else:
-        raise TypeError('N must be Tree_graph or gt.Graph object')    
 
+    
     # initialise edge property map
     eprop_err = g.new_ep("double")
     # get out degree property map
@@ -155,7 +150,7 @@ def g_edge_error(
     else:
         raise ValueError("method must be leaves or cable")
 
-    if not g_has_property(g,"reachable_leaves", t="v"):
+    if not g_has_property("reachable_leaves", g, t="v"):
         g_reachable_leaves(g, bind=True)
 
     for i in g.iter_edges():

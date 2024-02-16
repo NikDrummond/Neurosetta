@@ -155,7 +155,7 @@ def g_edge_error(
     else:
         raise ValueError("method must be leaves or cable")
 
-    if not g_has_property(g,"reachable_leaves", t="v"):
+    if not g_has_property(g,"reachable_leaves", g, t="v"):
         g_reachable_leaves(g, bind=True)
 
     for i in g.iter_edges():

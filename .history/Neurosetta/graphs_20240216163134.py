@@ -623,7 +623,7 @@ def downstream_vertices(N: Tree_graph | gt.Graph, source: int) -> np.ndarray:
     return np.unique(gt.dfs_iterator(g, source, array=True))
 
 
-def edge_length(i, g):
+def _edge_length(i, g):
     return g.ep["Path_length"][i]
 
 
@@ -648,5 +648,5 @@ def g_cable_length(N: Tree_graph | gt.Graph, source: int = 0) -> float:
         if sub_tree.shape[0] == 0:
             cable = 0
         else:
-            cable = np.apply_along_axis(edge_length, 1, sub_tree, g).sum()
+            cable = np.apply_along_axis(_edge_length, 1, sub_tree, g).sum()
     return cable

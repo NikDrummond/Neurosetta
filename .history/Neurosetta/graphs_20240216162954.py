@@ -50,7 +50,7 @@ def g_vert_coords(
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N, gt.Graph):
+    elif isinstance(N, gt.graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -80,7 +80,7 @@ def get_g_distances(
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N,gt.Graph):
+    elif isinstance(N,gt.graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -111,7 +111,7 @@ def g_leaf_inds(N: Tree_graph | gt.Graph) -> np.ndarray[int]:
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N,gt.Graph):
+    elif isinstance(N,gt.graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -127,7 +127,7 @@ def g_branch_inds(N: Tree_graph | gt.Graph) -> np.ndarray[int]:
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N,gt.Graph):
+    elif isinstance(N,gt.graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -145,7 +145,7 @@ def g_lb_inds(N: Tree_graph | gt.Graph, return_types: bool = False) -> np.ndarra
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N,gt.Graph):
+    elif isinstance(N,gt.graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -164,7 +164,7 @@ def g_root_ind(N: Tree_graph | gt.Graph) -> int:
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N,gt.Graph):
+    elif isinstance(N,gt.graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -231,7 +231,7 @@ def dist_mat(
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N,gt.Graph):
+    elif isinstance(N,gt.graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -261,7 +261,7 @@ def HDBSCAN_g(
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N,gt.Graph):
+    elif isinstance(N,gt.graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -329,7 +329,7 @@ def random_nodes(
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N,gt.Graph):
+    elif isinstance(N,gt.graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -373,7 +373,7 @@ def path_vertex_set(
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N,gt.Graph):
+    elif isinstance(N,gt.graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -576,7 +576,7 @@ def g_reachable_leaves(N: Tree_graph | gt.Graph, bind: bool = False):
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N,gt.Graph):
+    elif isinstance(N,gt.graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -615,7 +615,7 @@ def downstream_vertices(N: Tree_graph | gt.Graph, source: int) -> np.ndarray:
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N,gt.Graph):
+    elif isinstance(N.gt.graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -623,7 +623,7 @@ def downstream_vertices(N: Tree_graph | gt.Graph, source: int) -> np.ndarray:
     return np.unique(gt.dfs_iterator(g, source, array=True))
 
 
-def edge_length(i, g):
+def _edge_length(i, g):
     return g.ep["Path_length"][i]
 
 
@@ -632,7 +632,7 @@ def g_cable_length(N: Tree_graph | gt.Graph, source: int = 0) -> float:
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N,gt.Graph):
+    elif isinstance(N.gt.graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -648,5 +648,5 @@ def g_cable_length(N: Tree_graph | gt.Graph, source: int = 0) -> float:
         if sub_tree.shape[0] == 0:
             cable = 0
         else:
-            cable = np.apply_along_axis(edge_length, 1, sub_tree, g).sum()
+            cable = np.apply_along_axis(_edge_length, 1, sub_tree, g).sum()
     return cable
