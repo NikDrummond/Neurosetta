@@ -55,16 +55,7 @@ def reroot_tree(N: Tree_graph | gt.Graph, root: int, inplace=False):
         return g2
 
 
-def prune_soma(N:Tree_graph | gt.Graph, inplace=False):
-
-    if isinstance(N, Tree_graph):
-        g =N.graph
-    elif isinstance(N, gt.Graph):
-        g = N
-    else:
-        raise TypeError('N must be Tree_graph or gt.Graph object')        
-    # get out degree property map
-    out_deg = g.degree_property_map("out")
+def prune_soma(g:Tree_graph, gt.Graph, inplace=False) -> Tree_graph():
     if g.degree_property_map("out")[g_root_ind(g)] != 1:
         # this gives the edge we wish to keep
         cable = 0

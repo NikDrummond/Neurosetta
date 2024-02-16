@@ -55,7 +55,7 @@ def reroot_tree(N: Tree_graph | gt.Graph, root: int, inplace=False):
         return g2
 
 
-def prune_soma(N:Tree_graph | gt.Graph, inplace=False):
+def prune_soma(N:Tree_graph, gt.Graph, inplace=False) -> Tree_graph | gt.Graph:
 
     if isinstance(N, Tree_graph):
         g =N.graph

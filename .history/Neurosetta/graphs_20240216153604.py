@@ -11,19 +11,12 @@ from .core import Tree_graph, Node_table, infer_node_types
 from .sets import Sfamily_intersect, Sfamily_XOR
 
 
-def g_has_property(
-    N: gt.Graph | Tree_graph, g_property: str, t: str | bool = None
-) -> bool:
+def g_has_property(N: gt.Graph | Tree_graph, g_property: str, t: str | bool = None) -> bool:
     """
     Check if a property is within a graph
     """
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N, gt.Graph):
-        g = N
-    else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
-
     # if t is specifically vertex or edge
     if t is not None:
         # check if vertex property
@@ -38,25 +31,24 @@ def g_has_property(
 # function to get node coordinates from a graph
 
 
-def g_vert_coords(
-    N: Tree_graph | gt.Graph, subset: List | bool = None
-) -> np.ndarray[float]:
+def g_vert_coords(g: gt.Graph, subset: List | bool = None) -> np.ndarray[float]:
     """
-    return spatial coordinates of vertices in an np.array
+    return spatial coordinates of verticies in an np.array
     """
 
     # return an np.array of coordinates from a graph
 
     # check input type
-    if isinstance(N, Tree_graph):
-        g = N.graph
-    elif isinstance(N.gt.graph):
-        g = N
+    if (isinstance(g, Tree_graph)) | (isinstance(g, gt.Graph)):
+        if isinstance(g, Tree_graph):
+            g = g.graph
     else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
+        raise TypeError(
+            "Input type not supported - must be Neurosetta.Tree_graph or graph_tool.Graph"
+        )
 
-    # check coordinates are a property
-    if not g_has_property(g, "coordinates", t="v"):
+    # check coordinates are a propety
+    if not g_has_property("coordinates", g, t="v"):
         raise AttributeError("Coordinates property missing from graph")
 
     # if we have no subset, return all
@@ -72,21 +64,19 @@ def g_vert_coords(
 
 
 def get_g_distances(
-    N: Tree_graph | gt.Graph, inplace: bool = False, name: str = "Path_length"
+    g: gt.Graph, inplace: bool = False, name: str = "Path_length"
 ) -> None | gt.PropertyMap:
     """
-    create edge property map of edge lengths for a graph with coordinates vertex property
+    create edge property map of edge lengths for a graph with corrdinates vertex property
     """
     # check input type
-    if isinstance(N, Tree_graph):
-        g = N.graph
-    elif isinstance(N.gt.graph):
-        g = N
-    else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
+    if not (isinstance(g, gt.Graph)):
+        raise TypeError(
+            "Input type not supported - must be Neurosetta.Tree_graph or graph_tool.Graph"
+        )
 
-    # check coordinates are a property
-    if not g_has_property(g, "coordinates", t="v"):
+    # check coordinates are a propety
+    if not g_has_property("coordinates", g, t="v"):
         raise AttributeError("Coordinates property missing from graph")
 
     # generate distance/weight for graph
@@ -104,52 +94,28 @@ def get_g_distances(
         return eprop_w
 
 
-def g_leaf_inds(N: Tree_graph | gt.Graph) -> np.ndarray[int]:
+def g_leaf_inds(g: gt.Graph) -> np.ndarray[int]:
     """
-    Returns a numpy array of leaf node indices
+    Returns a numpy array of leaf node indicies
     """
-    # check input type
-    if isinstance(N, Tree_graph):
-        g = N.graph
-    elif isinstance(N.gt.graph):
-        g = N
-    else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
-
     # graph leaf inds - includes soma
     return np.where(g.degree_property_map("out").a == 0)[0]
 
 
-def g_branch_inds(N: Tree_graph | gt.Graph) -> np.ndarray[int]:
+def g_branch_inds(g: gt.Graph) -> np.ndarray[int]:
     """
-    Returns a numpy array of leaf node indices
+    Returns a numpy array of leaf node indicies
     """
-    # check input type
-    if isinstance(N, Tree_graph):
-        g = N.graph
-    elif isinstance(N.gt.graph):
-        g = N
-    else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
-
     # graph leaf inds - includes soma
     return np.where(g.degree_property_map("out").a > 1)[0]
 
 
-def g_lb_inds(N: Tree_graph | gt.Graph, return_types: bool = False) -> np.ndarray[int]:
+def g_lb_inds(g: gt.Graph, return_types: bool = False) -> np.ndarray[int]:
     """
-    Returns indices of all leaf and branch nodes
+    Returns indicies of all leaf and branch nodes
 
-    Note: only useful if you want them all together and don't care which is which
+    Note: only usefull if you want them all together and don't care which is which
     """
-    # check input type
-    if isinstance(N, Tree_graph):
-        g = N.graph
-    elif isinstance(N.gt.graph):
-        g = N
-    else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
-
     l_inds = g_leaf_inds(g)
     b_inds = g_branch_inds(g)
 
@@ -157,17 +123,10 @@ def g_lb_inds(N: Tree_graph | gt.Graph, return_types: bool = False) -> np.ndarra
     return inds
 
 
-def g_root_ind(N: Tree_graph | gt.Graph) -> int:
+def g_root_ind(g: gt.Graph) -> int:
     """
     Return integer of root node index
     """
-    # check input type
-    if isinstance(N, Tree_graph):
-        g = N.graph
-    elif isinstance(N.gt.graph):
-        g = N
-    else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
     return np.where(g.degree_property_map("in").a == 0)[0][0]
 
 
@@ -220,23 +179,12 @@ def _gdist_mat(g: gt.Graph, inds: list, flatten: bool = False) -> np.ndarray[flo
 
 
 def dist_mat(
-    N: Tree_graph | gt.Graph,
-    inds: np.array,
-    method: str = "Euclidean",
-    flatten: bool = False,
+    g: gt.Graph, inds: np.array, method: str = "Euclidean", flatten: bool = False
 ) -> np.ndarray[float]:
     """
     Generate pairwise distance matrix for graph
     """
-    # check input type
-    if isinstance(N, Tree_graph):
-        g = N.graph
-    elif isinstance(N.gt.graph):
-        g = N
-    else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
-
-    if g_has_property(g, "coordinates", "v"):
+    if g_has_property("coordinates", g, "v"):
         if method == "Euclidean":
             dist = _edist_mat(g, inds, flatten)
         elif method == "Path Length":
@@ -248,7 +196,7 @@ def dist_mat(
 
 
 def HDBSCAN_g(
-    N: Tree_graph | gt.Graph,
+    g: gt.Graph,
     nodes: str = "both",
     metric: str = "Path Length",
     min_cluster=20,
@@ -258,14 +206,6 @@ def HDBSCAN_g(
     """
     Compute HDBSCAN clustering on a neuron
     """
-    # check input type
-    if isinstance(N, Tree_graph):
-        g = N.graph
-    elif isinstance(N.gt.graph):
-        g = N
-    else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
-
     # get node inds
     if nodes == "both":
         inds = g_lb_inds(g)
@@ -298,7 +238,7 @@ def HDBSCAN_g(
 
 def random_nodes(
     n: int = 1,
-    N: Tree_graph | gt.Graph = None,
+    g: gt.Graph = None,
     subset: np.ndarray[int] = None,
     exclude: np.ndarray[int] | int = None,
 ) -> int | np.ndarray[int]:
@@ -326,13 +266,6 @@ def random_nodes(
     random_sample:
 
     """
-    # check input type
-    if isinstance(N, Tree_graph):
-        g = N.graph
-    elif isinstance(N.gt.graph):
-        g = N
-    else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
 
     if (g is None) and (subset is None) and (exclude is None):
         raise AttributeError("No data provided to get a sample from!")
@@ -360,9 +293,8 @@ def random_nodes(
 
     return sample
 
-
 def path_vertex_set(
-    N: Tree_graph | gt.Graph,
+    g: gt.Graph,
     source: int,
     target: int | np.ndarray[int] | List,
     weight: None | str | gt.EdgePropertyMap = None,
@@ -370,18 +302,11 @@ def path_vertex_set(
     """
     Given a source node, return vertex path to target. If multiple targets, return list of paths
     """
-    # check input type
-    if isinstance(N, Tree_graph):
-        g = N.graph
-    elif isinstance(N.gt.graph):
-        g = N
-    else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
 
     # if weight string is provided, try to calculate the weights
     if isinstance(weight, str):
         # check if graph edges have this property
-        if not g_has_property(g, weight, t="e"):
+        if not g_has_property(weight, g, t="e"):
             print("Provided weight not a graph property, ignoring!")
             weight = None
 
@@ -414,11 +339,18 @@ def path_vertex_set(
     return path
 
 
-def nearest_vertex(
-    coords: np.ndarray | Tree_graph | gt.Graph,
-    point: np.ndarray,
-    return_dist: bool = False,
-) -> int | tuple:
+def find_point(coords, point):
+    """
+    return the index of the row in coords which matches the coordinates of a point (approximately).
+    
+    Only returns first point
+    """
+    ind = np.where(np.isclose(coords, point).sum(axis=1) != 0)
+
+
+    return np.where(np.isclose(coords, point).sum(axis=1) != 0)[0][0]
+
+def nearest_vertex(coords:np.ndarray | Tree_graph | gt.Graph, point:np.ndarray,return_dist:bool = False) -> int | tuple:
     """
     Find the index of the vertex in coords closest to the given point.
 
@@ -443,6 +375,7 @@ def nearest_vertex(
         coords = g_vert_coords(coords)
     elif not isinstance(coords, np.ndarray):
         raise TypeError("coords must be a np.ndarray, Tree_graph, pr gt.Graph")
+    
 
     binary_array = np.isclose(coords, point)
 
@@ -461,7 +394,7 @@ def nearest_vertex(
     if return_dist:
         return (nearest_v, dist)
     else:
-        return nearest_v
+        return nearest_v    
 
 
 def NP_segment(
@@ -553,8 +486,7 @@ def NP_segment(
     # return
     return g2
 
-
-def g_reachable_leaves(N: Tree_graph | gt.Graph, bind: bool = False):
+def g_reachable_leaves(g: gt.Graph, bind: bool = False):
     """Returns a vertex property map with the number of reachable leaf nodes from each node.
 
     Parameters
@@ -572,15 +504,6 @@ def g_reachable_leaves(N: Tree_graph | gt.Graph, bind: bool = False):
         A vertex property map containing the reachable leaf count for each node.
         If internalise=True, this is assigned to the input graph vertex property 'reachable_leaves' instead.
     """
-
-    # check input type
-    if isinstance(N, Tree_graph):
-        g = N.graph
-    elif isinstance(N.gt.graph):
-        g = N
-    else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
-
     l_inds = g_leaf_inds(g)
     leaf_paths = path_vertex_set(g, source=g_root_ind(g), target=l_inds)
     vprop_rl = g.new_vp("int")
@@ -590,10 +513,9 @@ def g_reachable_leaves(N: Tree_graph | gt.Graph, bind: bool = False):
     if bind:
         g.vp["reachable_leaves"] = vprop_rl
     else:
-        return vprop_rl
-
-
-def downstream_vertices(N: Tree_graph | gt.Graph, source: int) -> np.ndarray:
+        return vprop_rl     
+    
+def downstream_vertices(g:gt.Graph, source:int) -> np.ndarray:
     """Returns an array of unique downstream vertex indices for the given source vertex in graph g.
 
     Performs a depth-first search from the source vertex and collects the visited vertices.
@@ -601,7 +523,7 @@ def downstream_vertices(N: Tree_graph | gt.Graph, source: int) -> np.ndarray:
 
     Parameters
     ----------
-    g : gt.Graph
+    g : gt.Graph 
         Graph to work from
     source : int
         source node id
@@ -611,42 +533,23 @@ def downstream_vertices(N: Tree_graph | gt.Graph, source: int) -> np.ndarray:
     np.ndarray
         Vertices downstream from source
     """
+    return np.unique(gt.dfs_iterator(g, source, array=True))    
 
-    # check input type
-    if isinstance(N, Tree_graph):
-        g = N.graph
-    elif isinstance(N.gt.graph):
-        g = N
-    else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
+def edge_length(i,g):
+    return g.ep['Path_length'][i]
+    
+def g_cable_length(g:gt.Graph,source:int = 0)->float:
 
-    return np.unique(gt.dfs_iterator(g, source, array=True))
-
-
-def _edge_length(i, g):
-    return g.ep["Path_length"][i]
-
-
-def g_cable_length(N: Tree_graph | gt.Graph, source: int = 0) -> float:
-
-    # check input type
-    if isinstance(N, Tree_graph):
-        g = N.graph
-    elif isinstance(N.gt.graph):
-        g = N
-    else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
-
-    if not g_has_property(g, "Path_length", t="e"):
-        get_g_distances(g, inplace=True)
+    if not g_has_property('Path_length', g):
+        get_g_distances(g, inplace = True)
     # if we are going from the root (total cable)
     if source == 0:
-        cable = sum(g.ep["Path_length"].a)
+        cable = sum(g.ep['Path_length'].a)
     else:
         # Get cable from sub-tree rooted at source vertex
-        sub_tree = gt.dfs_iterator(g, source=source, array=True)
+        sub_tree = gt.dfs_iterator(g, source = source, array = True)
         if sub_tree.shape[0] == 0:
             cable = 0
-        else:
-            cable = np.apply_along_axis(_edge_length, 1, sub_tree, g).sum()
+        else:    
+            cable = np.apply_along_axis(edge_length, 1, sub_tree, g).sum()
     return cable
