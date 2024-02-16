@@ -360,46 +360,7 @@ def random_nodes(
 
     return sample
 
-def path_vertex_set(
-    N: Tree_graph | gt.Graph,
-    source: int,
-    target: int | np.ndarray[int] | List,
-    weight: None | str | gt.EdgePropertyMap = None,
-) -> List[np.ndarray[int]]:
 
-    # Check input type
-    if isinstance(N, Tree_graph):
-        g = N.graph
-    elif isinstance(N, gt.Graph):
-        g = N
-    else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
-
-    # Preprocess the graph if necessary
-    if isinstance(weight, str):
-        if not g_has_property(g, weight, t="e"):
-            print("Provided weight not a graph property, ignoring!")
-            weight = None
-
-    # Prepare the graph for shortest path computation
-    g2 = g.copy()
-    if g2.is_directed():
-        g2.set_directed(False)
-
-    paths = []
-
-    # Compute shortest paths
-    if isinstance(target, (int, np.integer)):
-        target = [target]
-
-    for t in target:
-        if weight is None:
-            path = gt.shortest_path(g2, source, t)[0]
-        else:
-            path = gt.shortest_path(g2, source, t, weights=g2.ep[weight])[0]
-        paths.append([g.vertex_index[i] for i in path])
-
-    return paths
 
 
 def nearest_vertex(
@@ -543,21 +504,37 @@ def NP_segment(
 
 
 def g_reachable_leaves(N: Tree_graph | gt.Graph, bind: bool = False):
-    """Returns a vertex property map with the number of reachable leaf nodes from each node."""
-    
+    """Returns a vertex property map with the number of reachable leaf nodes from each node.
+
+    Parameters
+    ----------
+    g : gt.Graph
+        The input graph.
+
+    bind : bool, optional
+        If True, the reachable leaf count is assigned as a vertex property in the input graph.
+        If False (default), a standalone vertex property map is returned.
+
+    Returns
+    -------
+    vprop_rl : gt.VertexPropertyMap
+        A vertex property map containing the reachable leaf count for each node.
+        If internalise=True, this is assigned to the input graph vertex property 'reachable_leaves' instead.
+    """
+
+    # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N, gt.Graph):
+    elif isinstance(N,gt.Graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
 
     l_inds = g_leaf_inds(g)
     leaf_paths = path_vertex_set(g, source=g_root_ind(g), target=l_inds)
-
     vprop_rl = g.new_vp("int")
     for v in g.iter_vertices():
-        vprop_rl[v] = sum(v in path for path in leaf_paths)
+        vprop_rl[v] = sum([v in i for i in leaf_paths])
 
     if bind:
         g.vp["reachable_leaves"] = vprop_rl
