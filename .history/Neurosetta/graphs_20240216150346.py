@@ -370,10 +370,12 @@ def nearest_vertex(coords:np.ndarray | Tree_graph | gt.Graph, point:np.ndarray,r
         Distance to nearest vertex.
     """
 
-    if (isinstance(coords, Tree_graph)) | (isinstance(coords, gt.Graph)):
+    if isinstance(coords, Tree_graph) | ():
         coords = g_vert_coords(coords)
+    elif :
+
     elif not isinstance(coords, np.ndarray):
-        raise TypeError("coords must be a np.ndarray, Tree_graph, pr gt.Graph")
+        raise AttributeError("coords must be a np.ndarray, Tree_graph, pr gt.Graph")
     
 
     binary_array = np.isclose(coords, point)

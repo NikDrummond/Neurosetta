@@ -349,7 +349,7 @@ def find_point(coords, point):
 
     return np.where(np.isclose(coords, point).sum(axis=1) != 0)[0][0]
 
-def nearest_vertex(coords:np.ndarray | Tree_graph | gt.Graph, point:np.ndarray,return_dist:bool = False) -> int | tuple:
+def nearest_vertex(N:np.ndarray | Tree_graph | gt.Graph, point:np.ndarray,return_dist:bool = False) -> int | tuple:
     """
     Find the index of the vertex in coords closest to the given point.
 
@@ -370,10 +370,10 @@ def nearest_vertex(coords:np.ndarray | Tree_graph | gt.Graph, point:np.ndarray,r
         Distance to nearest vertex.
     """
 
-    if (isinstance(coords, Tree_graph)) | (isinstance(coords, gt.Graph)):
-        coords = g_vert_coords(coords)
-    elif not isinstance(coords, np.ndarray):
-        raise TypeError("coords must be a np.ndarray, Tree_graph, pr gt.Graph")
+    if isinstance(N, Tree_graph):
+        coords = g_vert_coords(N)
+    else:
+        coords = N
     
 
     binary_array = np.isclose(coords, point)
