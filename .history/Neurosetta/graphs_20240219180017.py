@@ -433,11 +433,12 @@ def nearest_vertex(
         raise TypeError("coords must be a np.ndarray, Tree_graph, pr gt.Graph")
 
     # KDTree of all points in N
-    tree1 = KDTree(coords)
-    dists,nearest_v = tree1.query(points, k = 1)
-    
+tree1 = KDTree(coords)
+# KDTree of cluster points
+tree2 = KDTree(points)
+
     if return_dist:
-        return (nearest_v, dists)
+        return (nearest_v, dist)
     else:
         return nearest_v
 

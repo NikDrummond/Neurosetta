@@ -404,7 +404,7 @@ def path_vertex_set(
 
 def nearest_vertex(
     coords: np.ndarray | Tree_graph | gt.Graph,
-    points: np.ndarray,
+    point: np.ndarray,
     return_dist: bool = False,
 ) -> int | tuple:
     """
@@ -414,7 +414,7 @@ def nearest_vertex(
     ----------
     N : np.ndarray | nr.Tree_graph
         Array of vertex coordinates or neuron tree graph
-    points : np.ndarray
+    point : np.ndarray
         Coordinates of the query point.
     return_dist : bool, optional
         If True, return distance to nearest neighbor.
@@ -432,12 +432,23 @@ def nearest_vertex(
     elif not isinstance(coords, np.ndarray):
         raise TypeError("coords must be a np.ndarray, Tree_graph, pr gt.Graph")
 
-    # KDTree of all points in N
-    tree1 = KDTree(coords)
-    dists,nearest_v = tree1.query(points, k = 1)
-    
+    try:
+        binary_array = np.isclose(coords, point)
+
+        # if there is an exact match
+        if len(np.where(binary_array.sum(axis=1) == 3)[0]):
+            nearest_v = np.where(binary_array.sum(axis=1) == 3)[0][0]
+            dist = 0
+    # if there is no exact match, fall back to a KDTree
+    else:
+        all_coords = np.vstack((coords, point))
+        tree = KDTree(all_coords)
+        nearest_v = tree.query(all_coords[-1], k=[2])
+        dist = nearest_v[0][0]
+        nearest_v = nearest_v[1][0]
+
     if return_dist:
-        return (nearest_v, dists)
+        return (nearest_v, dist)
     else:
         return nearest_v
 

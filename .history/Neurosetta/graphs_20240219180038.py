@@ -434,10 +434,13 @@ def nearest_vertex(
 
     # KDTree of all points in N
     tree1 = KDTree(coords)
-    dists,nearest_v = tree1.query(points, k = 1)
-    
+    # KDTree of cluster points
+    tree2 = KDTree(points)
+
+    dists,nearest_v = tree1.query(g2_c_coords, k = 1)
+
     if return_dist:
-        return (nearest_v, dists)
+        return (nearest_v, dist)
     else:
         return nearest_v
 
