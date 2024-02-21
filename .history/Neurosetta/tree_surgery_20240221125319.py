@@ -1,3 +1,4 @@
+from tkinter.tix import Tree
 import graph_tool.all as gt
 import numpy as np
 import scipy.stats as stats
@@ -5,7 +6,7 @@ from .core import Tree_graph, infer_node_types
 from .graphs import *
 
 
-def reroot_tree(N: Tree_graph | gt.Graph, root: int, inplace=False, prune = True):
+def reroot_tree(N: Tree_graph | gt.Graph, root: int, inplace=False, prune_soma = True):
     """_summary_
 
     Parameters
@@ -46,10 +47,6 @@ def reroot_tree(N: Tree_graph | gt.Graph, root: int, inplace=False, prune = True
     g2.vp["radius"] = vprop_rad
     # regenerate node types
     infer_node_types(g2)
-    
-    # if we want to prune
-    if prune:
-        g2 = prune_soma(g2)
 
     if isinstance(N, Tree_graph):
         if inplace:
@@ -60,7 +57,7 @@ def reroot_tree(N: Tree_graph | gt.Graph, root: int, inplace=False, prune = True
         return g2
 
 
-def prune_soma(N:Tree_graph | gt.Graph):
+def prune_soma(N:Tree_graph | gt.Graph, inplace=False):
 
     if isinstance(N, Tree_graph):
         g =N.graph

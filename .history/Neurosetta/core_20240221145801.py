@@ -285,7 +285,7 @@ def save(N:Tree_graph,f_path = None):
     f_path : _type_, optional
         _description_, by default None
     """
-    # check we have the ID property of our graph
+    # check we have the ID propert of our graph
     if ("g", 'ID') not in N.graph.properties:
         idgp = N.graph.new_gp('string')
         idgp[N.graph] = N.name

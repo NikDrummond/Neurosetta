@@ -5,7 +5,7 @@ from .core import Tree_graph, infer_node_types
 from .graphs import *
 
 
-def reroot_tree(N: Tree_graph | gt.Graph, root: int, inplace=False, prune = True):
+def reroot_tree(N: Tree_graph | gt.Graph, root: int, inplace=False):
     """_summary_
 
     Parameters
@@ -46,21 +46,16 @@ def reroot_tree(N: Tree_graph | gt.Graph, root: int, inplace=False, prune = True
     g2.vp["radius"] = vprop_rad
     # regenerate node types
     infer_node_types(g2)
-    
-    # if we want to prune
-    if prune:
-        g2 = prune_soma(g2)
 
     if isinstance(N, Tree_graph):
         if inplace:
-            N.graph = g2
-        else:
-            return Tree_graph(name=N.name, graph=g2)
+            N = Tree_graph(name=N.name, graph=g2)
+            return N
     else:
         return g2
 
 
-def prune_soma(N:Tree_graph | gt.Graph):
+def prune_soma(N:Tree_graph | gt.Graph, inplace=False):
 
     if isinstance(N, Tree_graph):
         g =N.graph
@@ -136,7 +131,7 @@ def g_edge_error(
     ValueError
         _description_
     """
-    if isinstance(N, Tree_graph):
+    if isinstance(N, nr.Tree_graph):
         g =N.graph
     elif isinstance(N, gt.Graph):
         g = N
@@ -151,16 +146,16 @@ def g_edge_error(
 
     if method == "leaves":
         # count leaves
-        norm: int = len(g_leaf_inds(g))
+        norm: int = len(nr.g_leaf_inds(g))
     elif method == "cable":
-        norm = g_cable_length(g)
+        norm = nr.g_cable_length(g)
     elif method == "partial_cable":
         norm = None
     else:
         raise ValueError("method must be leaves or cable")
 
-    if not g_has_property(g,"reachable_leaves", t="v"):
-        g_reachable_leaves(g, bind=True)
+    if not nr.g_has_property(g,"reachable_leaves", t="v"):
+        nr.g_reachable_leaves(g, bind=True)
 
     for i in g.iter_edges():
         # reachable leaves from parent and child
@@ -185,18 +180,18 @@ def g_edge_error(
                     proportion = l_child / norm
                 elif method == "cable":
                     # get cable length of sub tree
-                    sub_cable = g_cable_length(g, i[1])
+                    sub_cable = nr.g_cable_length(g, i[1])
 
                     # we need to add the length of the source edge
-                    sub_cable += edge_length(i, g)
+                    sub_cable += nr.edge_length(i, g)
                     proportion = sub_cable / norm
                 elif method == "partial_cable":
                     # get cable length of sub tree
-                    sub_cable = g_cable_length(g, i[1])
+                    sub_cable = nr.g_cable_length(g, i[1])
                     # we need to add the length of the source edge
-                    sub_cable += edge_length(i, g)
+                    sub_cable += nr.edge_length(i, g)
                     # calculate norm - amount of cable from branch point
-                    norm = g_cable_length(g, i[0])
+                    norm = nr.g_cable_length(g, i[0])
                     proportion = sub_cable / norm
                 # if we are also removing less of the graph than prop_cut:
                 if proportion < prop_cut:

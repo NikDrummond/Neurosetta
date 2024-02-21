@@ -274,33 +274,4 @@ def write_swc(N:Node_table | Tree_graph, fpath: str) -> None:
     
 
 
-## .nr file format read/write
-def save(N:Tree_graph,f_path = None):
-    """_summary_
-
-    Parameters
-    ----------
-    N : nr.Tree_graph
-        _description_
-    f_path : _type_, optional
-        _description_, by default None
-    """
-    # check we have the ID property of our graph
-    if ("g", 'ID') not in N.graph.properties:
-        idgp = N.graph.new_gp('string')
-        idgp[N.graph] = N.name
-        N.graph.gp['ID'] = idgp
-
-    # If no f_path is given, save where we are
-    if f_path is None:
-        sp = N.name + '.nr'
-    else:
-        sp = f_path + N.name + '.nr'
-                    
-    N.graph.save(sp, fmt = 'gt')
-
-def load(f_path):
-    """"""
-    g = gt.load_graph(f_path, fmt = 'gt')
-    name = g.gp['ID']
-    return Tree_graph(name, g)            
+##     

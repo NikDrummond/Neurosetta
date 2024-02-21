@@ -589,25 +589,43 @@ def edge_length(i, g):
     return g.ep["Path_length"][i]
 
 
+"""
+Calculates the total cable length from the given source vertex to all
+downstream vertices in a TreeGraph or Graph.
 
+Parameters
+----------
+N : TreeGraph or Graph
+    The input graph 
+source : int, optional
+    The source vertex index, by default 0
+
+Returns
+------- 
+float
+    The total cable length downstream from the source vertex
+"""
 
 
 def g_cable_length(N: Tree_graph | gt.Graph, source: int = 0) -> float:
-    """
-    Calculates the total cable length from the given source vertex to all
-    downstream vertices in a TreeGraph or Graph.
+    """_summary_
 
     Parameters
     ----------
-    N : TreeGraph or Graph
-        The input graph 
+    N : Tree_graph | gt.Graph
+        _description_
     source : int, optional
-        The source vertex index, by default 0
+        _description_, by default 0
 
     Returns
-    ------- 
+    -------
     float
-        The total cable length downstream from the source vertex
+        _description_
+
+    Raises
+    ------
+    TypeError
+        _description_
     """
     # check input type
     if isinstance(N, Tree_graph):

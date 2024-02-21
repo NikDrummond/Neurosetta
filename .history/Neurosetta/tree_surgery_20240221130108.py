@@ -1,3 +1,4 @@
+from tkinter.tix import Tree
 import graph_tool.all as gt
 import numpy as np
 import scipy.stats as stats

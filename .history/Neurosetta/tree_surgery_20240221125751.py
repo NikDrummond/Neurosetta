@@ -1,3 +1,4 @@
+from tkinter.tix import Tree
 import graph_tool.all as gt
 import numpy as np
 import scipy.stats as stats
@@ -33,6 +34,9 @@ def reroot_tree(N: Tree_graph | gt.Graph, root: int, inplace=False, prune = True
 
     # generate new graph
     g2 = gt.Graph(edges, hashed=True, hash_type="int")
+
+
+
 
     # get coordinates
     coords = np.array([g.vp["coordinates"][i] for i in g2.vp["ids"].a])
