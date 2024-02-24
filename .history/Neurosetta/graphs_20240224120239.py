@@ -171,13 +171,13 @@ def g_root_ind(N: Tree_graph | gt.Graph) -> int:
     return np.where(g.degree_property_map("in").a == 0)[0][0]
 
 def leaf_count(N: Tree_graph | gt.Graph) -> int:
-    return len(g_leaf_inds(N))
+    return len(nr.g_leaf_inds(N))
 
-def branch_count(N: Tree_graph | gt.Graph) -> int:
-    return len(g_branch_inds(N))
+def branch_count(N: nr.Tree_graph | gt.Graph) -> int:
+    return len(nr.g_branch_inds(N))
 
-def segment_counts(N: Tree_graph | gt.Graph) -> int:
-    return len(g_lb_inds(N))
+def segment_counts(N: nr.Tree_graph | gt.Graph) -> int:
+    return len(nr.g_lb_inds(N))
 
 def _edist_mat(g: gt.Graph, inds: list, flatten: bool = False) -> np.ndarray[float]:
     """

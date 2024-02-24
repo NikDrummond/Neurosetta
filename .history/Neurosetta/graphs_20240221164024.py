@@ -103,7 +103,7 @@ def get_g_distances(
     else:
         return eprop_w
 
-# functions for getting indicies/ counts of leaves/branches /root
+
 def g_leaf_inds(N: Tree_graph | gt.Graph) -> np.ndarray[int]:
     """
     Returns a numpy array of leaf node indices
@@ -170,14 +170,6 @@ def g_root_ind(N: Tree_graph | gt.Graph) -> int:
         raise TypeError("N must be Tree_graph or gt.Graph")
     return np.where(g.degree_property_map("in").a == 0)[0][0]
 
-def leaf_count(N: Tree_graph | gt.Graph) -> int:
-    return len(g_leaf_inds(N))
-
-def branch_count(N: Tree_graph | gt.Graph) -> int:
-    return len(g_branch_inds(N))
-
-def segment_counts(N: Tree_graph | gt.Graph) -> int:
-    return len(g_lb_inds(N))
 
 def _edist_mat(g: gt.Graph, inds: list, flatten: bool = False) -> np.ndarray[float]:
     """
@@ -200,7 +192,7 @@ def _gdist_mat(g: gt.Graph, inds: list, flatten: bool = False) -> np.ndarray[flo
         g.set_directed(False)
 
     # if graph doesn't already have path length property
-    if not g_has_property(g,'Path_length'):
+    if not g_has_property(g,'Path_lengh'):
         # add edge weights based on distance
         eprop_w = g.new_ep("double")
         # get length of each edge
@@ -216,14 +208,6 @@ def _gdist_mat(g: gt.Graph, inds: list, flatten: bool = False) -> np.ndarray[flo
                 g=g, source=inds[i], target=inds, weights=eprop_w
             )
 
-    # if we do have the property        
-    else:
-        # generate path length distance matrix
-        g_dist = np.zeros((len(inds), len(inds)))
-        for i in range(len(inds)):
-            g_dist[i] = gt.shortest_distance(
-                g=g, source=inds[i], target=inds, weights=g.ep['Path_length']
-            )
     # make symmetric - I am gratuitously assuming it isn't only because of floating point errors
     g_dist = np.tril(g_dist) + np.triu(g_dist.T, 1)
 

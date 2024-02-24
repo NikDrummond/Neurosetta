@@ -176,8 +176,8 @@ def leaf_count(N: Tree_graph | gt.Graph) -> int:
 def branch_count(N: Tree_graph | gt.Graph) -> int:
     return len(g_branch_inds(N))
 
-def segment_counts(N: Tree_graph | gt.Graph) -> int:
-    return len(g_lb_inds(N))
+def segment_counts(N: nr.Tree_graph | gt.Graph) -> int:
+    return len(nr.g_lb_inds(N))
 
 def _edist_mat(g: gt.Graph, inds: list, flatten: bool = False) -> np.ndarray[float]:
     """

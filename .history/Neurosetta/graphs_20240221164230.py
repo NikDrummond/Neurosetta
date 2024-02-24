@@ -103,7 +103,7 @@ def get_g_distances(
     else:
         return eprop_w
 
-# functions for getting indicies/ counts of leaves/branches /root
+
 def g_leaf_inds(N: Tree_graph | gt.Graph) -> np.ndarray[int]:
     """
     Returns a numpy array of leaf node indices
@@ -170,14 +170,6 @@ def g_root_ind(N: Tree_graph | gt.Graph) -> int:
         raise TypeError("N must be Tree_graph or gt.Graph")
     return np.where(g.degree_property_map("in").a == 0)[0][0]
 
-def leaf_count(N: Tree_graph | gt.Graph) -> int:
-    return len(g_leaf_inds(N))
-
-def branch_count(N: Tree_graph | gt.Graph) -> int:
-    return len(g_branch_inds(N))
-
-def segment_counts(N: Tree_graph | gt.Graph) -> int:
-    return len(g_lb_inds(N))
 
 def _edist_mat(g: gt.Graph, inds: list, flatten: bool = False) -> np.ndarray[float]:
     """
