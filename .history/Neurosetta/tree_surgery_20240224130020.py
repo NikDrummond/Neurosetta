@@ -222,7 +222,7 @@ def simplify_neuron(N: Tree_graph) -> Tree_graph:
     """
     # get the start points of all segments
     seg_starts = list(g_branch_inds(N))
-    seg_starts.append(g_root_ind(N))
+    seg_starts.append(nr.g_root_ind(N))
     # for counting which row we are on 
     i = 0
     # initialise what will become the edges
