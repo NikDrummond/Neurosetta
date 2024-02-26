@@ -268,8 +268,7 @@ def simplify_neuron(N: Tree_graph) -> Tree_graph:
         eprop_p[i] = path_length(N,source = source, target = target)
 
     # add this edge property to the graph
-    g.ep['Path_length'] = eprop_p
-        
+    g.ep['Path_length'] = eprop_p    
     # set properties
     vprop_rad = g.new_vp('double')
     vprop_coords = g.new_vp('vector<double>')

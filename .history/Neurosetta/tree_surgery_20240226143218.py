@@ -267,9 +267,6 @@ def simplify_neuron(N: Tree_graph) -> Tree_graph:
         target = g.vp['ids'][i[1]]
         eprop_p[i] = path_length(N,source = source, target = target)
 
-    # add this edge property to the graph
-    g.ep['Path_length'] = eprop_p
-        
     # set properties
     vprop_rad = g.new_vp('double')
     vprop_coords = g.new_vp('vector<double>')
@@ -279,9 +276,6 @@ def simplify_neuron(N: Tree_graph) -> Tree_graph:
     g.vp['coordinates'] = vprop_coords
     g.vp['radius'] = vprop_rad
 
-    # add Euc_dist property - this is the euclidean distance between nodes in the simplified graph
-    get_g_distances(g, inplace = True,name = 'Euc_dist')
-    
     # add node types
     infer_node_types(g)
 

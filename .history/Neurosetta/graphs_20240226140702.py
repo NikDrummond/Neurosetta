@@ -654,7 +654,7 @@ def g_cable_length(N: Tree_graph | gt.Graph, source: int = 0) -> float:
             cable = np.apply_along_axis(edge_length, 1, sub_tree, g).sum()
     return cable
 
-def path_length(N:Tree_graph | gt.Graph,source: int, target : int, weight:str = 'Path_length'):
+def path_length(N:Tree_graph | gt.graph,source: int, target : int, weight:str = 'Path_length'):
     """
     Weighted distance between two vertices
     """

@@ -221,10 +221,7 @@ def simplify_neuron(N: Tree_graph) -> Tree_graph:
         _description_
     """
 
-    # make sure we have 'Path_length' property
-    if not g_has_property(N,'Path_length',"e"):
-        get_g_distances(N, inplace = True)
-        
+    
     # get the start points of all segments
     seg_starts = list(g_branch_inds(N))
     seg_starts.append(g_root_ind(N))
@@ -249,27 +246,14 @@ def simplify_neuron(N: Tree_graph) -> Tree_graph:
             edges[i,1] = N.graph.vp['ids'][e.target()]
             i += 1
 
-    # sometimes this gives as an edge to itself, remove these
-    edges = edges[[False if i[0] - i[1] == 0 else True for i in edges]] 
-
     # create graph
     g = gt.Graph(edges, hashed = True, hash_type = 'int')
+    gt.remove_self_loops(g)
 
     # add core vertex properties
     coords = np.array([N.graph.vp['coordinates'][i] for i in np.unique(edges)])
     radius = np.array([N.graph.vp['radius'][i] for i in np.unique(edges)])        
 
-    # create Path length edge property map - this preserves the path length of the edge from the original graph
-    eprop_p = g.new_ep('double')
-
-    for i in g.iter_edges():
-        source = g.vp['ids'][i[0]]
-        target = g.vp['ids'][i[1]]
-        eprop_p[i] = path_length(N,source = source, target = target)
-
-    # add this edge property to the graph
-    g.ep['Path_length'] = eprop_p
-        
     # set properties
     vprop_rad = g.new_vp('double')
     vprop_coords = g.new_vp('vector<double>')
@@ -279,9 +263,6 @@ def simplify_neuron(N: Tree_graph) -> Tree_graph:
     g.vp['coordinates'] = vprop_coords
     g.vp['radius'] = vprop_rad
 
-    # add Euc_dist property - this is the euclidean distance between nodes in the simplified graph
-    get_g_distances(g, inplace = True,name = 'Euc_dist')
-    
     # add node types
     infer_node_types(g)
 

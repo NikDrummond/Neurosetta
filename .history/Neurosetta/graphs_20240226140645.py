@@ -611,8 +611,8 @@ def downstream_vertices(N: Tree_graph | gt.Graph, source: int) -> np.ndarray:
     return np.unique(gt.dfs_iterator(g, source, array=True))
 
 
-def edge_length(i, g, weight = 'Path_length'):
-    return g.ep[weight][i]
+def edge_length(i, g, weigth = ):
+    return g.ep["Path_length"][i]
 
 
 def g_cable_length(N: Tree_graph | gt.Graph, source: int = 0) -> float:
@@ -654,7 +654,7 @@ def g_cable_length(N: Tree_graph | gt.Graph, source: int = 0) -> float:
             cable = np.apply_along_axis(edge_length, 1, sub_tree, g).sum()
     return cable
 
-def path_length(N:Tree_graph | gt.Graph,source: int, target : int, weight:str = 'Path_length'):
+def path_length(N:Tree_graph | gt.graph,source: int, target : int, weight:str = 'Path_length'):
     """
     Weighted distance between two vertices
     """
