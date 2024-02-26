@@ -3,7 +3,6 @@ from .graphs import g_leaf_inds, g_root_ind, g_has_property
 
 import graph_tool.all as gt
 import numpy as np
-import persim
 
 
 def TMD(N: Tree_graph | gt.Graph, func: str | gt.VertexPropertyMap, bind=True):
@@ -126,34 +125,10 @@ def TMD_barcode(g):
     else:
         raise AttributeError('Graph has no TMD dictionary - generate this using the TMD function')
     
-def TMD_persistance_diagram(g, split = False):
+def TMD_persistance_diagram(g):
     
     segments = TMD_seg_edge(g)
     func = g.gp['TMD']['function']
     points = np.asarray([[g.vp[func][i[0]],g.vp[func][i[1]]] for i in segments])
 
-    if split:
-        return points[:,0], points[:,1]   
-    else:
-        return points 
-    
-
-def bottleneck_dist(N1,N2):
-    """Compute bottleneck distance between two persistance diagrams
-
-    Parameters
-    ----------
-    N1 : _type_
-        _description_
-    N2 : _type_
-        _description_
-
-    Returns
-    -------
-    _type_
-        _description_
-    """
-    N1_pd = TMD_persistance_diagram(N1.graph)
-    N2_pd = TMD_persistance_diagram(N2.graph)
-
-    return persim.bottleneck(N1_pd,N2_pd)    
+    return points[:,1], points[:,0]    

@@ -683,7 +683,7 @@ def path_length(N:Tree_graph | gt.Graph,source: int, target : int, weight:str = 
         return dist
     
 
-def root_dist(N: Tree_graph | gt.Graph, weight: str = 'Path_length', bind = True):
+def root_dist(N: nr.Tree_graph | gt.Graph, weight: str = 'Path_length', bind = True):
     """
 
     Parameters
@@ -706,7 +706,7 @@ def root_dist(N: Tree_graph | gt.Graph, weight: str = 'Path_length', bind = True
         _description_
     """
     
-    if isinstance(N, Tree_graph):
+    if isinstance(N, nr.Tree_graph):
         g = N.graph
     elif isinstance(N, gt.Graph):
         g = N
@@ -715,7 +715,7 @@ def root_dist(N: Tree_graph | gt.Graph, weight: str = 'Path_length', bind = True
 
     root_dist = g.new_vp('double')
 
-    source = g_root_ind(g)
+    source = nr.g_root_ind(g)
 
     for i in g.iter_vertices():
         root_dist[i] = gt.shortest_distance(g,source = source, 

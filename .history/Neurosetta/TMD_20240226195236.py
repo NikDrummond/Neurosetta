@@ -138,8 +138,8 @@ def TMD_persistance_diagram(g, split = False):
         return points 
     
 
-def bottleneck_dist(N1,N2):
-    """Compute bottleneck distance between two persistance diagrams
+def bottleneck(N1,N2):
+    """_summary_
 
     Parameters
     ----------

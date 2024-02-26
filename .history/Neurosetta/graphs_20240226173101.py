@@ -674,58 +674,17 @@ def path_length(N:Tree_graph | gt.Graph,source: int, target : int, weight:str = 
                     source = source,
                     target = target,
                     weights = N.graph.ep[weight],
-                    directed = False)
+                    directed)
+    # inf is returned if there is no path - remember the graph is directed though, so try switching source and target
+    if dist == np.inf:  
+        dist = gt.shortest_distance(N.graph,
+                source = target,
+                target = source,
+                weights = N.graph.ep[weight]) 
 
     # if the length is still inf then there is no path
     if dist == np.inf:
         raise ValueError('No path exists between source and target vertex') 
     else:
         return dist
-    
-
-def root_dist(N: Tree_graph | gt.Graph, weight: str = 'Path_length', bind = True):
-    """
-
-    Parameters
-    ----------
-    N : nr.Tree_graph | gt.Graph
-        _description_
-    weight : str, optional
-        _description_, by default 'Path_length'
-    bind : bool, optional
-        _description_, by default True
-
-    Returns
-    -------
-    _type_
-        _description_
-
-    Raises
-    ------
-    TypeError
-        _description_
-    """
-    
-    if isinstance(N, Tree_graph):
-        g = N.graph
-    elif isinstance(N, gt.Graph):
-        g = N
-    else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
-
-    root_dist = g.new_vp('double')
-
-    source = g_root_ind(g)
-
-    for i in g.iter_vertices():
-        root_dist[i] = gt.shortest_distance(g,source = source, 
-                                            target = i,
-                                            weights = g.ep[weight]
-                                            )
-
-    if bind:
-        g.vp['root_dist']  = root_dist
-    else:
-        return root_dist   
-        
 

@@ -1,6 +1,5 @@
 setuptools>=41.0.1
-graph_tool>=2.48
+\graph-tool>=2.48
 numpy>=1.16.3
 vedo
 pandas
-persim
