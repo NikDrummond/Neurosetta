@@ -31,10 +31,9 @@ def g_has_property(
             return ("v", g_property) in g.properties
         elif t == "e":
             return ("e", g_property) in g.properties
-        elif t == "g":
-            return ("g", g_property) in g.properties
+        elif t == 
     else:
-        return (("v", g_property) in g.properties) | (("e", g_property) in g.properties) | (("g", g_property) in g.properties)
+        return (("v", g_property) in g.properties) | (("e", g_property) in g.properties)
 
 
 # function to get node coordinates from a graph
