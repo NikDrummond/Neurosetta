@@ -80,7 +80,7 @@ def get_g_distances(
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N, gt.Graph):
+    elif isinstance(N,gt.Graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -103,7 +103,6 @@ def get_g_distances(
     else:
         return eprop_w
 
-
 # functions for getting indicies/ counts of leaves/branches /root
 def g_leaf_inds(N: Tree_graph | gt.Graph) -> np.ndarray[int]:
     """
@@ -112,7 +111,7 @@ def g_leaf_inds(N: Tree_graph | gt.Graph) -> np.ndarray[int]:
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N, gt.Graph):
+    elif isinstance(N,gt.Graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -128,7 +127,7 @@ def g_branch_inds(N: Tree_graph | gt.Graph) -> np.ndarray[int]:
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N, gt.Graph):
+    elif isinstance(N,gt.Graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -146,7 +145,7 @@ def g_lb_inds(N: Tree_graph | gt.Graph, return_types: bool = False) -> np.ndarra
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N, gt.Graph):
+    elif isinstance(N,gt.Graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -165,24 +164,20 @@ def g_root_ind(N: Tree_graph | gt.Graph) -> int:
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N, gt.Graph):
+    elif isinstance(N,gt.Graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
     return np.where(g.degree_property_map("in").a == 0)[0][0]
 
-
 def leaf_count(N: Tree_graph | gt.Graph) -> int:
     return len(g_leaf_inds(N))
-
 
 def branch_count(N: Tree_graph | gt.Graph) -> int:
     return len(g_branch_inds(N))
 
-
 def segment_counts(N: Tree_graph | gt.Graph) -> int:
     return len(g_lb_inds(N))
-
 
 def _edist_mat(g: gt.Graph, inds: list, flatten: bool = False) -> np.ndarray[float]:
     """
@@ -205,7 +200,7 @@ def _gdist_mat(g: gt.Graph, inds: list, flatten: bool = False) -> np.ndarray[flo
         g.set_directed(False)
 
     # if graph doesn't already have path length property
-    if not g_has_property(g, "Path_length"):
+    if not g_has_property(g,'Path_length'):
         # add edge weights based on distance
         eprop_w = g.new_ep("double")
         # get length of each edge
@@ -221,13 +216,13 @@ def _gdist_mat(g: gt.Graph, inds: list, flatten: bool = False) -> np.ndarray[flo
                 g=g, source=inds[i], target=inds, weights=eprop_w
             )
 
-    # if we do have the property
+    # if we do have the property        
     else:
         # generate path length distance matrix
         g_dist = np.zeros((len(inds), len(inds)))
         for i in range(len(inds)):
             g_dist[i] = gt.shortest_distance(
-                g=g, source=inds[i], target=inds, weights=g.ep["Path_length"]
+                g=g, source=inds[i], target=inds, weights=g.ep['Path_length']
             )
     # make symmetric - I am gratuitously assuming it isn't only because of floating point errors
     g_dist = np.tril(g_dist) + np.triu(g_dist.T, 1)
@@ -254,7 +249,7 @@ def dist_mat(
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N, gt.Graph):
+    elif isinstance(N,gt.Graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -284,7 +279,7 @@ def HDBSCAN_g(
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N, gt.Graph):
+    elif isinstance(N,gt.Graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -352,7 +347,7 @@ def random_nodes(
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N, gt.Graph):
+    elif isinstance(N,gt.Graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -382,7 +377,6 @@ def random_nodes(
     sample = np.random.choice(sample, size=n)
 
     return sample
-
 
 def path_vertex_set(
     N: Tree_graph | gt.Graph,
@@ -458,8 +452,8 @@ def nearest_vertex(
 
     # KDTree of all points in N
     tree1 = KDTree(coords)
-    dists, nearest_v = tree1.query(points, k=1)
-
+    dists,nearest_v = tree1.query(points, k = 1)
+    
     if return_dist:
         return (nearest_v, dists)
     else:
@@ -558,7 +552,7 @@ def NP_segment(
 
 def g_reachable_leaves(N: Tree_graph | gt.Graph, bind: bool = False):
     """Returns a vertex property map with the number of reachable leaf nodes from each node."""
-
+    
     if isinstance(N, Tree_graph):
         g = N.graph
     elif isinstance(N, gt.Graph):
@@ -601,7 +595,7 @@ def downstream_vertices(N: Tree_graph | gt.Graph, source: int) -> np.ndarray:
     # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N, gt.Graph):
+    elif isinstance(N,gt.Graph):
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
@@ -613,6 +607,9 @@ def edge_length(i, g):
     return g.ep["Path_length"][i]
 
 
+
+
+
 def g_cable_length(N: Tree_graph | gt.Graph, source: int = 0) -> float:
     """
     Calculates the total cable length from the given source vertex to all
@@ -621,12 +618,12 @@ def g_cable_length(N: Tree_graph | gt.Graph, source: int = 0) -> float:
     Parameters
     ----------
     N : TreeGraph or Graph
-        The input graph
+        The input graph 
     source : int, optional
         The source vertex index, by default 0
 
     Returns
-    -------
+    ------- 
     float
         The total cable length downstream from the source vertex
     """
@@ -652,8 +649,7 @@ def g_cable_length(N: Tree_graph | gt.Graph, source: int = 0) -> float:
             cable = np.apply_along_axis(edge_length, 1, sub_tree, g).sum()
     return cable
 
-
-def TMD(N: Tree_graph | gt.Graph, func: str | gt.VertexPropertyMap, bind=True):
+def TMD(N: Tree_graph | gt.Graph, func:str | gt.VertexPropertyMap, bind = False):
     """_summary_
 
     Parameters
@@ -673,25 +669,25 @@ def TMD(N: Tree_graph | gt.Graph, func: str | gt.VertexPropertyMap, bind=True):
     TypeError
         _description_
     """
-    if isinstance(N, Tree_graph):
+    if isinstance(N,nr.Tree_graph):
         g = N.graph
-    elif isinstance(N, gt.Graph):
+    elif isinstance(N,gt.Graph):
         g = N
     else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
+        raise TypeError("N must be Tree_graph or gt.Graph")        
 
     # indicies of leaves and root
-    l_inds = g_leaf_inds(g)
-    root = g_root_ind(g)
+    l_inds = nr.g_leaf_inds(g)
+    root = nr.g_root_ind(g)
 
     # initialise segments and visited nodes
-    segments = np.zeros((len(l_inds), 2)).astype(int)
+    segments = np.zeros((len(l_inds),2)).astype(int)
     visited = np.zeros_like(g.get_vertices()).astype(bool)
 
     # indicies of leaves sorted by descending dist func
     if isinstance(func, str):
         sorted_l = l_inds[np.argsort(g.vp[func].a[l_inds])[::-1]]
-    elif isinstance(func, gt.VertexPropertyMap):
+    elif isinstance(func, gt.VertexPropertyMap):    
         sorted_l = l_inds[np.argsort(func.a[l_inds])[::-1]]
 
     # iterate
@@ -702,23 +698,23 @@ def TMD(N: Tree_graph | gt.Graph, func: str | gt.VertexPropertyMap, bind=True):
         # while we are collecting nodes:
         while True:
             # if parent not in viewed:
-            if visited[current_p] == False:
+            if visited[current_p] == False:   
                 # add to viewed
                 visited[current_p] = True
 
                 # if we are at the root:
                 if current_p == root:
-                    # note this segment
-                    segments[i] = [l, current_p]
+                # note this segment
+                    segments[i] = [l,current_p]
                     # move to next leaf
                     break
                 else:
                     # move to next node
                     current_p = g.get_in_neighbours(current_p)[0]
             # else:
-            else:
+            else:    
                 # note node and l - node to segments
-                segments[i] = [l, current_p]
+                segments[i] = [l,current_p]
                 # move to next leaf
                 break
     # get length of segments according to function used
@@ -726,17 +722,15 @@ def TMD(N: Tree_graph | gt.Graph, func: str | gt.VertexPropertyMap, bind=True):
         lens = np.array([abs(g.vp[func][i[0]] - g.vp[func][i[1]]) for i in segments])
     elif isinstance(func, gt.VertexPropertyMap):
         lens = np.array([abs(func[i[0]] - func[i[1]]) for i in segments])
-
-    TMD = dict(
-        {
-            "function": func,
-            "birth_ind": segments[:, 1],
-            "death_ind": segments[:, 0],
-            "survival_len": lens,
-        }
-    )
-
+    
+    
+    
+    TMD = dict({'function':func,
+      'birth_ind':segments[:,1],
+      'death_ind':segments[:,0],
+      'survival_len':lens})            
+    
     if bind:
-        g.gp["TMD"] = g.new_gp("object", TMD)
-    else:
+        g.gp['TMD'] = g.new_gp('object',TMD)
+    else:    
         return TMD
