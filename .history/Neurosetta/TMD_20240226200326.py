@@ -158,14 +158,3 @@ def bottleneck_dist(N1,N2):
     N2_pd = TMD_persistance_diagram(N2.graph)
 
     return persim.bottleneck(N1_pd,N2_pd)    
-
-def bottleneck_matrix(N_all):
-    dist_mat = np.zeros((len(N_all),len(N_all)))
-    for i in itertools.combinations(range(len(N_all)),2):
-        p1 = N_all[i[0]]
-        p2 = N_all[i[1]]
-        t = bottleneck_dist(p1,p2)
-        dist_mat[i[0],i[1]] = t
-        dist_mat[i[1],i[0]] = t
-
-    return dist_mat 

@@ -164,7 +164,7 @@ def bottleneck_matrix(N_all):
     for i in itertools.combinations(range(len(N_all)),2):
         p1 = N_all[i[0]]
         p2 = N_all[i[1]]
-        t = bottleneck_dist(p1,p2)
+        t = nr.bottleneck_dist(p1,p2)
         dist_mat[i[0],i[1]] = t
         dist_mat[i[1],i[0]] = t
 
