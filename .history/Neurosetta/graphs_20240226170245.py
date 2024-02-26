@@ -74,7 +74,7 @@ def g_vert_coords(
 
 
 def get_g_distances(
-    N: Tree_graph | gt.Graph, bind: bool = False, name: str = "Path_length"
+    N: Tree_graph | gt.Graph, inplace: bool = False, name: str = "Path_length"
 ) -> None | gt.PropertyMap:
     """
     create edge property map of edge lengths for a graph with coordinates vertex property
@@ -97,8 +97,12 @@ def get_g_distances(
     # get length of each edge
     for i in g.iter_edges():
         eprop_w[i] = np.linalg.norm(g.vp["coordinates"][i[0]].a - g.vp["coordinates"][i[1]].a)
+    eprop_w.a = [
+        np.linalg.norm()
+        for i in g.iter_edges()
+    ]
 
-    if bind:
+    if inplace:
         g.ep[name] = eprop_w
     else:
         return eprop_w
@@ -508,7 +512,7 @@ def NP_segment(
     # dend_inds are the indicies in the graph of verticies in the dendrites
 
     # add weight property
-    get_g_distances(g, bind=True)
+    get_g_distances(g, inplace=True)
 
     # get
     paths = path_vertex_set(g, source=rand_leaf, target=dend_inds, weight="weight")
@@ -639,7 +643,7 @@ def g_cable_length(N: Tree_graph | gt.Graph, source: int = 0) -> float:
         raise TypeError("N must be Tree_graph or gt.Graph")
 
     if not g_has_property(g, "Path_length", t="e"):
-        get_g_distances(g, bind=True)
+        get_g_distances(g, inplace=True)
     # if we are going from the root (total cable)
     if source == 0:
         cable = sum(g.ep["Path_length"].a)
@@ -666,7 +670,7 @@ def path_length(N:Tree_graph | gt.Graph,source: int, target : int, weight:str = 
 
     if not g_has_property(g,weight,'e'):
         if weight == 'Path_length':
-            get_g_distances(g, bind = True)
+            get_g_distances(g, inplace = True)
         else:    
             raise AttributeError('Input graph has no ' + weight + ' Edge property')   
     

@@ -109,7 +109,7 @@ def g_edge_error(
     binom_cut: float = 0.001,
     prop_cut: float = 0.01,
     method: str = "cable",
-    bind=False,
+    bind=,
 ) -> gt.EdgePropertyMap:
     """_summary_
 

@@ -508,7 +508,7 @@ def NP_segment(
     # dend_inds are the indicies in the graph of verticies in the dendrites
 
     # add weight property
-    get_g_distances(g, bind=True)
+    get_g_distances(g, inplace=True)
 
     # get
     paths = path_vertex_set(g, source=rand_leaf, target=dend_inds, weight="weight")
@@ -639,7 +639,7 @@ def g_cable_length(N: Tree_graph | gt.Graph, source: int = 0) -> float:
         raise TypeError("N must be Tree_graph or gt.Graph")
 
     if not g_has_property(g, "Path_length", t="e"):
-        get_g_distances(g, bind=True)
+        get_g_distances(g, inplace=True)
     # if we are going from the root (total cable)
     if source == 0:
         cable = sum(g.ep["Path_length"].a)
@@ -666,7 +666,7 @@ def path_length(N:Tree_graph | gt.Graph,source: int, target : int, weight:str = 
 
     if not g_has_property(g,weight,'e'):
         if weight == 'Path_length':
-            get_g_distances(g, bind = True)
+            get_g_distances(g, inplace = True)
         else:    
             raise AttributeError('Input graph has no ' + weight + ' Edge property')   
     

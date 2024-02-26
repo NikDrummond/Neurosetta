@@ -666,7 +666,7 @@ def path_length(N:Tree_graph | gt.Graph,source: int, target : int, weight:str = 
 
     if not g_has_property(g,weight,'e'):
         if weight == 'Path_length':
-            get_g_distances(g, bind = True)
+            get_g_distances(g, inplace = True)
         else:    
             raise AttributeError('Input graph has no ' + weight + ' Edge property')   
     

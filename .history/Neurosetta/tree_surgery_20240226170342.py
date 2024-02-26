@@ -223,7 +223,7 @@ def simplify_neuron(N: Tree_graph) -> Tree_graph:
 
     # make sure we have 'Path_length' property
     if not g_has_property(N,'Path_length',"e"):
-        get_g_distances(N, bind = True)
+        get_g_distances(N, inplace = True)
         
     # get the start points of all segments
     seg_starts = list(g_branch_inds(N))
