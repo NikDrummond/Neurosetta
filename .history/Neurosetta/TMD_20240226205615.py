@@ -170,15 +170,11 @@ def _calculate_distances(i, N_all, result_queue):
             distances[j] = bottleneck_dist(N_all[i], N_all[j])
     result_queue.put((i, distances))
 
-def bottleneck_matrix(N_all, parallel = True, max_processes = None):
+def bottleneck_matrix(N_all, parallel = True):
 
     if parallel:
         num_points = len(N_all)
         dist_mat = np.zeros((num_points, num_points))
-
-        # Determine the number of processes to use
-        if max_processes is None:
-            max_processes = mp.cpu_count()
 
         # Create a multiprocessing Queue to store results
         result_queue = mp.Queue()
@@ -190,18 +186,12 @@ def bottleneck_matrix(N_all, parallel = True, max_processes = None):
             processes.append(process)
             process.start()
 
-            # Limit the number of processes
-            if max_processes is not None and len(processes) >= max_processes:
-                for p in processes:
-                    p.join()
-                processes = []
-
-        # Retrieve remaining results from the Queue and fill the distance matrix
-        while not result_queue.empty():
+        # Retrieve results from the Queue and fill the distance matrix
+        for _ in range(num_points):
             i, distances = result_queue.get()
             dist_mat[i, :] = distances
 
-        # Join remaining processes
+        # Join all processes
         for process in processes:
             process.join()
 

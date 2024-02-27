@@ -170,7 +170,7 @@ def _calculate_distances(i, N_all, result_queue):
             distances[j] = bottleneck_dist(N_all[i], N_all[j])
     result_queue.put((i, distances))
 
-def bottleneck_matrix(N_all, parallel = True, max_processes = None):
+def bottleneck_matrix(N_all, parallel = True):
 
     if parallel:
         num_points = len(N_all)
@@ -186,7 +186,7 @@ def bottleneck_matrix(N_all, parallel = True, max_processes = None):
         # Create processes to calculate distances
         processes = []
         for i in range(num_points):
-            process = mp.Process(target=_calculate_distances, args=(i, N_all, result_queue))
+            process = mp.Process(target=calculate_distances, args=(i, N_all, result_queue))
             processes.append(process)
             process.start()
 

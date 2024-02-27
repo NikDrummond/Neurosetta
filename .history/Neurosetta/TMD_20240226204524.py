@@ -3,9 +3,8 @@ from .graphs import g_leaf_inds, g_root_ind, g_has_property
 
 import graph_tool.all as gt
 import numpy as np
-import multiprocessing as mp
 import persim
-
+import itertools
 
 
 def TMD(N: Tree_graph | gt.Graph, func: str | gt.VertexPropertyMap, bind=True):
@@ -160,60 +159,45 @@ def bottleneck_dist(N1,N2):
 
     return persim.bottleneck(N1_pd,N2_pd)    
 
+def bottleneck_matrix(N_all):
+    dist_mat = np.zeros((len(N_all),len(N_all)))
+    for i in itertools.combinations(range(len(N_all)),2):
+        p1 = N_all[i[0]]
+        p2 = N_all[i[1]]
+        t = bottleneck_dist(p1,p2)
+        dist_mat[i[0],i[1]] = t
+        dist_mat[i[1],i[0]] = t
 
+    return dist_mat 
 
-def _calculate_distances(i, N_all, result_queue):
+def bottleneck_matrix_2(N_all):
     num_points = len(N_all)
-    distances = np.zeros(num_points)
-    for j in range(num_points):
-        if j != i:
-            distances[j] = bottleneck_dist(N_all[i], N_all[j])
-    result_queue.put((i, distances))
+    dist_mat = np.zeros((num_points, num_points))
 
-def bottleneck_matrix(N_all, parallel = True, max_processes = None):
-
-    if parallel:
-        num_points = len(N_all)
-        dist_mat = np.zeros((num_points, num_points))
-
-        # Determine the number of processes to use
-        if max_processes is None:
-            max_processes = mp.cpu_count()
-
-        # Create a multiprocessing Queue to store results
-        result_queue = mp.Queue()
-
-        # Create processes to calculate distances
-        processes = []
-        for i in range(num_points):
-            process = mp.Process(target=_calculate_distances, args=(i, N_all, result_queue))
-            processes.append(process)
-            process.start()
-
-            # Limit the number of processes
-            if max_processes is not None and len(processes) >= max_processes:
-                for p in processes:
-                    p.join()
-                processes = []
-
-        # Retrieve remaining results from the Queue and fill the distance matrix
-        while not result_queue.empty():
-            i, distances = result_queue.get()
-            dist_mat[i, :] = distances
-
-        # Join remaining processes
-        for process in processes:
-            process.join()
-
-    else:    
-        num_points = len(N_all)
-        dist_mat = np.zeros((num_points, num_points))
-
-        # Calculate bottleneck distances
-        for i in range(num_points):
-            for j in range(i + 1, num_points):
-                t = bottleneck_dist(N_all[i], N_all[j])
-                dist_mat[i, j] = dist_mat[j, i] = t    
+    # Calculate bottleneck distances
+    for i in range(num_points):
+        for j in range(i + 1, num_points):
+            t = bottleneck_dist(N_all[i], N_all[j])
+            dist_mat[i, j] = dist_mat[j, i] = t
 
     return dist_mat
 
+def bottleneck_matrix_3(N_all):
+    num_points = len(N_all)
+    dist_mat = np.zeros((num_points, num_points))
+
+    # Create a meshgrid of indices for vectorized computation
+    idx = np.arange(num_points)
+    ii, jj = np.meshgrid(idx, idx)
+        # Ensure indices are integer arrays
+    ii = ii.astype(int)
+    jj = jj.astype(int)
+
+    # Calculate distances for all pairs using bottleneck_dist
+    distances = np.vectorize(bottleneck_dist)(N_all[ii], N_all[jj])
+
+    # Set upper triangular matrix with bottleneck distances
+    dist_mat[np.triu_indices(num_points, k=1)] = distances[np.triu_indices(num_points, k=1)]
+    dist_mat += dist_mat.T
+
+    return dist_mat
