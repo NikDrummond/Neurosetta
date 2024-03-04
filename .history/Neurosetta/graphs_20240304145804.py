@@ -718,18 +718,12 @@ def root_dist(N: Tree_graph | gt.Graph, weight: str = 'Path_length', bind = True
     source = g_root_ind(g)
 
     if norm:
-        total = sum(g.ep[weight].a)
+        total = sum()
     for i in g.iter_vertices():
-        if norm:
-            root_dist[i] = gt.shortest_distance(g,source = source, 
-                                                target = i,
-                                                weights = g.ep[weight]
-                                                ) / total
-        else:
-            root_dist[i] = gt.shortest_distance(g,source = source, 
-                                                target = i,
-                                                weights = g.ep[weight]
-                                                )
+        root_dist[i] = gt.shortest_distance(g,source = source, 
+                                            target = i,
+                                            weights = g.ep[weight]
+                                            )
 
     if bind:
         g.vp['root_dist']  = root_dist

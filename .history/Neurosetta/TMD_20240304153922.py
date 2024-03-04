@@ -3,9 +3,8 @@ from .graphs import g_leaf_inds, g_root_ind, g_has_property
 
 import graph_tool.all as gt
 import numpy as np
-from scipy import stats
 import multiprocessing as mp
-from persim import bottleneck
+from persim
 from tqdm import tqdm
 
 
@@ -139,29 +138,7 @@ def TMD_persistance_diagram(g, split = False):
         return points[:,0], points[:,1]   
     else:
         return points 
-
-def TMD_persistance_im(g,xlim = None, ylim = None, norm_factor = None):
-
-    ph = TMD_persistance_diagram(g)
-
-    if xlim is None:
-        xlim = [min(np.transpose(ph)[0]), max(np.transpose(ph)[0])]
-    if ylim is None:
-        ylim = [min(np.transpose(ph)[1]), max(np.transpose(ph)[1])]
-
-    X, Y = np.mgrid[xlim[0] : xlim[1] : 100j, ylim[0] : ylim[1] : 100j]
-
-    values = np.transpose(ph)
-    kernel = stats.gaussian_kde(values)
-    positions = np.vstack([X.ravel(), Y.ravel()])
-    Z = np.reshape(kernel(positions).T, X.shape)
-
-    if norm_factor is None:
-        norm_factor = np.max(Z)
-
-    Zn = Z / norm_factor
-
-    return Zn    
+    
 
 def bottleneck_dist(N1,N2):
     """Compute bottleneck distance between two persistance diagrams
@@ -181,7 +158,7 @@ def bottleneck_dist(N1,N2):
     N1_pd = TMD_persistance_diagram(N1.graph)
     N2_pd = TMD_persistance_diagram(N2.graph)
 
-    return bottleneck(N1_pd,N2_pd)    
+    return persim.bottleneck(N1_pd,N2_pd)    
 
 
 

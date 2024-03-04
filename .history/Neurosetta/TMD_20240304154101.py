@@ -3,7 +3,6 @@ from .graphs import g_leaf_inds, g_root_ind, g_has_property
 
 import graph_tool.all as gt
 import numpy as np
-from scipy import stats
 import multiprocessing as mp
 from persim import bottleneck
 from tqdm import tqdm
@@ -142,7 +141,7 @@ def TMD_persistance_diagram(g, split = False):
 
 def TMD_persistance_im(g,xlim = None, ylim = None, norm_factor = None):
 
-    ph = TMD_persistance_diagram(g)
+    pd = TMD_persistance_diagram(g)
 
     if xlim is None:
         xlim = [min(np.transpose(ph)[0]), max(np.transpose(ph)[0])]

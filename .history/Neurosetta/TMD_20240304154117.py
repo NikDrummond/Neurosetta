@@ -3,7 +3,7 @@ from .graphs import g_leaf_inds, g_root_ind, g_has_property
 
 import graph_tool.all as gt
 import numpy as np
-from scipy import stats
+
 import multiprocessing as mp
 from persim import bottleneck
 from tqdm import tqdm
