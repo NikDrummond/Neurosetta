@@ -266,20 +266,20 @@ def simplify_neuron(N: Tree_graph) -> Tree_graph:
     for i in g.iter_edges():
         source = g.vp['ids'][i[0]]
         target = g.vp['ids'][i[1]]
-        eprop_p[i] = path_length(N,source = source, target = target)
+        eprop_p[i] = nr.path_length(N,source = source, target = target)
 
     # add this edge property to the graph
     g.ep['Path_length'] = eprop_p
 
     # add Euc_dist property - this is the euclidean distance between nodes in the simplified graph
-    get_g_distances(g, bind = True,name = 'Euc_dist')
+    nr.get_g_distances(g, bind = True,name = 'Euc_dist')
 
     # add node types
-    infer_node_types(g)
+    nr.infer_node_types(g)
 
     # add simplified graph property
     simp = g.new_gp('bool')
     simp[g] = True
     g.gp['simplified'] = simp
 
-    return Tree_graph(N.name,g)
+    return nr.Tree_graph(N.name,g)

@@ -144,7 +144,7 @@ def TMD_persistance_im(g,xlim = None, ylim = None, norm_factor = None):
 
     """ this comes from : https://github.com/BlueBrain/TMD/blob/master/examples/Advanced/variability.py
 
-    for now...
+    for now, 
 
     Returns
     -------

@@ -207,58 +207,57 @@ def g_edge_error(
     else:
         return eprop_err
     
-def simplify_neuron(N: Tree_graph) -> Tree_graph:
 
-        # make sure we have 'Path_length' property
+def simplify_neuron(N: Tree_graph) -> Tree_graph:
+    """
+    Parameters
+    ----------
+    N : nr.Tree_graph
+        _description_
+
+    Returns
+    -------
+    nr.Tree_graph
+        _description_
+    """
+
+    # make sure we have 'Path_length' property
     if not g_has_property(N,'Path_length',"e"):
         get_g_distances(N, bind = True)
         
-
-    # starts are all leaves and branches
-    seg_stops = g_lb_inds(N)
-    # ends are all branches and the root
-    seg_starts = np.hstack((g_root_ind(N),g_branch_inds(N)))
-
-    # initialise edges array
+    # get the start points of all segments
+    seg_starts = list(g_branch_inds(N))
+    seg_starts.append(g_root_ind(N))
+    # for counting which row we are on 
+    i = 0
     # initialise what will become the edges
     edges = np.zeros((segment_counts(N),2)).astype(int)
 
-    index = 0
-    for e in gt.dfs_iterator(N.graph,g_root_ind(N),array=True):
-        curr_start = e[0]
-        curr_end = e[1]
+    # get graph degree map
+    total_deg = N.graph.degree_property_map("total")
 
-        # if the source vertex is a start point:
-        if curr_start in seg_starts:
-            edges[index,0] = curr_start
+    # we are traversing edges in a  first manner
+    for e in gt.dfs_iterator(N.graph,N.graph.vertex(0)):
+        # if the start of the current edge is a start point
+        if N.graph.vp['ids'][e.source()] in seg_starts:
+            edges[i,0] = N.graph.vp['ids'][e.source()]
 
-        # if the target vertex is an segment end
-        if curr_end in seg_stops:
-            edges[index,1] = curr_end
-            index += 1   
+        # if the end of the current edge is the end of a segment
+        # total degree of the target node in edge
+        d = total_deg[e.target()]
+        if ((d == 1) | (d > 2)):
+            edges[i,1] = N.graph.vp['ids'][e.target()]
+            i += 1
 
-    index = 0
-    for e in gt.dfs_iterator(N.graph,g_root_ind(N),array=True):
-        curr_start = e[0]
-        curr_end = e[1]
+    # sometimes this gives as an edge to itself, remove these
+    edges = edges[[False if i[0] - i[1] == 0 else True for i in edges]] 
 
-        # if the source vertex is a start point:
-        if curr_start in seg_starts:
-            edges[index,0] = curr_start
-
-        # if the target vertex is an segment end
-        if curr_end in seg_stops:
-            edges[index,1] = curr_end
-            index += 1        
-
-
+    # create graph
     g = gt.Graph(edges, hashed = True, hash_type = 'int')
 
-
-    coords = np.array([N.graph.vp['coordinates'][i] for i in g.vp['ids'].a])
-    radius = np.array([N.graph.vp['radius'][i] for i in g.vp['ids'].a])
-    g.vp['coordinates'] = g.new_vp("vector<double>", coords)
-    g.vp['radius'] = g.new_vp('double',radius)
+    # add core vertex properties
+    coords = np.array([N.graph.vp['coordinates'][i] for i in np.unique(edges)])
+    radius = np.array([N.graph.vp['radius'][i] for i in np.unique(edges)])        
 
     # create Path length edge property map - this preserves the path length of the edge from the original graph
     eprop_p = g.new_ep('double')
@@ -271,9 +270,18 @@ def simplify_neuron(N: Tree_graph) -> Tree_graph:
     # add this edge property to the graph
     g.ep['Path_length'] = eprop_p
 
+    # set properties
+    vprop_rad = g.new_vp('double')
+    vprop_coords = g.new_vp('vector<double>')
+    vprop_rad.a = radius
+    vprop_coords.set_2d_array(coords.T)
+
+    g.vp['coordinates'] = vprop_coords
+    g.vp['radius'] = vprop_rad
+
     # add Euc_dist property - this is the euclidean distance between nodes in the simplified graph
     get_g_distances(g, bind = True,name = 'Euc_dist')
-
+    
     # add node types
     infer_node_types(g)
 
@@ -283,3 +291,6 @@ def simplify_neuron(N: Tree_graph) -> Tree_graph:
     g.gp['simplified'] = simp
 
     return Tree_graph(N.name,g)
+
+
+        

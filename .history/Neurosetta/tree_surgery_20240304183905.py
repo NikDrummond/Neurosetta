@@ -266,7 +266,7 @@ def simplify_neuron(N: Tree_graph) -> Tree_graph:
     for i in g.iter_edges():
         source = g.vp['ids'][i[0]]
         target = g.vp['ids'][i[1]]
-        eprop_p[i] = path_length(N,source = source, target = target)
+        eprop_p[i] = nr.path_length(N,source = source, target = target)
 
     # add this edge property to the graph
     g.ep['Path_length'] = eprop_p
