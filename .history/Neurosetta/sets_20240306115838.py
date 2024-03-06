@@ -39,3 +39,14 @@ def Sfamily_XOR(fam: List) -> np.ndarray:
     x_or = union[~np.isin(union, intersection)]
 
     return x_or
+
+def jacard_similarity(A,B):
+    """_summary_
+
+    Parameters
+    ----------
+    A : _type_
+        _description_
+    B : _type_
+        _description_
+    """

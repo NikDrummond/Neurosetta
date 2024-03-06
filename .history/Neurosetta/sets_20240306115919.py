@@ -40,25 +40,6 @@ def Sfamily_XOR(fam: List) -> np.ndarray:
 
     return x_or
 
-def jacard_similarity(A:np.ndarray,B:np.ndarray, dist:bool = False) -> float:
-    """Returns the Jacard Similarity (or distance) between two sets
-
-    The similarity is calculated as the cardinality of the intersection divided by the 
-    cardinality of the union of the two sets. 
-
-    If dist is True, returns 1 - the similarity
-
-    Parameters
-    ----------
-    A : np.ndarray
-        _description_
-    B : np.ndarray
-        _description_
-
-    Returns
-    -------
-    float
-        _description_
-    """
-    return len(np.intersect1d(A,B)) / len(np.union1d(A,B))
+def jacard_similarity(A:np.ndarray,B:np.ndarray) -> float:
+    
 
