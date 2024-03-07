@@ -25,8 +25,8 @@ def plot3d(N, radius: bool = False, soma: bool = True, **kwargs) -> vd.Plotter:
             if soma:
                 pnt = vd.Point(g_vert_coords(N,g_root_ind(N))[0])
                 vd.show([lns,pnt]).close
-            else:    
-                vd.show(lns).close()
+                
+            vd.show(lns).close()
 
     elif isinstance(N, Node_table):
         if radius == True:

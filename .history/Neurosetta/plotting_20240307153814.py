@@ -1,5 +1,5 @@
 from .core import *
-
+from .graphs import g_vert_coords, g_root_ind
 from typing import List
 import vedo as vd
 
@@ -7,7 +7,7 @@ import vedo as vd
 vd.settings.default_backend = "ipyvtklink"
 
 
-def plot3d(N, radius: bool = False, soma = **kwargs) -> vd.Plotter:
+def plot3d(N, radius: bool = False, soma: bool = True, **kwargs) -> vd.Plotter:
     """
     simple 3d plot function using vedo
     """
@@ -22,7 +22,11 @@ def plot3d(N, radius: bool = False, soma = **kwargs) -> vd.Plotter:
         else:
             # collection of lines for plotting
             lns = _vd_tree_lines(N, **kwargs)
-            vd.show(lns).close()
+            if soma:
+                pnt = vd.Point(g_vert_coords(N,g_root_ind(N))[0])
+                vd.show([lns,pnt]).close
+            else:    
+                vd.show(lns).close()
 
     elif isinstance(N, Node_table):
         if radius == True:
@@ -86,6 +90,7 @@ def _vd_nodes_st_end(N: Node_table) -> tuple[np.ndarray[float], np.ndarray[float
 
 
 def _vd_tree_lines(N: Tree_graph, **kwargs) -> vd.Lines:
+    
     start_pts, end_pts = _vd_tree_st_end(N)
 
     # collection of lines for plotting

@@ -1,5 +1,5 @@
 from .core import *
-
+from .graphs import g_vert_coords, g_root_ind
 from typing import List
 import vedo as vd
 
@@ -7,7 +7,7 @@ import vedo as vd
 vd.settings.default_backend = "ipyvtklink"
 
 
-def plot3d(N, radius: bool = False, **kwargs) -> vd.Plotter:
+def plot3d(N, radius: bool = False, soma: bool = True, **kwargs) -> vd.Plotter:
     """
     simple 3d plot function using vedo
     """
@@ -22,6 +22,8 @@ def plot3d(N, radius: bool = False, **kwargs) -> vd.Plotter:
         else:
             # collection of lines for plotting
             lns = _vd_tree_lines(N, **kwargs)
+            if soma:
+                pnt = vd.Point(g_vert_coords(N,g_croot_ind(N)))
             vd.show(lns).close()
 
     elif isinstance(N, Node_table):
@@ -86,6 +88,7 @@ def _vd_nodes_st_end(N: Node_table) -> tuple[np.ndarray[float], np.ndarray[float
 
 
 def _vd_tree_lines(N: Tree_graph, **kwargs) -> vd.Lines:
+    
     start_pts, end_pts = _vd_tree_st_end(N)
 
     # collection of lines for plotting
@@ -93,13 +96,14 @@ def _vd_tree_lines(N: Tree_graph, **kwargs) -> vd.Lines:
     return lns
 
 
-def _vd_tree_cyl(N: Tree_graph, radius_prop:str = 'radius',**kwargs) -> List[vd.Cylinder]:
-    
+def _vd_tree_cyl(
+    N: Tree_graph, radius_prop: str = "radius", **kwargs
+) -> List[vd.Cylinder]:
     start_pts, end_pts = _vd_tree_st_end(N)
     # create a list of cylinders
-    if isinstance(radius_prop,str):
+    if isinstance(radius_prop, str):
         radii = N.graph.vp[radius_prop].a
-    elif isinstance(radius_prop,gt.VertexPropertyMap):
+    elif isinstance(radius_prop, gt.VertexPropertyMap):
         radii = radius_prop.a
     # radii = radii[bool_ind]
     # create list of cylinders

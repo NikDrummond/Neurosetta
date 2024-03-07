@@ -23,10 +23,8 @@ def plot3d(N, radius: bool = False, soma: bool = True, **kwargs) -> vd.Plotter:
             # collection of lines for plotting
             lns = _vd_tree_lines(N, **kwargs)
             if soma:
-                pnt = vd.Point(g_vert_coords(N,g_root_ind(N))[0])
-                vd.show([lns,pnt]).close
-            else:    
-                vd.show(lns).close()
+                pnt = 
+            vd.show(lns).close()
 
     elif isinstance(N, Node_table):
         if radius == True:
