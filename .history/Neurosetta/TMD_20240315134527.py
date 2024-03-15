@@ -172,80 +172,80 @@ def TMD_persistance_im(g,xlim = None, ylim = None, norm_factor = None):
 
     return Zn    
 
-# def bottleneck_dist(N1,N2):
-#     """Compute bottleneck distance between two persistance diagrams
+def bottleneck_dist(N1,N2):
+    """Compute bottleneck distance between two persistance diagrams
 
-#     Parameters
-#     ----------
-#     N1 : _type_
-#         _description_
-#     N2 : _type_
-#         _description_
+    Parameters
+    ----------
+    N1 : _type_
+        _description_
+    N2 : _type_
+        _description_
 
-#     Returns
-#     -------
-#     _type_
-#         _description_
-#     """
-#     N1_pd = TMD_persistance_diagram(N1.graph)
-#     N2_pd = TMD_persistance_diagram(N2.graph)
+    Returns
+    -------
+    _type_
+        _description_
+    """
+    N1_pd = TMD_persistance_diagram(N1.graph)
+    N2_pd = TMD_persistance_diagram(N2.graph)
 
-#     return bottleneck(N1_pd,N2_pd)    
+    return bottleneck(N1_pd,N2_pd)    
 
 
 
-# def _calculate_distances(i, N_all, result_queue):
-#     num_points = len(N_all)
-#     distances = np.zeros(num_points)
-#     for j in range(num_points):
-#         if j != i:
-#             distances[j] = bottleneck_dist(N_all[i], N_all[j])
-#     result_queue.put((i, distances))
+def _calculate_distances(i, N_all, result_queue):
+    num_points = len(N_all)
+    distances = np.zeros(num_points)
+    for j in range(num_points):
+        if j != i:
+            distances[j] = bottleneck_dist(N_all[i], N_all[j])
+    result_queue.put((i, distances))
 
-# def bottleneck_matrix(N_all, parallel = True, max_processes = None):
+def bottleneck_matrix(N_all, parallel = True, max_processes = None):
 
-#     if parallel:
-#         num_points = len(N_all)
-#         dist_mat = np.zeros((num_points, num_points))
+    if parallel:
+        num_points = len(N_all)
+        dist_mat = np.zeros((num_points, num_points))
 
-#         # Determine the number of processes to use
-#         if max_processes is None:
-#             max_processes = mp.cpu_count()
+        # Determine the number of processes to use
+        if max_processes is None:
+            max_processes = mp.cpu_count()
 
-#         # Create a multiprocessing Queue to store results
-#         result_queue = mp.Queue()
+        # Create a multiprocessing Queue to store results
+        result_queue = mp.Queue()
 
-#         # Create processes to calculate distances
-#         processes = []
-#         for i in range(num_points):
-#             process = mp.Process(target=_calculate_distances, args=(i, N_all, result_queue))
-#             processes.append(process)
-#             process.start()
+        # Create processes to calculate distances
+        processes = []
+        for i in range(num_points):
+            process = mp.Process(target=_calculate_distances, args=(i, N_all, result_queue))
+            processes.append(process)
+            process.start()
 
-#             # Limit the number of processes
-#             if max_processes is not None and len(processes) >= max_processes:
-#                 for p in processes:
-#                     p.join()
-#                 processes = []
+            # Limit the number of processes
+            if max_processes is not None and len(processes) >= max_processes:
+                for p in processes:
+                    p.join()
+                processes = []
 
-#         # Retrieve remaining results from the Queue and fill the distance matrix
-#         while not result_queue.empty():
-#             i, distances = result_queue.get()
-#             dist_mat[i, :] = distances
+        # Retrieve remaining results from the Queue and fill the distance matrix
+        while not result_queue.empty():
+            i, distances = result_queue.get()
+            dist_mat[i, :] = distances
 
-#         # Join remaining processes
-#         for process in processes:
-#             process.join()
+        # Join remaining processes
+        for process in processes:
+            process.join()
 
-#     else:    
-#         num_points = len(N_all)
-#         dist_mat = np.zeros((num_points, num_points))
+    else:    
+        num_points = len(N_all)
+        dist_mat = np.zeros((num_points, num_points))
 
-#         # Calculate bottleneck distances
-#         for i in tqdm(range(num_points)):
-#             for j in range(i + 1, num_points):
-#                 t = bottleneck_dist(N_all[i], N_all[j])
-#                 dist_mat[i, j] = dist_mat[j, i] = t    
+        # Calculate bottleneck distances
+        for i in tqdm(range(num_points)):
+            for j in range(i + 1, num_points):
+                t = bottleneck_dist(N_all[i], N_all[j])
+                dist_mat[i, j] = dist_mat[j, i] = t    
 
-#     return dist_mat
+    return dist_mat
 
