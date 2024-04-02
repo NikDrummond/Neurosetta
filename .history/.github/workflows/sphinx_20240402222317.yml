@@ -31,7 +31,7 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          git diff --quiet --exit-code build/html/          
+            git diff --quiet --exit-code build/html/          
 
       - name: Commit and push changes
         run: |

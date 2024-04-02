@@ -29,9 +29,9 @@ jobs:
           make html
 
       - name: Check for changes
-        id: check_changes
-        run: |
-          git diff --quiet --exit-code build/html/          
+          id: check_changes
+          run: |
+            git diff --quiet --exit-code build/html/          
 
       - name: Commit and push changes
         run: |
