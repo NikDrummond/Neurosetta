@@ -5,7 +5,7 @@ import graph_tool.all as gt
 import numpy as np
 from scipy import stats
 import multiprocessing as mp
-from gudhi import bottleneck_distance as bottle_d
+#from persim import bottleneck
 from tqdm import tqdm
 
 
@@ -172,25 +172,25 @@ def TMD_persistance_im(g,xlim = None, ylim = None, norm_factor = None):
 
     return Zn    
 
-def bottleneck_dist(N1,N2, e = None):
-    """Compute bottleneck distance between two persistance diagrams
+# def bottleneck_dist(N1,N2):
+#     """Compute bottleneck distance between two persistance diagrams
 
-    Parameters
-    ----------
-    N1 : _type_
-        _description_
-    N2 : _type_
-        _description_
+#     Parameters
+#     ----------
+#     N1 : _type_
+#         _description_
+#     N2 : _type_
+#         _description_
 
-    Returns
-    -------
-    _type_
-        _description_
-    """
-    N1_pd = TMD_persistance_diagram(N1.graph).astype(np.float64)
-    N2_pd = TMD_persistance_diagram(N2.graph).astype(np.float64)
+#     Returns
+#     -------
+#     _type_
+#         _description_
+#     """
+#     N1_pd = TMD_persistance_diagram(N1.graph)
+#     N2_pd = TMD_persistance_diagram(N2.graph)
 
-    return bottle_d(N1_pd,N2_pd,e)    
+#     return bottleneck(N1_pd,N2_pd)    
 
 
 

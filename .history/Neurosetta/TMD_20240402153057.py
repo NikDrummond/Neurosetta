@@ -172,7 +172,7 @@ def TMD_persistance_im(g,xlim = None, ylim = None, norm_factor = None):
 
     return Zn    
 
-def bottleneck_dist(N1,N2, e = None):
+def bottleneck_dist(N1,N2, e = N):
     """Compute bottleneck distance between two persistance diagrams
 
     Parameters
@@ -187,10 +187,10 @@ def bottleneck_dist(N1,N2, e = None):
     _type_
         _description_
     """
-    N1_pd = TMD_persistance_diagram(N1.graph).astype(np.float64)
-    N2_pd = TMD_persistance_diagram(N2.graph).astype(np.float64)
+    N1_pd = TMD_persistance_diagram(N1.graph)
+    N2_pd = TMD_persistance_diagram(N2.graph)
 
-    return bottle_d(N1_pd,N2_pd,e)    
+    return bottle_d(N1_pd,N2_pd)    
 
 
 

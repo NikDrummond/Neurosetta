@@ -188,7 +188,7 @@ def bottleneck_dist(N1,N2, e = None):
         _description_
     """
     N1_pd = TMD_persistance_diagram(N1.graph).astype(np.float64)
-    N2_pd = TMD_persistance_diagram(N2.graph).astype(np.float64)
+    N2_pd = TMD_persistance_diagram(N2.graph).astype(np.float)
 
     return bottle_d(N1_pd,N2_pd,e)    
 
