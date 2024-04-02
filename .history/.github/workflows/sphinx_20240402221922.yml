@@ -18,9 +18,7 @@ jobs:
         with:
           python-version: '3.x'  # Choose your Python version
 
-      - name: Install sphinx
-        run: |
-            pip install sphinx sphinx-rtd-theme  # Install Sphinx and the Read the Docs theme
+          
 
       - name: Build Sphinx documentation
         run: |
