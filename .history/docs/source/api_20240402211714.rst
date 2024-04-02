@@ -31,14 +31,14 @@ Sets
 
 TMD
 ---
-.. automodule:: Neurosetta.TMD
+.. automodule:: neurosetta.TMD
     :members:
     :undoc-members:
     :show-inheritance:   
 
 Tree-surgery
 ------------
-.. automodule:: Neurosetta.tree_surgery
+.. automodule:: neurosetta.tree_surgery
     :members:
     :undoc-members:
     :show-inheritance:   

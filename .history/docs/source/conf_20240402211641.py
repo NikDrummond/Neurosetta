@@ -6,10 +6,6 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-import sys, os
-
-sys.path.insert(0, os.path.abspath('extensions'))
-
 project = 'Neurosetta'
 copyright = '2024, Nik Drummond'
 author = 'Nik Drummond'

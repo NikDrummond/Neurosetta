@@ -17,28 +17,28 @@ Graphs
 
 Plotting
 --------
-.. automodule:: Neurosetta.plotting
+.. automodule:: neurosetta.plotting
     :members:
     :undoc-members:
     :show-inheritance:  
 
 Sets
 ----
-.. automodule:: Neurosetta.sets
+.. automodule:: neurosetta.sets
     :members:
     :undoc-members:
     :show-inheritance:    
 
 TMD
 ---
-.. automodule:: Neurosetta.TMD
+.. automodule:: neurosetta.TMD
     :members:
     :undoc-members:
     :show-inheritance:   
 
 Tree-surgery
 ------------
-.. automodule:: Neurosetta.tree_surgery
+.. automodule:: neurosetta.tree_surgery
     :members:
     :undoc-members:
     :show-inheritance:   

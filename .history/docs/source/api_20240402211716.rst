@@ -38,7 +38,7 @@ TMD
 
 Tree-surgery
 ------------
-.. automodule:: Neurosetta.tree_surgery
+.. automodule:: neurosetta.tree_surgery
     :members:
     :undoc-members:
     :show-inheritance:   
