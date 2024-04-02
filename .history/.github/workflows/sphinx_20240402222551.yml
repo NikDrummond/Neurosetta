@@ -40,12 +40,12 @@ jobs:
             exit 1
           fi
   
-      - name: Commit and push changes
-        if: steps.check_directory.outputs.returncode == '0'
-        run: |
-          cd docs
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add build/html/
-          git commit -m "Auto-generated Sphinx documentation"
-          git push
+        - name: Commit and push changes
+          if: steps.check_directory.outputs.returncode == '0'
+          run: |
+            cd docs
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add build/html/
+            git commit -m "Auto-generated Sphinx documentation"
+            git push

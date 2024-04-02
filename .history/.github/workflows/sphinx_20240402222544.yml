@@ -29,23 +29,23 @@ jobs:
           make html
 
       - name: Check for build/html directory
-        id: check_directory
-        run: |
-          cd docs
-          if [ -d "build/html" ]; then
-            echo "Directory exists"
-            exit 0
-          else
-            echo "Directory does not exist"
-            exit 1
-          fi
+          id: check_directory
+          run: |
+            cd docs
+            if [ -d "build/html" ]; then
+              echo "Directory exists"
+              exit 0
+            else
+              echo "Directory does not exist"
+              exit 1
+            fi
   
-      - name: Commit and push changes
-        if: steps.check_directory.outputs.returncode == '0'
-        run: |
-          cd docs
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add build/html/
-          git commit -m "Auto-generated Sphinx documentation"
-          git push
+        - name: Commit and push changes
+          if: steps.check_directory.outputs.returncode == '0'
+          run: |
+            cd docs
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add build/html/
+            git commit -m "Auto-generated Sphinx documentation"
+            git push

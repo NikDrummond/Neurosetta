@@ -1,0 +1,51 @@
+name: Generate Sphinx Documentation
+
+on:
+  push:
+    branches:
+      - main  # Change this to your main branch name
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'  # Choose your Python version
+
+      - name: Install sphinx
+        run: |
+            pip install sphinx sphinx-rtd-theme  # Install Sphinx and the Read the Docs theme
+
+      - name: Build Sphinx documentation
+        run: |
+          cd docs
+          make clean
+          make html
+
+        - name: Check for build/html directory
+          id: check_directory
+          run: |
+            cd docs
+            if [ -d "build/html" ]; then
+              echo "Directory exists"
+              exit 0
+            else
+              echo "Directory does not exist"
+              exit 1
+            fi
+  
+        - name: Commit and push changes
+          if: steps.check_directory.outputs.returncode == '0'
+          run: |
+            cd docs
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add build/html/
+            git commit -m "Auto-generated Sphinx documentation"
+            git push
