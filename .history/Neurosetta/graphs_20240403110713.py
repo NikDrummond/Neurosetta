@@ -15,11 +15,7 @@ def g_has_property(
     N: gt.Graph | Tree_graph, g_property: str, t: str | bool = None
 ) -> bool:
     """
-    Check if a property is within a graph. Will either check for a property generally, or can check specifically graph, vertex, or edge.
-
-    If the g_property argument is None (default), all graph, vertex, and edge properties are checked against. If however the looked for property is a specific type, then the g_property argument can be set to either "v", "e", or "g".
-
-    In this case only the graph ('g'), vertex ('v'), or edge ('e') property is checked.
+    Check if a property is within a graph. Will either check for a property generally, or can 
     """
     if isinstance(N, Tree_graph):
         g = N.graph

@@ -19,7 +19,7 @@ def g_has_property(
 
     If the g_property argument is None (default), all graph, vertex, and edge properties are checked against. If however the looked for property is a specific type, then the g_property argument can be set to either "v", "e", or "g".
 
-    In this case only the graph ('g'), vertex ('v'), or edge ('e') property is checked.
+    In
     """
     if isinstance(N, Tree_graph):
         g = N.graph
