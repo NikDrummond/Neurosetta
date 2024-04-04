@@ -344,15 +344,15 @@ def apply_mask(N:Tree_graph | gt.Graph, mask: str | np.ndarray | gt.VertexProper
     g = reroot_tree(g, g_root_ind(N))
     # reroot adds 'core' properties
     # add path length for edges (if needed)
-    if not g_has_property(g,'Path_length'):
-        get_g_distances(g, inplace = True)
+    if not g_has_property(g2,'Path_length'):
+        nr.get_g_distances(g2, inplace = True)
 
     # if we were given A TREE GRAPH, RETURN A TREE GRAPH
-    if isinstance(N,Tree_graph):
-        g = Tree_graph(name = N.name, graph = g)
+    if isinstance(N,nr.Tree_graph):
+        g = nr.Tree_graph(name = N.name, graph = g)
 
     if inplace:
-        if isinstance(N, Tree_graph):
+        if isinstance(N, nr.Tree_graph):
             N.graph = g
             return
     else:
