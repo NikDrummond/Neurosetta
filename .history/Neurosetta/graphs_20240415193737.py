@@ -758,4 +758,4 @@ def get_edge_coords(N:Tree_graph) -> tuple[np.ndarray,np.ndarray]:
     coords = g_vert_coords(N)
     p1 = coords[edges[:,0]]
     p2 = coords[edges[:,1]]
-    return p1,p2
+    return p1,p2  

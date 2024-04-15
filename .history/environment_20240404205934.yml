@@ -1,0 +1,15 @@
+name: cm_
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - setuptools
+  - graph-tool
+  - gudhi
+  - pykdtree
+  - vedo
+  - numpy
+  - pandas
+  - scipy  
+  - hdbscan
+  - tqdm
