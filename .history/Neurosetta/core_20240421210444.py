@@ -307,46 +307,4 @@ def load(f_path):
 
 ### Prototyping Neuronal network class
 
-class Network_graph(Stone):
-    """
-    Neuronal Network
-    """
-    def __init__(self, name:str, graph:gt.Graph) -> None:
-        self.graph = graph
-        super().__init__(name)
-        self.make()
-
-    def make(self):
-        self.id_lookup = dict(map(lambda i,j : (i,j) , self.graph.vp['ids'].a,self.graph.get_vertices()))    
-
-def Network_from_table(edges:pd.DataFrame | np.ndarray, add_weights:bool = True, weight_label:str = 'weight',name:str = None):
-    """
-    Build a neuron network graph from a data frame or edge list.
-
-    The first two columns of the edges input must relate to source -> target edge mapping.
-    
-    If add_weights is True, the third column of edges will be used as the weighting for each edge.
-
-    Any other columns will be ignored. 
-    """
-    # unpack the weightes form the df
-    if isinstance(edges,pd.DataFrame):
-        edges = edges.values
-
-    # if weights is false, keep only first two columns
-    if not add_weights:
-        edges = edges[:,0:2]
-        g = gt.Graph(edges,hashed = True, hash_type = 'int')
-    else:
-        g = gt.Graph(edges[:,0:3],hashed = True, eprops = [(weight_label,'int')], hash_type = 'int')
-
-    return Network_graph(name = name,graph = g)        
-
-def add_vp(g,df,id_col,val_col,name,dtype):
-    """
-    Find a quicker way to do this...
-    """
-    vprop = g.new_vp(dtype)
-    for v in g.iter_vertices():
-        vprop[v] = df.loc[df[id_col] == g.vp['ids'][v],val_col].values[0]
-    g.vp[name] = vprop             
+            
