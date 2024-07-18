@@ -190,9 +190,7 @@ def bottleneck_dist(N1,N2, e = None, inv = True):
     N1_pd = TMD_persistance_diagram(N1.graph).astype(np.float64)
     N2_pd = TMD_persistance_diagram(N2.graph).astype(np.float64)
 
-    if inv:
-        N1_pd = N1_pd[:,[1,0]]
-        N2_pd = N2_pd[:,[1,0]]
+    if inv
 
     return bottle_d(N1_pd,N2_pd,e)    
 

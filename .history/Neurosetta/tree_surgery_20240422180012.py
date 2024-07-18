@@ -235,7 +235,7 @@ def simplify_neuron(N: Tree_graph) -> Tree_graph:
         # if the target vertex is an segment end
         if curr_end in seg_stops:
             edges[index,1] = curr_end
-            index += 1        
+        index += 1        
 
 
     g = gt.Graph(edges, hashed = True, hash_type = 'int')

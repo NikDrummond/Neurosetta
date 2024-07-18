@@ -1,4 +1,4 @@
-import graph_tool.all as gt
+N.list_properimport graph_tool.all as gt
 import numpy as np
 from scipy.spatial import KDTree
 from scipy.spatial.distance import squareform, pdist
@@ -98,12 +98,10 @@ def get_g_distances(
     # generate distance/weight for graph
     # add edge weights based on distance
     eprop_w = g.new_ep("double")
+    # get length of each edge
+    for i in g.iter_edges():
+        eprop_w[i] = np.linalg.norm(g.vp["coordinates"][i[0]].a - g.vp["coordinates"][i[1]].a)
 
-    edges = g.get_edges()
-    coords = g_vert_coords(g)
-    eprop_w.a = np.linalg.norm(coords[edges[:,0]] - coords[edges[:,1]], axis = 1)
-    
-    # bind this as an edge property to the graph
     if bind:
         g.ep[name] = eprop_w
     else:

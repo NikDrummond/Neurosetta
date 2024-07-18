@@ -100,10 +100,11 @@ def get_g_distances(
     eprop_w = g.new_ep("double")
 
     edges = g.get_edges()
-    coords = g_vert_coords(g)
-    eprop_w.a = np.linalg.norm(coords[edges[:,0]] - coords[edges[:,1]], axis = 1)
-    
-    # bind this as an edge property to the graph
+coords = nr.g_vert_coords(g)
+    # get length of each edge
+    for i in g.iter_edges():
+        eprop_w[i] = np.linalg.norm(g.vp["coordinates"][i[0]].a - g.vp["coordinates"][i[1]].a)
+
     if bind:
         g.ep[name] = eprop_w
     else:

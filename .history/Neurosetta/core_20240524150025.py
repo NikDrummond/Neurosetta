@@ -90,7 +90,7 @@ def table_from_swc(file_path: str) -> pd.DataFrame:
         names=["node_id", "type", "x", "y", "z", "radius", "parent_id"],
         comment="#",
         engine="c",
-        sep = '\s+',
+        sep = ,
         dtype={
             "node_id": np.int32,
             "type": np.int32,

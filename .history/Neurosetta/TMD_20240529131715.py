@@ -192,7 +192,6 @@ def bottleneck_dist(N1,N2, e = None, inv = True):
 
     if inv:
         N1_pd = N1_pd[:,[1,0]]
-        N2_pd = N2_pd[:,[1,0]]
 
     return bottle_d(N1_pd,N2_pd,e)    
 
