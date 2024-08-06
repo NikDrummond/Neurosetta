@@ -1,8 +1,6 @@
 import graph_tool.all as gt
 import numpy as np
 import scipy.stats as stats
-from scipy.cluster.hierarchy import fcluster
-import fastcluster as fc
 from .core import Tree_graph, infer_node_types
 from .graphs import *
 
@@ -390,58 +388,9 @@ def vertex_hierarchical_clusters(N: Tree_graph | gt.Graph,subset: np.ndarray | N
     if subset is None:
         subset = g.get_vertices()    
     # generate pairwise distance matrix based on path length
-    mat = dist_mat(g, subset, method = distance, flatten=True)
+    dist_mat = nr.dist_mat(g, subset, method = distance, flatten=True)
     # generate linkage matrix
-    Z = fc.linkage(mat, method = method)
+    Z = fc.linkage(dist_mat, method = method)
     # cluster inds
     c_ids = fcluster(Z,k, criterion = 'maxclust')
     return Z, c_ids        
-
-def linkage_cluster_permutation(clusters:np.ndarray,Z:np.ndarray,inplace = True,root_cluster:int | None = None,perms:int = 1000,a:float = 0.001):
-    """_summary_
-
-    Parameters
-    ----------
-    clusters : np.ndarray
-        _description_
-    Z : np.ndarray
-        _description_
-    inplace : bool, optional
-        _description_, by default True
-    root_cluster : int | None, optional
-        _description_, by default None
-    perms : int, optional
-        _description_, by default 1000
-    a : float, optional
-        _description_, by default 0.001
-
-    Returns
-    -------
-    _type_
-        _description_
-    """
-    cluster_ids = np.unique(clusters)
-
-    if root_cluster is not None:
-        np.delete(cluster_ids,np.where(cluster_ids == root_cluster))
-    if not inplace:
-        data = clusters.copy()
-
-    for cluster_id in cluster_ids:
-        cluster = np.where(clusters == cluster_id)[0]
-        link_dist = np.array([Z[np.where( (Z[:,0] == c) | (Z[:,1] == c))][0][2] for c in cluster])
-        # perform permutation
-        perm_sample = np.zeros(perms)
-        for i in range(perms):
-            perm_sample[i] = np.mean(np.random.choice(link_dist,2))
-        # calculate exact p    
-        ps = np.array([len(perm_sample[ perm_sample >= t]) / len(perm_sample) for t in link_dist])    
-        if inplace:
-            clusters[cluster[np.where(ps <= a)]] = -1
-        else:
-            data[cluster[np.where(ps <= a)]] = -1
-
-    if inplace:            
-        return clusters
-    else:
-        return data     

@@ -48,10 +48,10 @@ def _vd_tree_st_end(N: Tree_graph) -> tuple[np.ndarray[float], np.ndarray[float]
     # get all edges
     edges = N.graph.get_edges()
     # get coordinate array
-    coords = g_vert_coords(N)
+    coords = nr.g_vert_coords(N)
     # initialise start and end points
     edges = N.graph.get_edges()
-    coords = g_vert_coords(N)
+    coords = nr.g_vert_coords(N)
 
     start_pts = coords[edges[:,0]]
     end_pts = coords[edges[:,1]]

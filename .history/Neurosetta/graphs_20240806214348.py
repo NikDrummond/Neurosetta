@@ -65,16 +65,7 @@ def g_vert_coords(
     if not g_has_property(g, "coordinates", t="v"):
         raise AttributeError("Coordinates property missing from graph")
 
-    # if we have no subset, return all
-    if subset is None:
-        coords = g.vp["coordinates"].get_2d_array().T
-    else:
-        # if subset is just a single int, convert to a list
-        if isinstance(subset, (int, np.integer)):
-            subset = [subset]
-        coords = g.vp["coordinates"].get_2d_array().T
-        coords = coords[subset]
-        
+
     return coords
 
 

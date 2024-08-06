@@ -74,7 +74,6 @@ def g_vert_coords(
             subset = [subset]
         coords = g.vp["coordinates"].get_2d_array().T
         coords = coords[subset]
-        
     return coords
 
 

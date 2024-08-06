@@ -398,28 +398,7 @@ def vertex_hierarchical_clusters(N: Tree_graph | gt.Graph,subset: np.ndarray | N
     return Z, c_ids        
 
 def linkage_cluster_permutation(clusters:np.ndarray,Z:np.ndarray,inplace = True,root_cluster:int | None = None,perms:int = 1000,a:float = 0.001):
-    """_summary_
 
-    Parameters
-    ----------
-    clusters : np.ndarray
-        _description_
-    Z : np.ndarray
-        _description_
-    inplace : bool, optional
-        _description_, by default True
-    root_cluster : int | None, optional
-        _description_, by default None
-    perms : int, optional
-        _description_, by default 1000
-    a : float, optional
-        _description_, by default 0.001
-
-    Returns
-    -------
-    _type_
-        _description_
-    """
     cluster_ids = np.unique(clusters)
 
     if root_cluster is not None:
