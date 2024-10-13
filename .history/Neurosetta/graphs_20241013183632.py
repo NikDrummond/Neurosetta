@@ -793,7 +793,7 @@ def get_edges(N:Tree_graph, subset: str | None = None) -> np.ndarray:
     if subset is None:
         return edges
     elif isinstance(subset,str):
-        l_inds = g_leaf_inds(N)
+        l_inds = nr.g_leaf_inds(N)
         mask = np.zeros(edges.shape[0], dtype = bool)
         mask[l_inds] = 1
         if subset is 'Internal':
