@@ -764,10 +764,7 @@ def get_edge_coords(N:Tree_graph) -> tuple[np.ndarray,np.ndarray]:
     return p1,p2
 
 def get_edges(N:Tree_graph, subset: str | None) -> np.ndarray:
-    """Return array of edges within a given neuron. If subset is not None, 'Internal' or 'External' must be specified
-
-    In such a case, either edges with a leaf node as the target are returned ('External")
-    Or edges with no leaf node are returned ("Internal")
+    """Return array of edges within 
 
     Parameters
     ----------

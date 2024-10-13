@@ -67,13 +67,14 @@ def g_vert_coords(
 
     # if we have no subset, return all
     if subset is None:
-        coords = np.array([g.vp["coordinates"][i] for i in g.get_vertices()])
+        coords = g.vp["coordinates"].get_2d_array().T
     else:
         # if subset is just a single int, convert to a list
         if isinstance(subset, (int, np.integer)):
             subset = [subset]
-        coords = np.array([g.vp["coordinates"][i] for i in subset])
-
+        coords = g.vp["coordinates"].get_2d_array().T
+        coords = coords[subset]
+        
     return coords
 
 
@@ -103,7 +104,7 @@ def get_g_distances(
     coords = g_vert_coords(g)
     eprop_w.a = np.linalg.norm(coords[edges[:,0]] - coords[edges[:,1]], axis = 1)
     
-    
+    # bind this as an edge property to the graph
     if bind:
         g.ep[name] = eprop_w
     else:
@@ -761,3 +762,5 @@ def get_edge_coords(N:Tree_graph) -> tuple[np.ndarray,np.ndarray]:
     p1 = coords[edges[:,0]]
     p2 = coords[edges[:,1]]
     return p1,p2
+
+

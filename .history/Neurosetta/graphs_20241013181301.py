@@ -67,13 +67,14 @@ def g_vert_coords(
 
     # if we have no subset, return all
     if subset is None:
-        coords = np.array([g.vp["coordinates"][i] for i in g.get_vertices()])
+        coords = g.vp["coordinates"].get_2d_array().T
     else:
         # if subset is just a single int, convert to a list
         if isinstance(subset, (int, np.integer)):
             subset = [subset]
-        coords = np.array([g.vp["coordinates"][i] for i in subset])
-
+        coords = g.vp["coordinates"].get_2d_array().T
+        coords = coords[subset]
+        
     return coords
 
 
@@ -100,8 +101,10 @@ def get_g_distances(
     eprop_w = g.new_ep("double")
 
     edges = g.get_edges()
-    coords = nr.g_vert_coords(g)
+    coords = g_vert_coords(g)
+    eprop_w.a = np.linalg.norm(coords[edges[:,0]] - coords[edges[:,1]], axis = 1)
     
+    # bind this as an edge property to the graph
     if bind:
         g.ep[name] = eprop_w
     else:
@@ -759,3 +762,45 @@ def get_edge_coords(N:Tree_graph) -> tuple[np.ndarray,np.ndarray]:
     p1 = coords[edges[:,0]]
     p2 = coords[edges[:,1]]
     return p1,p2
+
+def get_edges(N:Tree_graph, subset: str | None) -> np.ndarray:
+    """Return array of edges within a given neuron. If subset is not None, 'Internal' or 'External' must be specified
+
+    
+
+    Parameters
+    ----------
+    N : nr.Tree_graph
+        neurosetta Tree_graph representing a neuron
+    subset : str | None
+        If None (default) np.ndarray of all edges is returned. If "Internal" only edges with no leaf nodes are returned.
+        If 'External" only edges with a leaf node are returned 
+
+    Returns
+    -------
+    np.ndarray
+        array of edges within the graph, Where the first values is the source node index, and second the target node index.
+
+    Raises
+    ------
+    AttributeError
+        If a string is passed for subset which is not 'Internal' or 'External'
+    AttributeError
+        If Subset it neither None, nor a string specifying 'Internal' or 'External'
+    """
+    edges =  N.graph.get_edges()
+    if subset is None:
+        return edges
+    elif isinstance(subset,str):
+        l_inds = nr.g_leaf_inds(N)
+        mask = np.zeros(edges.shape[0], dtype = bool)
+        mask[l_inds] = 1
+        if subset is 'Internal':
+            return edges[~mask]    
+        elif subset is 'External':    
+            return edges[mask]
+        else:
+            raise AttributeError('Specified subset must be Internal, or External')
+    else:
+        raise AttributeError('Subset must be None, to return all edges, or Internal or External')
+

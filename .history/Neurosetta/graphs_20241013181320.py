@@ -65,7 +65,16 @@ def g_vert_coords(
     if not g_has_property(g, "coordinates", t="v"):
         raise AttributeError("Coordinates property missing from graph")
 
-
+    # if we have no subset, return all
+    if subset is None:
+        coords = g.vp["coordinates"].get_2d_array().T
+    else:
+        # if subset is just a single int, convert to a list
+        if isinstance(subset, (int, np.integer)):
+            subset = [subset]
+        coords = g.vp["coordinates"].get_2d_array().T
+        coords = coords[subset]
+        
     return coords
 
 
@@ -753,3 +762,45 @@ def get_edge_coords(N:Tree_graph) -> tuple[np.ndarray,np.ndarray]:
     p1 = coords[edges[:,0]]
     p2 = coords[edges[:,1]]
     return p1,p2
+
+def get_edges(N:Tree_graph, subset: str | None) -> np.ndarray:
+    """Return array of edges within a given neuron. If subset is not None, 'Internal' or 'External' must be specified
+
+    In such a case, either edges with a leaf node as the target
+
+    Parameters
+    ----------
+    N : nr.Tree_graph
+        neurosetta Tree_graph representing a neuron
+    subset : str | None
+        If None (default) np.ndarray of all edges is returned. If "Internal" only edges with no leaf nodes are returned.
+        If 'External" only edges with a leaf node are returned 
+
+    Returns
+    -------
+    np.ndarray
+        array of edges within the graph, Where the first values is the source node index, and second the target node index.
+
+    Raises
+    ------
+    AttributeError
+        If a string is passed for subset which is not 'Internal' or 'External'
+    AttributeError
+        If Subset it neither None, nor a string specifying 'Internal' or 'External'
+    """
+    edges =  N.graph.get_edges()
+    if subset is None:
+        return edges
+    elif isinstance(subset,str):
+        l_inds = nr.g_leaf_inds(N)
+        mask = np.zeros(edges.shape[0], dtype = bool)
+        mask[l_inds] = 1
+        if subset is 'Internal':
+            return edges[~mask]    
+        elif subset is 'External':    
+            return edges[mask]
+        else:
+            raise AttributeError('Specified subset must be Internal, or External')
+    else:
+        raise AttributeError('Subset must be None, to return all edges, or Internal or External')
+

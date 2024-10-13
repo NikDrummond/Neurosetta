@@ -13,6 +13,7 @@ class Stone(object):
     def __init__(self, name: str) -> None:
         self.name = name
         self.id = id
+        self.units = None
 
 
 class Tree_graph(Stone):
@@ -20,10 +21,10 @@ class Tree_graph(Stone):
     Tree graph
     """
 
-    def __init__(self, name: str, graph: gt.Graph) -> None:
-        self.graph = graph
-
+    def __init__(self, name: str, graph: gt.Graph, units: str = "nm") -> None:
         super().__init__(name)
+        self.graph = graph
+        
 
 
 class Node_table(Stone):
@@ -42,7 +43,9 @@ class Neuron_mesh(Stone):
     A mesh
     """
 
-    def __init__(self, name: str, vertices: np.ndarray[float], faces: np.ndarray[int]) -> None:
+    def __init__(
+        self, name: str, vertices: np.ndarray[float], faces: np.ndarray[int]
+    ) -> None:
         self.vertices = vertices
         self.faces = faces
 
@@ -51,18 +54,19 @@ class Neuron_mesh(Stone):
 
 # read swc
 
-def read_swc(path: str, output: str = 'Graph') -> List | Tree_graph | Node_table:
+
+def read_swc(path: str, output: str = "Graph") -> List | Tree_graph | Node_table:
     """
     Read in swc file(s) and return table/graph output
-    """    
-    
+    """
+
     if os.path.isdir(path):
         files = os.listdir(path)
-        files = [f for f in files if f.endswith('.swc') ]
-        N = [_read_swc(path + f, output = output) for f in files]
+        files = [f for f in files if f.endswith(".swc")]
+        N = [_read_swc(path + f, output=output) for f in files]
 
     else:
-        N = _read_swc(path, output = output)
+        N = _read_swc(path, output=output)
 
     return N
 
@@ -90,7 +94,7 @@ def table_from_swc(file_path: str) -> pd.DataFrame:
         names=["node_id", "type", "x", "y", "z", "radius", "parent_id"],
         comment="#",
         engine="c",
-        sep = '\s+',
+        sep="\s+",
         dtype={
             "node_id": np.int32,
             "type": np.int32,
@@ -100,7 +104,7 @@ def table_from_swc(file_path: str) -> pd.DataFrame:
             "radius": np.float64,
             "parent_id": np.int32,
         },
-        index_col=False
+        index_col=False,
     )
 
     # check for duplicate node ids
@@ -168,7 +172,8 @@ def graph_from_table(df: pd.DataFrame) -> gt.Graph:
 
     return g
 
-def infer_node_types(g:gt.Graph, array:bool = False) -> np.ndarray:
+
+def infer_node_types(g: gt.Graph, array: bool = False) -> np.ndarray:
     """
 
     Parameters
@@ -185,7 +190,7 @@ def infer_node_types(g:gt.Graph, array:bool = False) -> np.ndarray:
     np.ndarray
         _description_
     """
-        # add type to nodes - infer from topology rather than from table
+    # add type to nodes - infer from topology rather than from table
     # types
     out_deg = g.get_out_degrees(g.get_vertices())
     in_deg = g.get_in_degrees(g.get_vertices())
@@ -196,18 +201,20 @@ def infer_node_types(g:gt.Graph, array:bool = False) -> np.ndarray:
     node_types[ends] = 6
     node_types[branches] = 5
     node_types[root] = -1
-        
+
     # create and add populate property
     vprop_type = g.new_vp("int")
     vprop_type.a = node_types
-    g.vp['type'] = vprop_type
-        
+    g.vp["type"] = vprop_type
+
     if array:
         return vprop_type.a
 
 
 # graph to node table
-def graph_to_table(g: gt.Graph, output: str = "Neurosetta") -> pd.DataFrame | Node_table:
+def graph_to_table(
+    g: gt.Graph, output: str = "Neurosetta"
+) -> pd.DataFrame | Node_table:
     """
     Convert Tree Graph to swc like table
     """
@@ -262,20 +269,23 @@ def graph_to_table(g: gt.Graph, output: str = "Neurosetta") -> pd.DataFrame | No
     elif output.casefold() == "Table".casefold():
         return df
 
-def write_swc(N:Node_table | Tree_graph, fpath: str) -> None:
+
+def write_swc(N: Node_table | Tree_graph, fpath: str) -> None:
     """
     Write Neuron to swc
     """
     if isinstance(N, Tree_graph):
         N = graph_to_table(N)
 
-    np.savetxt(fpath,N.nodes,
-            header = 'SWC Generated using Neurosetta \n Columns \n' + str(N.nodes.columns))
-    
+    np.savetxt(
+        fpath,
+        N.nodes,
+        header="SWC Generated using Neurosetta \n Columns \n" + str(N.nodes.columns),
+    )
 
 
 ## .nr file format read/write
-def save(N:Tree_graph,f_path = None):
+def save(N: Tree_graph, f_path=None):
     """_summary_
 
     Parameters
@@ -286,67 +296,82 @@ def save(N:Tree_graph,f_path = None):
         _description_, by default None
     """
     # check we have the ID property of our graph
-    if ("g", 'ID') not in N.graph.properties:
-        idgp = N.graph.new_gp('string')
+    if ("g", "ID") not in N.graph.properties:
+        idgp = N.graph.new_gp("string")
         idgp[N.graph] = N.name
-        N.graph.gp['ID'] = idgp
+        N.graph.gp["ID"] = idgp
 
     # If no f_path is given, save where we are
     if f_path is None:
-        sp = N.name + '.nr'
+        sp = N.name + ".nr"
     else:
-        sp = f_path + N.name + '.nr'
-                    
-    N.graph.save(sp, fmt = 'gt')
+        sp = f_path + N.name + ".nr"
+
+    N.graph.save(sp, fmt="gt")
+
 
 def load(f_path):
     """"""
-    g = gt.load_graph(f_path, fmt = 'gt')
-    name = g.gp['ID']
-    return Tree_graph(name, g)    
+    g = gt.load_graph(f_path, fmt="gt")
+    name = g.gp["ID"]
+    return Tree_graph(name, g)
+
 
 ### Prototyping Neuronal network class
+
 
 class Network_graph(Stone):
     """
     Neuronal Network
     """
-    def __init__(self, name:str, graph:gt.Graph) -> None:
+
+    def __init__(self, name: str, graph: gt.Graph) -> None:
         self.graph = graph
         super().__init__(name)
         self.make()
 
     def make(self):
-        self.id_lookup = dict(map(lambda i,j : (i,j) , self.graph.vp['ids'].a,self.graph.get_vertices()))    
+        self.id_lookup = dict(
+            map(lambda i, j: (i, j), self.graph.vp["ids"].a, self.graph.get_vertices())
+        )
 
-def Network_from_table(edges:pd.DataFrame | np.ndarray, add_weights:bool = True, weight_label:str = 'weight',name:str = None):
+
+def Network_from_table(
+    edges: pd.DataFrame | np.ndarray,
+    add_weights: bool = True,
+    weight_label: str = "weight",
+    name: str = None,
+):
     """
     Build a neuron network graph from a data frame or edge list.
 
     The first two columns of the edges input must relate to source -> target edge mapping.
-    
+
     If add_weights is True, the third column of edges will be used as the weighting for each edge.
 
-    Any other columns will be ignored. 
+    Any other columns will be ignored.
     """
     # unpack the weightes form the df
-    if isinstance(edges,pd.DataFrame):
+    if isinstance(edges, pd.DataFrame):
         edges = edges.values
 
     # if weights is false, keep only first two columns
     if not add_weights:
-        edges = edges[:,0:2]
-        g = gt.Graph(edges,hashed = True, hash_type = 'int')
+        edges = edges[:, 0:2]
+        g = gt.Graph(edges, hashed=True, hash_type="int")
     else:
-        g = gt.Graph(edges[:,0:3],hashed = True, eprops = [(weight_label,'int')], hash_type = 'int')
+        g = gt.Graph(
+            edges[:, 0:3], hashed=True, eprops=[(weight_label, "int")], hash_type="int"
+        )
 
-    return Network_graph(name = name,graph = g)        
+    return Network_graph(name=name, graph=g)
 
-def add_vp(g,df,id_col,val_col,name,dtype):
+
+def add_vp(g, df, id_col, val_col, name, dtype):
     """
     Find a quicker way to do this...
     """
     vprop = g.new_vp(dtype)
     for v in g.iter_vertices():
-        vprop[v] = df.loc[df[id_col] == g.vp['ids'][v],val_col].values[0]
-    g.vp[name] = vprop             
+        vprop[v] = df.loc[df[id_col] == g.vp["ids"][v], val_col].values[0]
+    g.vp[name] = vprop
