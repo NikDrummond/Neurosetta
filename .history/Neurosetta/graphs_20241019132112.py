@@ -941,7 +941,7 @@ def synapse_MST(N:Tree_graph, synapses:str = 'All', root: bool = True) -> Tree_g
     # if we want to add the root
     if root:
         root_coord = g_vert_coords(N,g_root_ind(N))[0]
-        coords = np.vstack((root_coord,coords))
+        coords = np.vstack((root,coords))
 
     # make sure we have path lengths, and if not we add it
     if ~ g_has_property(N,'Path_length'):
