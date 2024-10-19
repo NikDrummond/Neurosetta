@@ -144,7 +144,7 @@ def g_branch_inds(N: Tree_graph | gt.Graph) -> np.ndarray[int]:
     return np.where(g.degree_property_map("out").a > 1)[0]
 
 
-def g_lb_inds(N: Tree_graph | gt.Graph, return_types: bool = False, root:bool = False) -> np.ndarray[int]:
+def g_lb_inds(N: Tree_graph | gt.Graph, return_types: bool = False, ) -> np.ndarray[int]:
     """
     Returns indices of all leaf and branch nodes
 
@@ -162,10 +162,6 @@ def g_lb_inds(N: Tree_graph | gt.Graph, return_types: bool = False, root:bool = 
     b_inds = g_branch_inds(g)
 
     inds = np.unique(np.concatenate([l_inds, b_inds]))
-    # if root is false we are removing it
-    if ~root:
-        inds = inds[inds != g_root_ind(N)]
-    
     return inds
 
 
@@ -667,7 +663,7 @@ def path_length(N:Tree_graph | gt.Graph,source: int, target : int, weight:str = 
     """
     Weighted distance between two vertices
     """
-    # check input type
+        # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
     elif isinstance(N, gt.Graph):
@@ -808,149 +804,3 @@ def get_edges(N:Tree_graph, subset: str | None = None) -> np.ndarray:
     else:
         raise AttributeError('Subset must be None, to return all edges, or Internal or External')
 
-def graph_height(N: Tree_graph,map_to:str = 'edge',bind:bool = False):
-    """_summary_
-
-    Parameters
-    ----------
-    N : Tree_graph
-        Neuron to generate property map of tree heights from
-    map_to : str, optional
-        If 'vertex' will map height property to nodes within the graph, 
-        If 'edge' will map property to the edges. If 'all' returns both an edge and vertex property map.   by default 'edge'
-    bind : bool, optional
-        Map property directly to the neuron object if True, otherwise returns a property map, by default False
-
-    Returns
-    -------
-    Tree_graph | graph_tool.PropertyMap
-        If bind = True, N is modified inplace. otherwise individual property maps are returned.
-
-    Raises
-    ------
-    AttributeError
-        In the case where map_to is not 'edge", 'vertex', or 'all'
-    """
-    if map_to not in ['edge','vertex','all']:
-        raise AttributeError('map_to argument must be "edge", "vertex", or "all"')
-    # initialise a vertex property
-    h_vprop = N.graph.new_vp('int')
-    # get root ind and leaf/branch inds
-    root = g_root_ind(N)
-    lb_inds = g_lb_inds(N)
-    # this is slower than it should be, but iterate over all verts
-    for v in N.graph.iter_vertices():
-        # get path
-        path = gt.shortest_path(N.graph,root,v)[0]
-        # convert to index for next bit
-        path = [N.graph.vertex_index[v] for v in path]
-        # length of take intersection with leaves/branches
-        h_vprop[v] = len(np.intersect1d(path,lb_inds))
-
-    # if we want to retyrn this as an edge property    
-    if map_to in  ['edge','all']:
-        h_eprop = N.graph.new_ep('int',h_vprop.a[get_edges(N)[:,1]])
-
-    if bind:
-        if map_to == 'edge':
-            N.graph.ep['Edge_Height'] = h_eprop
-        elif map_to == 'vertex':
-            N.graph.vp['Vertex_Height'] = h_vprop
-        elif map_to == 'all':
-            N.graph.vp['Vertex_Height'] = h_vprop   
-            N.graph.ep['Edge_height'] = h_eprop
-    else:                
-        if map_to == 'edge':
-            return h_eprop
-        elif map_to == 'vertex':
-            return h_vprop
-        elif map_to == 'all':
-            return h_vprop, h_eprop
-
-def Euclidean_MST(coords, root = True):
-    """_summary_
-
-    Parameters
-    ----------
-    coords : np.ndarray
-        coordinates to find the euclidean MST of. Note, if root is true we assume that the 
-        first coordinate is the root!
-    root : bool, optional
-        If True, we assume the first coordinate is the root. otherwise returns the unrooted MST, by default True
-
-    Returns
-    -------
-    gt.Graph
-        returns the Minimum Spanning Tree graph of the provided point cloud
-    """
-    # Note, we are assuming that the first coordinate is the root (if root is true)!
-    
-    # generate complete graph
-    g = gt.complete_graph(coords.shape[0], self_loops = False, directed = False)
-    # add coordinates as vertex property
-    vprop_coords = g.new_vp('vector<double>')
-    vprop_coords.set_2d_array(coords.T)
-    g.vp['coordinates'] = vprop_coords
-    # add weights/ euclidean distance
-    get_g_distances(g, bind = True)
-    # Create MST edge property map (will filter after)
-    if root:
-        mst = gt.min_spanning_tree(g,weights = g.ep['Path_length'], root = 0)
-    else:
-        # calculate the MST - returned here is a mask edge property
-        mst = gt.min_spanning_tree(g,weights = g.ep['Path_length'])
-    # clean up!
-    g.set_edge_filter(mst)
-    g.purge_vertices()
-    # and we are done!
-    return g
-
-def synapse_MST(N:Tree_graph, synapses:str = 'All', root: bool = True) -> nr.Tree_graph:
-    """_summary_
-
-    Parameters
-    ----------
-    N : Tree_graph
-        Neuron to construct Euclidean MST from
-    synapses : str, optional
-        Which synapses to construct MST with, can be 'Inputs", which uses just input synapses,
-        'Outputs' which uses just output synapses, or 'All' which uses inputs and outputs, by default 'All'
-    root : bool, optional
-        if you wish to include the root node (recommended) or not, by default True
-
-    Returns
-    -------
-    nr.Tree_graph
-        Tree_graph of the Euclidean Spanning Tree of given subset of synapses for the given neuron.
-    """
-    assert isinstance(N,Tree_graph), "Input must be neurosetta.Tree_graph"
-
-    ### Get coordinates according to include
-    if synapses == 'Inputs':
-        assert g_has_property(N,'inputs'), "Given neuron must have inputs property to make MST of Input Synapses"
-        coords = N.graph.gp['inputs'][['graph_x','graph_y','graph_z']].values
-    elif synapses == 'Output':
-        assert g_has_property(N,'outputs'), "Given neuron must have outputs property to make MST of Output Synapses"
-        coords = N.graph.gp['outputs'][['graph_x','graph_y','graph_z']].values
-    elif synapses == 'All':
-        assert (g_has_property(N,'inputs') and g_has_property(N,'outputs')), "Given neuron must have both outputs and inputs property to make MST of All Synapses"
-        input_coords = N.graph.gp['inputs'][['graph_x','graph_y','graph_z']].values
-        output_coords = N.graph.gp['outputs'][['graph_x','graph_y','graph_z']].values
-        coords = np.vstack((input_coords,output_coords))
-    
-    # if we want to add the root
-    if root:
-        root_coord = g_vert_coords(N,g_root_ind(N))[0]
-        coords = np.vstack((root,coords))
-
-    # make sure we have path lengths, and if not we add it
-    if ~ g_has_property(N,'Path_length'):
-        get_g_distances(N, bind = True)
-    
-    # build MST
-    g = Euclidean_MST(coords,root = root)
-
-    # pack this into a neuron object
-    g = Tree_graph(name = N.name + '_MST', graph = g)
-
-    return g

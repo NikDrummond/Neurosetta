@@ -667,7 +667,7 @@ def path_length(N:Tree_graph | gt.Graph,source: int, target : int, weight:str = 
     """
     Weighted distance between two vertices
     """
-    # check input type
+        # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
     elif isinstance(N, gt.Graph):
@@ -823,16 +823,16 @@ def graph_height(N: Tree_graph,map_to:str = 'edge',bind:bool = False):
 
     Returns
     -------
-    Tree_graph | graph_tool.PropertyMap
-        If bind = True, N is modified inplace. otherwise individual property maps are returned.
+    Tree_graph | 
+        _description_
 
     Raises
     ------
     AttributeError
-        In the case where map_to is not 'edge", 'vertex', or 'all'
+        _description_
     """
     if map_to not in ['edge','vertex','all']:
-        raise AttributeError('map_to argument must be "edge", "vertex", or "all"')
+        raise AttributeError('map_to argument must be "edge" or "vertex')
     # initialise a vertex property
     h_vprop = N.graph.new_vp('int')
     # get root ind and leaf/branch inds

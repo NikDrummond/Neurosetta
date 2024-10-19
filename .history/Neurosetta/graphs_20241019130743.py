@@ -667,7 +667,7 @@ def path_length(N:Tree_graph | gt.Graph,source: int, target : int, weight:str = 
     """
     Weighted distance between two vertices
     """
-    # check input type
+        # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
     elif isinstance(N, gt.Graph):

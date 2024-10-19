@@ -667,7 +667,7 @@ def path_length(N:Tree_graph | gt.Graph,source: int, target : int, weight:str = 
     """
     Weighted distance between two vertices
     """
-    # check input type
+        # check input type
     if isinstance(N, Tree_graph):
         g = N.graph
     elif isinstance(N, gt.Graph):
@@ -814,25 +814,24 @@ def graph_height(N: Tree_graph,map_to:str = 'edge',bind:bool = False):
     Parameters
     ----------
     N : Tree_graph
-        Neuron to generate property map of tree heights from
+        _description_
     map_to : str, optional
-        If 'vertex' will map height property to nodes within the graph, 
-        If 'edge' will map property to the edges. If 'all' returns both an edge and vertex property map.   by default 'edge'
+        _description_, by default 'edge'
     bind : bool, optional
-        Map property directly to the neuron object if True, otherwise returns a property map, by default False
+        _description_, by default False
 
     Returns
     -------
-    Tree_graph | graph_tool.PropertyMap
-        If bind = True, N is modified inplace. otherwise individual property maps are returned.
+    _type_
+        _description_
 
     Raises
     ------
     AttributeError
-        In the case where map_to is not 'edge", 'vertex', or 'all'
+        _description_
     """
     if map_to not in ['edge','vertex','all']:
-        raise AttributeError('map_to argument must be "edge", "vertex", or "all"')
+        raise AttributeError('map_to argument must be "edge" or "vertex')
     # initialise a vertex property
     h_vprop = N.graph.new_vp('int')
     # get root ind and leaf/branch inds
@@ -914,14 +913,14 @@ def synapse_MST(N:Tree_graph, synapses:str = 'All', root: bool = True) -> nr.Tre
         Neuron to construct Euclidean MST from
     synapses : str, optional
         Which synapses to construct MST with, can be 'Inputs", which uses just input synapses,
-        'Outputs' which uses just output synapses, or 'All' which uses inputs and outputs, by default 'All'
+        'Outputs' which uses just output synapses, by default 'All'
     root : bool, optional
-        if you wish to include the root node (recommended) or not, by default True
+        _description_, by default True
 
     Returns
     -------
     nr.Tree_graph
-        Tree_graph of the Euclidean Spanning Tree of given subset of synapses for the given neuron.
+        _description_
     """
     assert isinstance(N,Tree_graph), "Input must be neurosetta.Tree_graph"
 
