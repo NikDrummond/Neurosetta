@@ -1,7 +1,7 @@
 from .core import *
 from .sets import *
 from .graphs import *
-from .transformations import *
+
 from .connectivity import *
 from .TMD import *
 from .tree_surgery import *
