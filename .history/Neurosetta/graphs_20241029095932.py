@@ -717,7 +717,7 @@ def root_dist(N: Tree_graph | gt.Graph, weight: str = 'Path_length', bind = True
         _description_
     """
     
-    if isinstance(N, Tree_graph):
+    if isinstance(N, nr.Tree_graph):
         # get edges
         edges = N.graph.get_edges()
     elif isinstance(N, gt.Graph):
@@ -725,7 +725,7 @@ def root_dist(N: Tree_graph | gt.Graph, weight: str = 'Path_length', bind = True
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")        
     # get root
-    root = g_root_ind(N)
+    root = nr.g_root_ind(N)
     # initialise
     root_dist = N.graph.new_vp('double')
     # dfs

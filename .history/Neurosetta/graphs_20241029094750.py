@@ -718,30 +718,34 @@ def root_dist(N: Tree_graph | gt.Graph, weight: str = 'Path_length', bind = True
     """
     
     if isinstance(N, Tree_graph):
-        # get edges
-        edges = N.graph.get_edges()
+        g = N.graph
     elif isinstance(N, gt.Graph):
-        edges = N.get_edges()
+        g = N
     else:
-        raise TypeError("N must be Tree_graph or gt.Graph")        
-    # get root
-    root = g_root_ind(N)
-    # initialise
-    root_dist = N.graph.new_vp('double')
-    # dfs
-    for e in gt.dfs_iterator(N.graph):
-        if e.source() == root:
-            root_dist[e.target()] = N.graph.ep['Path_length'][e]
-        else:    
-            root_dist[e.target()] = N.graph.ep['Path_length'][e] + root_dist[e.source()]
+        raise TypeError("N must be Tree_graph or gt.Graph")
+    
+    root_dist = g.new_vp('double')
+
+    source = g_root_ind(g)
 
     if norm:
-        root_dist.a = root_dist.a / sum(N.graph.ep['Path_length'].a)
+        total = sum(g.ep[weight].a)
+    for i in g.iter_vertices():
+        if norm:
+            root_dist[i] = gt.shortest_distance(g,source = source, 
+                                                target = i,
+                                                weights = g.ep[weight]
+                                                ) / total
+        else:
+            root_dist[i] = gt.shortest_distance(g,source = source, 
+                                                target = i,
+                                                weights = g.ep[weight]
+                                                )
 
     if bind:
-        N.graph.vp['Root_distance'] = root_dist
+        g.vp['root_dist']  = root_dist
     else:
-        return root_dist
+        return root_dist   
         
 
 def get_edge_coords(N:Tree_graph) -> tuple[np.ndarray,np.ndarray]:
@@ -791,8 +795,8 @@ def get_edges(N:Tree_graph, subset: str | None = None) -> np.ndarray:
     """
     if isinstance(N, Tree_graph):
         edges =  N.graph.get_edges()
-    elif isinstance(N, gt.Graph):
-        edges = N.get_edges()    
+    elif isinsatnce(N, gt.Graph):
+        edges =     
     if subset is None:
         return edges
     elif isinstance(subset,str):
