@@ -681,10 +681,10 @@ def path_length(N:Tree_graph | gt.Graph,source: int, target : int, weight:str = 
         else:    
             raise AttributeError('Input graph has no ' + weight + ' Edge property')   
     
-    dist = gt.shortest_distance(g,
+    dist = gt.shortest_distance(N.graph,
                     source = source,
                     target = target,
-                    weights = g.ep[weight],
+                    weights = N.graph.ep[weight],
                     directed = False)
 
     # if the length is still inf then there is no path

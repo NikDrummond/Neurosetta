@@ -684,7 +684,7 @@ def path_length(N:Tree_graph | gt.Graph,source: int, target : int, weight:str = 
     dist = gt.shortest_distance(g,
                     source = source,
                     target = target,
-                    weights = g.ep[weight],
+                    weights = N.graph.ep[weight],
                     directed = False)
 
     # if the length is still inf then there is no path
