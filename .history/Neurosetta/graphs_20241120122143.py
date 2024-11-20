@@ -793,7 +793,7 @@ def get_edges(N:Tree_graph, root: int | None = None, subset: str | None = None) 
     ### sort out g
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N, gt.Graph):
+    elif isinstance(N, gt.graph):
         g = N
     else:
         raise TypeError('N must be neurosetta.Tree_graph or gt.Graph')

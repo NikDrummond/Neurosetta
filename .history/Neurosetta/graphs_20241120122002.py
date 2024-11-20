@@ -793,7 +793,7 @@ def get_edges(N:Tree_graph, root: int | None = None, subset: str | None = None) 
     ### sort out g
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N, gt.Graph):
+    elif isinstance(N, gt.graph):
         g = N
     else:
         raise TypeError('N must be neurosetta.Tree_graph or gt.Graph')
@@ -805,58 +805,46 @@ def get_edges(N:Tree_graph, root: int | None = None, subset: str | None = None) 
         edges = gt.dfs_iterator(g, root, array = True)
 
     ### Subset if needed
-    if subset is None:
-        return edges
-    elif isinstance(subset, str):
-        l_inds = g_leaf_inds(N)
-        # mask = np.array([1 if i in l_inds else 0 for i in edges[:,1]],dtype = bool)
-        if subset is 'Internal':
-            return edges[~np.isin(edges[:,1],l_inds)]   
-        elif subset is 'External':    
-            return edges[np.isin(edges[:,1],l_inds)]   
-        else:
-            raise AttributeError('Specified subset must be Internal, or External')
-    else:
-        raise AttributeError('Subset must be None, Internal, or External')
+    if subset is None
 
-    # ### subset if needed
-    # if root is None:
-    #     if isinstance(N, Tree_graph):
-    #         edges =  N.graph.get_edges()
-    #     elif isinstance(N, gt.Graph):
-    #         edges = N.get_edges()    
-    #     if subset is None:
-    #         return edges
-    #     elif isinstance(subset,str):
-    #         l_inds = g_leaf_inds(N)
-    #         mask = np.array([1 if i in l_inds else 0 for i in edges[:,1]],dtype = bool)
-    #         if subset is 'Internal':
-    #             return edges[~mask]    
-    #         elif subset is 'External':    
-    #             return edges[mask]
-    #         else:
-    #             raise AttributeError('Specified subset must be Internal, or External')
-    #     else:
-    #         raise AttributeError('Subset must be None, to return all edges, or Internal or External')
-    # else:
-    #     if isinstance(N, Tree_graph):
-    #         edges =  gt.dfs_iterator(N.graph,root,array = True)
-    #     elif isinstance(N, gt.Graph):
-    #         edges = gt.dfs_iterator(N,root,array = True) 
-    #     if subset is None:
-    #         return edges
-    #     # if we want a subset
-    #     elif isinstance(subset,str):
-    #         l_inds = g_leaf_inds(N)
-    #         # mask = np.array([1 if i in l_inds else 0 for i in edges[:,1]],dtype = bool)
-    #         if subset is 'Internal':
-    #             return edges[~np.isin(edges[:,1],l_inds)]   
-    #         elif subset is 'External':    
-    #             return edges[np.isin(edges[:,1],l_inds)]   
-    #         else:
-    #             raise AttributeError('Specified subset must be Internal, or External')
-    #     else:
-    #         raise AttributeError('Subset must be None, to return all edges, or Internal or External')
+    ### subset if needed
+    if root is None:
+        if isinstance(N, Tree_graph):
+            edges =  N.graph.get_edges()
+        elif isinstance(N, gt.Graph):
+            edges = N.get_edges()    
+        if subset is None:
+            return edges
+        elif isinstance(subset,str):
+            l_inds = g_leaf_inds(N)
+            mask = np.array([1 if i in l_inds else 0 for i in edges[:,1]],dtype = bool)
+            if subset is 'Internal':
+                return edges[~mask]    
+            elif subset is 'External':    
+                return edges[mask]
+            else:
+                raise AttributeError('Specified subset must be Internal, or External')
+        else:
+            raise AttributeError('Subset must be None, to return all edges, or Internal or External')
+    else:
+        if isinstance(N, Tree_graph):
+            edges =  gt.dfs_iterator(N.graph,root,array = True)
+        elif isinstance(N, gt.Graph):
+            edges = gt.dfs_iterator(N,root,array = True) 
+        if subset is None:
+            return edges
+        # if we want a subset
+        elif isinstance(subset,str):
+            l_inds = g_leaf_inds(N)
+            # mask = np.array([1 if i in l_inds else 0 for i in edges[:,1]],dtype = bool)
+            if subset is 'Internal':
+                return edges[~np.isin(edges[:,1],l_inds)]   
+            elif subset is 'External':    
+                return edges[np.isin(edges[:,1],l_inds)]   
+            else:
+                raise AttributeError('Specified subset must be Internal, or External')
+        else:
+            raise AttributeError('Subset must be None, to return all edges, or Internal or External')
 def graph_height(N: Tree_graph,map_to:str = 'edge',bind:bool = False):
     """_summary_
 

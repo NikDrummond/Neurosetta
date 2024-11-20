@@ -793,7 +793,7 @@ def get_edges(N:Tree_graph, root: int | None = None, subset: str | None = None) 
     ### sort out g
     if isinstance(N, Tree_graph):
         g = N.graph
-    elif isinstance(N, gt.Graph):
+    elif isinstance(N, gt.graph):
         g = N
     else:
         raise TypeError('N must be neurosetta.Tree_graph or gt.Graph')
@@ -817,7 +817,7 @@ def get_edges(N:Tree_graph, root: int | None = None, subset: str | None = None) 
         else:
             raise AttributeError('Specified subset must be Internal, or External')
     else:
-        raise AttributeError('Subset must be None, Internal, or External')
+        raise AttributeError
 
     # ### subset if needed
     # if root is None:
