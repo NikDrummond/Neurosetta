@@ -255,7 +255,7 @@ def _gdist_mat(g: gt.Graph, inds: list, flatten: bool = False) -> np.ndarray[flo
 
 def dist_mat(
     N: Tree_graph | gt.Graph,
-    inds: np.ndarray | None = None,
+    inds: None | np.ndarray,
     method: str = "Euclidean",
     flatten: bool = False,
 ) -> np.ndarray[float]:

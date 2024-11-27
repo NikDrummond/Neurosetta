@@ -153,7 +153,8 @@ def coords_Eig(
 
     # mean center the data, if we want
     if center:
-        Coords = Coords - np.mean(Coords, axis = 0)
+        for i in range(Coords.shape[0]):
+            Coords[i] -= np.mean(Coords[i])
 
     cov_mat = np.cov(Coords)
     evals, evects = np.linalg.eig(cov_mat)
@@ -173,18 +174,18 @@ def eig_axis_eulers(evects):
     """
     Given a list of eigenvector as returned by coords_Eig, return Euler angles needed to align The first eigenvector with the y-axis, second with the x-axis, and third with the z-axis
     """
+    # # Yaw
+    # theta1 = np.rad2deg(np.arctan(evects[0][0] / evects[0][1]))
+    # # pitch
+    # theta2 = np.rad2deg(np.arctan(evects[1][2] / evects[1][0]))
+    # # roll
+    # theta3 = np.rad2deg(np.arctan(evects[2][1] / evects[2][2]))
     # Yaw
-    theta1 = np.rad2deg(np.arctan(evects[0][0] / evects[0][1]))
-    # pitch
-    theta2 = np.rad2deg(np.arctan(evects[1][2] / evects[1][0]))
-    # roll
-    theta3 = np.rad2deg(np.arctan(evects[2][1] / evects[2][2]))
-    # Yaw
-    # theta1 = np.degrees(np.arctan2(evects[0, 0], evects[1, 0]))  # Aligns first eigenvector (v1) with y
-    # # Roll
-    # theta2 = np.degrees(np.arctan2(evects[2, 1], evects[0, 1]))  # Aligns second eigenvector (v2) with x
-    # # Pitch
-    # theta3 = np.degrees(np.arctan2(evects[1, 2], evects[2, 2]))  # Aligns third eigenvector (v3) with z
+    theta1 = np.degrees(np.arctan2(evects[0, 0], evects[1, 0]))  # Aligns first eigenvector (v1) with y
+    # Roll
+    theta2 = np.degrees(np.arctan2(evects[2, 1], evects[0, 1]))  # Aligns second eigenvector (v2) with x
+    # Pitch
+    theta3 = np.degrees(np.arctan2(evects[1, 2], evects[2, 2]))  # Aligns third eigenvector (v3) with z
 
     return theta1, theta2, theta3
 

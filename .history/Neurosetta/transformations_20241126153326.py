@@ -146,14 +146,15 @@ def coords_Eig(
 
     # check dimensions of input
     if 3 not in Coords.shape:
-        raise AttributeError("Input coordinates are not 3D")
+        raise AttributeError("Input coordinates are not 3 dimensional")
     else:
         if Coords.shape[0] != 3:
             Coords = Coords.T
 
     # mean center the data, if we want
-    if center:
-        Coords = Coords - np.mean(Coords, axis = 0)
+    if center == True:
+        for i in range(Coords.shape[0]):
+            Coords[i] -= np.mean(Coords[i])
 
     cov_mat = np.cov(Coords)
     evals, evects = np.linalg.eig(cov_mat)
@@ -163,8 +164,8 @@ def coords_Eig(
     if PCA:
         evals /= np.sum(evals)
 
-    # evects = [evects[:, i] for i in sort_inds]
-    evects = evects[:,sort_inds]
+    evects = [evects[:, i] for i in sort_inds]
+    evects
 
     return evals[sort_inds], evects
 
@@ -179,12 +180,10 @@ def eig_axis_eulers(evects):
     theta2 = np.rad2deg(np.arctan(evects[1][2] / evects[1][0]))
     # roll
     theta3 = np.rad2deg(np.arctan(evects[2][1] / evects[2][2]))
-    # Yaw
-    # theta1 = np.degrees(np.arctan2(evects[0, 0], evects[1, 0]))  # Aligns first eigenvector (v1) with y
-    # # Roll
-    # theta2 = np.degrees(np.arctan2(evects[2, 1], evects[0, 1]))  # Aligns second eigenvector (v2) with x
-    # # Pitch
-    # theta3 = np.degrees(np.arctan2(evects[1, 2], evects[2, 2]))  # Aligns third eigenvector (v3) with z
+    
+    theta1 = np.degrees(np.arctan2(evects[0, 0], evects[1, 0]))  # Aligns first eigenvector (v1) with y
+    theta2 = np.degrees(np.arctan2(evects[2, 1], evects[0, 1]))  # Aligns second eigenvector (v2) with x
+    theta3 = np.degrees(np.arctan2(evects[1, 2], evects[2, 2]))  # Aligns third eigenvector (v3) with z
 
     return theta1, theta2, theta3
 
