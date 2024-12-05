@@ -255,7 +255,7 @@ def _gdist_mat(g: gt.Graph, inds: list, flatten: bool = False) -> np.ndarray[flo
 
 def dist_mat(
     N: Tree_graph | gt.Graph,
-    inds: np.array,
+    inds: np.ndarray | None = None,
     method: str = "Euclidean",
     flatten: bool = False,
 ) -> np.ndarray[float]:
@@ -269,6 +269,9 @@ def dist_mat(
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
+    
+    if inds is None:
+        inds = g.get_vertices()
 
     if g_has_property(g, "coordinates", "v"):
         if method == "Euclidean":
@@ -617,7 +620,7 @@ def downstream_vertices(N: Tree_graph | gt.Graph, source: int) -> np.ndarray:
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
 
-    return np.unique(gt.dfs_iterator(g, source, array=True))
+    return np.unique(gt.dfs_iterator(g, source, array=True),dtype = np.int64)
 
 
 def edge_length(i, g, weight = 'Path_length'):
@@ -681,10 +684,10 @@ def path_length(N:Tree_graph | gt.Graph,source: int, target : int, weight:str = 
         else:    
             raise AttributeError('Input graph has no ' + weight + ' Edge property')   
     
-    dist = gt.shortest_distance(N.graph,
+    dist = gt.shortest_distance(g,
                     source = source,
                     target = target,
-                    weights = N.graph.ep[weight],
+                    weights = g.ep[weight],
                     directed = False)
 
     # if the length is still inf then there is no path
@@ -718,34 +721,30 @@ def root_dist(N: Tree_graph | gt.Graph, weight: str = 'Path_length', bind = True
     """
     
     if isinstance(N, Tree_graph):
-        g = N.graph
+        # get edges
+        edges = N.graph.get_edges()
     elif isinstance(N, gt.Graph):
-        g = N
+        edges = N.get_edges()
     else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
-    
-    root_dist = g.new_vp('double')
-
-    source = g_root_ind(g)
+        raise TypeError("N must be Tree_graph or gt.Graph")        
+    # get root
+    root = g_root_ind(N)
+    # initialise
+    root_dist = N.graph.new_vp('double')
+    # dfs
+    for e in gt.dfs_iterator(N.graph):
+        if e.source() == root:
+            root_dist[e.target()] = N.graph.ep['Path_length'][e]
+        else:    
+            root_dist[e.target()] = N.graph.ep['Path_length'][e] + root_dist[e.source()]
 
     if norm:
-        total = sum(g.ep[weight].a)
-    for i in g.iter_vertices():
-        if norm:
-            root_dist[i] = gt.shortest_distance(g,source = source, 
-                                                target = i,
-                                                weights = g.ep[weight]
-                                                ) / total
-        else:
-            root_dist[i] = gt.shortest_distance(g,source = source, 
-                                                target = i,
-                                                weights = g.ep[weight]
-                                                )
+        root_dist.a = root_dist.a / sum(N.graph.ep['Path_length'].a)
 
     if bind:
-        g.vp['root_dist']  = root_dist
+        N.graph.vp['Root_distance'] = root_dist
     else:
-        return root_dist   
+        return root_dist
         
 
 def get_edge_coords(N:Tree_graph) -> tuple[np.ndarray,np.ndarray]:
@@ -767,7 +766,7 @@ def get_edge_coords(N:Tree_graph) -> tuple[np.ndarray,np.ndarray]:
     p2 = coords[edges[:,1]]
     return p1,p2
 
-def get_edges(N:Tree_graph, subset: str | None = None) -> np.ndarray:
+def get_edges(N:Tree_graph, root: int | None = None, subset: str | None = None) -> np.ndarray:
     """Return array of edges within a given neuron. If subset is not None, 'Internal' or 'External' must be specified
 
     In such a case, either edges with a leaf node as the target are returned ('External")
@@ -793,22 +792,74 @@ def get_edges(N:Tree_graph, subset: str | None = None) -> np.ndarray:
     AttributeError
         If Subset it neither None, nor a string specifying 'Internal' or 'External'
     """
-    if isinsatnce(N, Tree_graph):
-    edges =  N.graph.get_edges()
+
+    ### sort out g
+    if isinstance(N, Tree_graph):
+        g = N.graph
+    elif isinstance(N, gt.Graph):
+        g = N
+    else:
+        raise TypeError('N must be neurosetta.Tree_graph or gt.Graph')
+    
+    ### Get edges
+    if root is None:
+        edges = g.get_edges()
+    else:
+        edges = gt.dfs_iterator(g, root, array = True)
+
+    ### Subset if needed
     if subset is None:
         return edges
-    elif isinstance(subset,str):
+    elif isinstance(subset, str):
         l_inds = g_leaf_inds(N)
-        mask = np.array([1 if i in l_inds else 0 for i in edges[:,1]],dtype = bool)
+        # mask = np.array([1 if i in l_inds else 0 for i in edges[:,1]],dtype = bool)
         if subset is 'Internal':
-            return edges[~mask]    
+            return edges[~np.isin(edges[:,1],l_inds)]   
         elif subset is 'External':    
-            return edges[mask]
+            return edges[np.isin(edges[:,1],l_inds)]   
         else:
             raise AttributeError('Specified subset must be Internal, or External')
     else:
-        raise AttributeError('Subset must be None, to return all edges, or Internal or External')
+        raise AttributeError('Subset must be None, Internal, or External')
 
+    # ### subset if needed
+    # if root is None:
+    #     if isinstance(N, Tree_graph):
+    #         edges =  N.graph.get_edges()
+    #     elif isinstance(N, gt.Graph):
+    #         edges = N.get_edges()    
+    #     if subset is None:
+    #         return edges
+    #     elif isinstance(subset,str):
+    #         l_inds = g_leaf_inds(N)
+    #         mask = np.array([1 if i in l_inds else 0 for i in edges[:,1]],dtype = bool)
+    #         if subset is 'Internal':
+    #             return edges[~mask]    
+    #         elif subset is 'External':    
+    #             return edges[mask]
+    #         else:
+    #             raise AttributeError('Specified subset must be Internal, or External')
+    #     else:
+    #         raise AttributeError('Subset must be None, to return all edges, or Internal or External')
+    # else:
+    #     if isinstance(N, Tree_graph):
+    #         edges =  gt.dfs_iterator(N.graph,root,array = True)
+    #     elif isinstance(N, gt.Graph):
+    #         edges = gt.dfs_iterator(N,root,array = True) 
+    #     if subset is None:
+    #         return edges
+    #     # if we want a subset
+    #     elif isinstance(subset,str):
+    #         l_inds = g_leaf_inds(N)
+    #         # mask = np.array([1 if i in l_inds else 0 for i in edges[:,1]],dtype = bool)
+    #         if subset is 'Internal':
+    #             return edges[~np.isin(edges[:,1],l_inds)]   
+    #         elif subset is 'External':    
+    #             return edges[np.isin(edges[:,1],l_inds)]   
+    #         else:
+    #             raise AttributeError('Specified subset must be Internal, or External')
+    #     else:
+    #         raise AttributeError('Subset must be None, to return all edges, or Internal or External')
 def graph_height(N: Tree_graph,map_to:str = 'edge',bind:bool = False):
     """_summary_
 
@@ -903,8 +954,18 @@ def Euclidean_MST(coords, root = True):
     # clean up!
     g.set_edge_filter(mst)
     g.purge_vertices()
-    # and we are done!
-    return g
+    # make a copy of g and make it directed - there may be a better way to do this?
+    edges = gt.dfs_iterator(g,0,array = True)
+    g2 = gt.Graph(edges, hashed = True, hash_type = 'int')
+    # get coordinates
+    coords = np.array([g.vp["coordinates"][i] for i in g2.vp["ids"].a])
+    vprop_coords = g2.new_vp("vector<double>")
+    vprop_coords.set_2d_array(coords.T)
+    g2.vp['coordinates'] = vprop_coords
+    # re-add weights/ euclidean distance
+    get_g_distances(g2, bind = True)
+    
+    return g2
 
 def synapse_MST(N:Tree_graph, synapses:str = 'All', root: bool = True) -> Tree_graph:
     """_summary_
@@ -955,3 +1016,58 @@ def synapse_MST(N:Tree_graph, synapses:str = 'All', root: bool = True) -> Tree_g
     g = Tree_graph(name = N.name + '_MST', graph = g)
 
     return g
+
+def bf_MST(coords, root = True, bf = 0.2):
+
+    # we use this class during the BFS call later, keep it internal to the function
+    class root_dist_visitor(gt.BFSVisitor):
+
+        def __init__(self, v_dist,g):
+            self.v_dist = v_dist
+            self.g = g
+
+        def tree_edge(self, e):
+            self.v_dist[e.target()] = self.v_dist[e.source()] + self.g.ep['Path_length'][e]
+            
+    # generate complete graph
+    g = gt.complete_graph(coords.shape[0], self_loops = False,directed = False)
+    # add coordinates as vertex property
+    vprop_coords = g.new_vp('vector<double>')
+    vprop_coords.set_2d_array(coords.T)
+    g.vp['coordinates'] = vprop_coords
+    # add pairwise euclidean distances
+    get_g_distances(g, bind = True)
+
+    # initialise vertex property map
+    root_dist_vp = g.new_vp('double')
+    # lets do this long hand before doing the vistor thing
+    gt.bfs_search(g,0,root_dist_visitor(root_dist_vp,g))
+    # convert out vertex property map to and edge property map
+    root_dist_ep = g.new_ep('double',root_dist_vp.a[g.get_edges()[:,1]])
+    # edge weights
+    e_weights = g.ep['Path_length'].a
+    # root distances
+    r_weights = root_dist_ep.a
+
+    # create new weights
+    weights = e_weights + (bf * r_weights)
+
+    eprop_weights = g.new_ep('double', weights)
+    # mst
+    mst = gt.min_spanning_tree(g,weights = eprop_weights, root = 0)
+    # apply to graph
+    g.set_edge_filter(mst)
+    # g.purge_vertices(in_place = False)
+    g.purge_edges()
+    # g.reindex_edges()
+
+    edges = gt.dfs_iterator(g,0,array = True)
+    g2 = gt.Graph(edges, hashed = True, hash_type = 'int')
+    # get coordinates
+    coords = np.array([g.vp["coordinates"][i] for i in g2.vp["ids"].a])
+    vprop_coords = g2.new_vp("vector<double>")
+    vprop_coords.set_2d_array(coords.T)
+    g2.vp['coordinates'] = vprop_coords
+
+    return g2
+

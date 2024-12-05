@@ -954,8 +954,18 @@ def Euclidean_MST(coords, root = True):
     # clean up!
     g.set_edge_filter(mst)
     g.purge_vertices()
-    # and we are done!
-    return g
+    # make a copy of g and make it directed - there may be a better way to do this?
+    edges = gt.dfs_iterator(g,0,array = True)
+    g2 = gt.Graph(edges, hashed = True, hash_type = 'int')
+    # get coordinates
+    coords = np.array([g.vp["coordinates"][i] for i in g2.vp["ids"].a])
+    vprop_coords = g2.new_vp("vector<double>")
+    vprop_coords.set_2d_array(coords.T)
+    g2.vp['coordinates'] = vprop_coords
+    # re-add weights/ euclidean distance
+    get_g_distances(g2, bind = True)
+    
+    return g2
 
 def synapse_MST(N:Tree_graph, synapses:str = 'All', root: bool = True) -> Tree_graph:
     """_summary_
@@ -1006,3 +1016,58 @@ def synapse_MST(N:Tree_graph, synapses:str = 'All', root: bool = True) -> Tree_g
     g = Tree_graph(name = N.name + '_MST', graph = g)
 
     return g
+
+def bf_MST(coords, root = True, bf = 0.2):
+
+    # we use this class during the BFS call later, keep it internal to the function
+    class root_dist_visitor(gt.BFSVisitor):
+
+        def __init__(self, v_dist,g):
+            self.v_dist = v_dist
+            self.g = g
+
+        def tree_edge(self, e):
+            self.v_dist[e.target()] = self.v_dist[e.source()] + self.g.ep['Path_length'][e]
+            
+    # generate complete graph
+    g = gt.complete_graph(coords.shape[0], self_loops = False,directed = False)
+    # add coordinates as vertex property
+    vprop_coords = g.new_vp('vector<double>')
+    vprop_coords.set_2d_array(coords.T)
+    g.vp['coordinates'] = vprop_coords
+    # add pairwise euclidean distances
+    get_g_distances(g, bind = True)
+
+    # initialise vertex property map
+    root_dist_vp = g.new_vp('double')
+    # lets do this long hand before doing the vistor thing
+    gt.bfs_search(g,0,root_dist_visitor(root_dist_vp,g))
+    # convert out vertex property map to and edge property map
+    root_dist_ep = g.new_ep('double',root_dist_vp.a[g.get_edges()[:,1]])
+    # edge weights
+    e_weights = g.ep['Path_length'].a
+    # root distances
+    r_weights = root_dist_ep.a
+
+    # create new weights
+    weights = e_weights + (bf * r_weights)
+
+    eprop_weights = g.new_ep('double', weights)
+    # mst
+    mst = gt.min_spanning_tree(g,weights = eprop_weights, root = 0)
+    # apply to graph
+    g.set_edge_filter(mst)
+    # g.purge_vertices(in_place = False)
+    g.purge_edges()
+    # g.reindex_edges()
+
+    edges = gt.dfs_iterator(g,0,array = True)
+    g2 = gt.Graph(edges, hashed = True, hash_type = 'int')
+    # get coordinates
+    coords = np.array([g.vp["coordinates"][i] for i in g2.vp["ids"].a])
+    vprop_coords = g2.new_vp("vector<double>")
+    vprop_coords.set_2d_array(coords.T)
+    g2.vp['coordinates'] = vprop_coords
+
+    return g2
+
