@@ -169,7 +169,7 @@ def g_lb_inds(N: Tree_graph | gt.Graph, return_types: bool = False, root:bool = 
     return inds
 
 
-def g_root_ind(N: Tree_graph | gt.Graph, all_roots = False) -> int:
+def g_root_ind(N: Tree_graph | gt.Graph, all = False) -> int:
     """
     Return integer of root node index
     """
@@ -180,11 +180,7 @@ def g_root_ind(N: Tree_graph | gt.Graph, all_roots = False) -> int:
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
-    
-    if all_roots:
-        return np.where(g.degree_property_map('in').a == 0)[0]
-    else:
-        return np.where(g.degree_property_map("in").a == 0)[0][0]
+    return np.where(g.degree_property_map("in").a == 0)[0][0]
 
 
 def leaf_count(N: Tree_graph | gt.Graph) -> int:

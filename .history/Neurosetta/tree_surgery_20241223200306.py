@@ -271,9 +271,6 @@ def simplify_neuron(N: Tree_graph) -> Tree_graph:
     simp[g] = True
     g.gp['simplified'] = simp
 
-    # make sure we keep ID
-    g.gp['ID'] = g.new_gp('string', N.graph.gp['ID'])
-
     return Tree_graph(N.name,g)
 
 
@@ -572,7 +569,7 @@ def upstream_weights(g,feedback_g_weights, edges, l_inds, method = 'edge'):
     else:
         return eprop_probs, vprop_probs, adjust
     
-def community_edge_mask(N_simp,p_thresh = 0.001, len_thresh = 0.1, bind = True):
+def community_edge_mask(N_simp,p_thresh = 0.001, len_thresh = 0.1):
     ### set up as before
     g = N_simp.graph.copy()
     edges = g.get_edges()
@@ -613,10 +610,8 @@ def community_edge_mask(N_simp,p_thresh = 0.001, len_thresh = 0.1, bind = True):
     vprop_mask = g.new_vp('bool')
     for v in rem_edges[:,1]:
         vprop_mask[v] = 1
-    if bind:
-        N_simp.graph.ep['mask_traversal'] = eprop_mask
-    else:
-        return eprop_mask, vprop_mask
+
+    return eprop_mask, vprop_mask
 
 def _k_largest_component_roots(N,k = 2):
 
@@ -660,11 +655,8 @@ def _g_component_masks(g,roots, bind = True):
 
     # if bind, add inverse mask
     if bind:
-        g.vp['k_null'] = g.new_vp('bool', inv_mask)
+        g.vp['k_null']
     # else return list of all masks
-    else:
-        masks.append(g.new_vp('bool', inv_mask))
-        return masks
 
 def N_component_masks(N,k, mask, bind = True):
     # set edge filter

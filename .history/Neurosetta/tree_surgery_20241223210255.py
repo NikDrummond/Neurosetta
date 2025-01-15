@@ -271,9 +271,6 @@ def simplify_neuron(N: Tree_graph) -> Tree_graph:
     simp[g] = True
     g.gp['simplified'] = simp
 
-    # make sure we keep ID
-    g.gp['ID'] = g.new_gp('string', N.graph.gp['ID'])
-
     return Tree_graph(N.name,g)
 
 

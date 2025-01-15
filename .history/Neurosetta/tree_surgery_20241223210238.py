@@ -271,9 +271,6 @@ def simplify_neuron(N: Tree_graph) -> Tree_graph:
     simp[g] = True
     g.gp['simplified'] = simp
 
-    # make sure we keep ID
-    g.gp['ID'] = g.new_gp('string', N.graph.gp['ID'])
-
     return Tree_graph(N.name,g)
 
 
@@ -614,9 +611,8 @@ def community_edge_mask(N_simp,p_thresh = 0.001, len_thresh = 0.1, bind = True):
     for v in rem_edges[:,1]:
         vprop_mask[v] = 1
     if bind:
-        N_simp.graph.ep['mask_traversal'] = eprop_mask
-    else:
-        return eprop_mask, vprop_mask
+        N_simp.graph.ep['mask']
+    return eprop_mask, vprop_mask
 
 def _k_largest_component_roots(N,k = 2):
 

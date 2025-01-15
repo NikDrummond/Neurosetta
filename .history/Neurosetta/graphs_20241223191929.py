@@ -182,9 +182,7 @@ def g_root_ind(N: Tree_graph | gt.Graph, all_roots = False) -> int:
         raise TypeError("N must be Tree_graph or gt.Graph")
     
     if all_roots:
-        return np.where(g.degree_property_map('in').a == 0)[0]
-    else:
-        return np.where(g.degree_property_map("in").a == 0)[0][0]
+    return np.where(g.degree_property_map("in").a == 0)[0][0]
 
 
 def leaf_count(N: Tree_graph | gt.Graph) -> int:
