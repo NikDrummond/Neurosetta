@@ -4,8 +4,13 @@ channels:
 dependencies:
   - python=3.10
   - setuptools
+  - graph-tool
+  - gudhi
+  - pykdtree
+  - vedo
   - numpy
-  - numba
+  - pandas
   - scipy  
   - hdbscan
   - tqdm
+  - fastcluster

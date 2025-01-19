@@ -5,6 +5,7 @@ dependencies:
   - python=3.10
   - setuptools
   - graph-tool
+  - pyqt=5
   - gudhi
   - pykdtree
   - vedo
@@ -13,4 +14,4 @@ dependencies:
   - scipy  
   - hdbscan
   - tqdm
-  - 
+  - fastcluster
