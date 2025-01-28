@@ -11,6 +11,7 @@ from typing import List
 class Stone(object):
     # Constructor
     def __init__(self, name: str) -> None:
+        self._type = None
         self.name = name
         self.id = id
         self.units = None
@@ -24,6 +25,7 @@ class Tree_graph(Stone):
     def __init__(self, name: str, graph: gt.Graph, units: str = "nm") -> None:
         super().__init__(name)
         self.graph = graph
+        self._type = 'Neuron'
         
 
 
@@ -38,18 +40,18 @@ class Node_table(Stone):
         super().__init__(name)
 
 
-# class Neuron_mesh(Stone):
-#     """
-#     A mesh
-#     """
+class Neuron_mesh(Stone):
+    """
+    A mesh
+    """
 
-#     def __init__(
-#         self, name: str, vertices: np.ndarray[float], faces: np.ndarray[int]
-#     ) -> None:
-#         self.vertices = vertices
-#         self.faces = faces
+    def __init__(
+        self, name: str, vertices: np.ndarray[float], faces: np.ndarray[int]
+    ) -> None:
+        self.vertices = vertices
+        self.faces = faces
 
-#         super().__init__(name)
+        super().__init__(name)
 
 
 # read swc

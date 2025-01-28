@@ -1,6 +1,5 @@
 import os
 
-from Neurosetta.graphs import g_has_property
 import graph_tool.all as gt
 import numpy as np
 import pandas as pd
@@ -27,6 +26,7 @@ class Tree_graph(Stone):
         super().__init__(name)
         self.graph = graph
         self._type = 'Neuron'
+        
         
 
 
@@ -378,56 +378,3 @@ def add_vp(g, df, id_col, val_col, name, dtype):
     for v in g.iter_vertices():
         vprop[v] = df.loc[df[id_col] == g.vp["ids"][v], val_col].values[0]
     g.vp[name] = vprop
-
-
-class Forrest_graph(Stone):
-
-    def __init__(self,graph: gt.Graph | List, name = None):
-        super().__init__(name)
-        # make graph
-        if isinstance(graph, gt.Graph):
-            self.graph = graph
-        elif isinstance(graph, List):
-            self.graph = self._make_from_list(graph)
-        else:
-            raise TypeError('Given type for Graph is not recognised')
-        self._type = 'Forest'
-
-    def _make_from_list(self, N_all: List):
-        """ Make a graph from a List of neurons"""
-        g = gt.Graph()
-        # add vertices
-        g.add_vertex(len(N_all));
-        # add individual neuron class objects as vertex property
-        g.vp['Neurons'] = g.new_vp('object', N_all)
-        # add core vertex properties properties
-        g.vp['ID'] = g.new_vp('string',[g.vp['Neurons'][i].graph.gp['ID'] for i in g.iter_vertices()])
-        # core graph properties (has an ID)
-        g.gp['ID'] = g.new_gp('string','unnamed')
-
-        return g
-    
-    ### Propagate properties from a gp key or list of keys
-    def propegate_vp_to_gp(self, props):
-        if isinstance(props, str):
-            if g_has_property(self.graph.vp['Neurons'][0], props):
-                curr_type = _get_property_type(self.graph.vp['Neurons'][0].graph.gp[props])
-                self.graph.vp[props] = self.graph.new_vp(curr_type,[self.graph.vp['Neurons'][i].graph.gp[props] for i in self.graph.iter_vertices()])
-            else:
-                print('First neuron does not have ' + props + ' property, so skipping')
-        elif isinstance(props, List):
-            for current_prop in props:
-                if g_has_property(self.graph.vp['Neurons'][0], current_prop):
-                    curr_type = _get_property_type(self.graph.vp['Neurons'][0].graph.gp[current_prop])
-                    self.graph.vp[current_prop] = self.graph.new_vp(curr_type,[self.graph.vp['Neurons'][i].graph.gp[current_prop] for i in self.graph.iter_vertices()])
-                else:
-                    print('First neuron does not have ' + current_prop + ' property, so skipping')
-
-def _get_property_type(prop):
-    """dumb function to get string for property maps given some property"""
-    if isinstance(prop, str):
-        return 'string'
-    elif isinstance(prop, int):
-        return 'int'
-    elif isinstance(prop, float):
-        return 'double'

@@ -410,14 +410,14 @@ class Forrest_graph(Stone):
     ### Propagate properties from a gp key or list of keys
     def propegate_vp_to_gp(self, props):
         if isinstance(props, str):
-            if g_has_property(self.graph.vp['Neurons'][0], props):
+            if nr.g_has_property(self.graph.vp['Neurons'][0], props):
                 curr_type = _get_property_type(self.graph.vp['Neurons'][0].graph.gp[props])
                 self.graph.vp[props] = self.graph.new_vp(curr_type,[self.graph.vp['Neurons'][i].graph.gp[props] for i in self.graph.iter_vertices()])
             else:
                 print('First neuron does not have ' + props + ' property, so skipping')
         elif isinstance(props, List):
             for current_prop in props:
-                if g_has_property(self.graph.vp['Neurons'][0], current_prop):
+                if nr.g_has_property(self.graph.vp['Neurons'][0], current_prop):
                     curr_type = _get_property_type(self.graph.vp['Neurons'][0].graph.gp[current_prop])
                     self.graph.vp[current_prop] = self.graph.new_vp(curr_type,[self.graph.vp['Neurons'][i].graph.gp[current_prop] for i in self.graph.iter_vertices()])
                 else:
