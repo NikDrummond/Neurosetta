@@ -1,5 +1,5 @@
-from .core import Tree_graph
-from .graphs import g_leaf_inds, g_root_ind, g_has_property
+from .core import Tree_graph, g_has_property
+from .graphs import g_leaf_inds, g_root_ind
 
 import graph_tool.all as gt
 import numpy as np
@@ -192,6 +192,7 @@ def bottleneck_dist(N1,N2, e = None, inv = True):
 
     if inv:
         N1_pd = N1_pd[:,[1,0]]
+        N2_pd = N2_pd[:,[1,0]]
 
     return bottle_d(N1_pd,N2_pd,e)    
 

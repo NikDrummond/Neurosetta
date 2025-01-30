@@ -1,6 +1,6 @@
 import numpy as np
-from .core import Tree_graph
-from .graphs import g_vert_coords, g_has_property
+from .core import Tree_graph, g_has_property
+from .graphs import g_vert_coords
 
 NoneType = type(None)
 

@@ -11,35 +11,6 @@ from .core import Tree_graph, Node_table, infer_node_types
 from .sets import Sfamily_intersect, Sfamily_XOR
 
 
-def g_has_property(
-    N: gt.Graph | Tree_graph, g_property: str, t: str | bool = None
-) -> bool:
-    """
-    Check if a property is within a graph. Will either check for a property generally, or can check specifically graph, vertex, or edge.
-
-    If the g_property argument is None (default), all graph, vertex, and edge properties are checked against. If however the looked for property is a specific type, then the g_property argument can be set to either "v", "e", or "g".
-
-    In this case only the graph ('g'), vertex ('v'), or edge ('e') property is checked.
-    """
-    if isinstance(N, Tree_graph):
-        g = N.graph
-    elif isinstance(N, gt.Graph):
-        g = N
-    else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
-
-    # if t is specifically vertex or edge
-    if t is not None:
-        # check if vertex property
-        if t == "v":
-            return ("v", g_property) in g.properties
-        elif t == "e":
-            return ("e", g_property) in g.properties
-        elif t == "g":
-            return ("g", g_property) in g.properties
-    else:
-        return (("v", g_property) in g.properties) | (("e", g_property) in g.properties) | (("g", g_property) in g.properties)
-
 
 # function to get node coordinates from a graph
 
@@ -169,7 +140,7 @@ def g_lb_inds(N: Tree_graph | gt.Graph, return_types: bool = False, root:bool = 
     return inds
 
 
-def g_root_ind(N: Tree_graph | gt.Graph, all = False) -> int:
+def g_root_ind(N: Tree_graph | gt.Graph, all_roots = False) -> int:
     """
     Return integer of root node index
     """
@@ -181,8 +152,10 @@ def g_root_ind(N: Tree_graph | gt.Graph, all = False) -> int:
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
     
-    if all:
-    return np.where(g.degree_property_map("in").a == 0)[0][0]
+    if all_roots:
+        return np.where(g.degree_property_map('in').a == 0)[0]
+    else:
+        return np.where(g.degree_property_map("in").a == 0)[0][0]
 
 
 def leaf_count(N: Tree_graph | gt.Graph) -> int:

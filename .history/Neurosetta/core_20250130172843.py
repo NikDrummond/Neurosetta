@@ -1,6 +1,6 @@
 import os
 
-# from Neurosetta.graphs import g_has_property
+from Neurosetta.graphs import g_has_property
 import graph_tool.all as gt
 import numpy as np
 import pandas as pd

@@ -1,5 +1,5 @@
-from .core import Tree_graph
-from .graphs import g_leaf_inds, g_root_ind, g_has_property
+from .core import Tree_graph, g_has_property
+from .graphs import g_leaf_inds, g_root_ind
 
 import graph_tool.all as gt
 import numpy as np

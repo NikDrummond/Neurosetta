@@ -1,5 +1,5 @@
 import numpy as np
-from .core import Tree_graph
+from .core import Tree_graph, g_has_property
 from .graphs import g_vert_coords, g_has_property
 
 NoneType = type(None)
@@ -146,25 +146,25 @@ def coords_Eig(
 
     # check dimensions of input
     if 3 not in Coords.shape:
-        raise AttributeError("Input coordinates are not 3 dimensional")
+        raise AttributeError("Input coordinates are not 3D")
     else:
         if Coords.shape[0] != 3:
             Coords = Coords.T
 
     # mean center the data, if we want
-    if center == True:
-        for i in range(Coords.shape[0]):
-            Coords[i] -= np.mean(Coords[i])
+    if center:
+        Coords = Coords - np.mean(Coords, axis = 0)
 
     cov_mat = np.cov(Coords)
     evals, evects = np.linalg.eig(cov_mat)
     # sort largest to smallest
     sort_inds = np.argsort(evals)[::-1]
 
-    if PCA == True:
-        evals /= sum(evals)
+    if PCA:
+        evals /= np.sum(evals)
 
-    evects = [evects[:, i] for i in sort_inds]
+    # evects = [evects[:, i] for i in sort_inds]
+    evects = evects[:,sort_inds]
 
     return evals[sort_inds], evects
 
@@ -179,9 +179,12 @@ def eig_axis_eulers(evects):
     theta2 = np.rad2deg(np.arctan(evects[1][2] / evects[1][0]))
     # roll
     theta3 = np.rad2deg(np.arctan(evects[2][1] / evects[2][2]))
-    yaw = np.degrees(np.arctan2(evects[0, 0], evects[1, 0]))  # Aligns first eigenvector (v1) with y
-    pitch = np.degrees(np.arctan2(evects[2, 1], evects[0, 1]))  # Aligns second eigenvector (v2) with x
-    roll = np.degrees(np.arctan2(evects[1, 2], evects[2, 2]))  # Aligns third eigenvector (v3) with z
+    # Yaw
+    # theta1 = np.degrees(np.arctan2(evects[0, 0], evects[1, 0]))  # Aligns first eigenvector (v1) with y
+    # # Roll
+    # theta2 = np.degrees(np.arctan2(evects[2, 1], evects[0, 1]))  # Aligns second eigenvector (v2) with x
+    # # Pitch
+    # theta3 = np.degrees(np.arctan2(evects[1, 2], evects[2, 2]))  # Aligns third eigenvector (v3) with z
 
     return theta1, theta2, theta3
 

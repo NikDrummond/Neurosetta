@@ -1,4 +1,4 @@
-from .core import Tree_graph
+from .core import Tree_graph, g_has_property
 from .graphs import g_leaf_inds, g_root_ind, g_has_property
 
 import graph_tool.all as gt
@@ -172,7 +172,7 @@ def TMD_persistance_im(g,xlim = None, ylim = None, norm_factor = None):
 
     return Zn    
 
-def bottleneck_dist(N1,N2, e = None, inv = ):
+def bottleneck_dist(N1,N2, e = None, inv = True):
     """Compute bottleneck distance between two persistance diagrams
 
     Parameters
@@ -189,6 +189,10 @@ def bottleneck_dist(N1,N2, e = None, inv = ):
     """
     N1_pd = TMD_persistance_diagram(N1.graph).astype(np.float64)
     N2_pd = TMD_persistance_diagram(N2.graph).astype(np.float64)
+
+    if inv:
+        N1_pd = N1_pd[:,[1,0]]
+        N2_pd = N2_pd[:,[1,0]]
 
     return bottle_d(N1_pd,N2_pd,e)    
 
