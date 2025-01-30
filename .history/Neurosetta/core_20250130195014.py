@@ -5,7 +5,6 @@ import graph_tool.all as gt
 import numpy as np
 import pandas as pd
 from typing import List
-from tqdm import tqdm
 
 # Main core class
 
@@ -512,54 +511,12 @@ class Forest_graph(Stone):
                         + " property, so skipping"
                     )
 
-    def add_type_lookup(self):
+    def type_lookup(self):
         self.types = np.array([self.graph.vp['type'][i] for i in self.graph.iter_vertices()],dtype = str)
 
     def type_subset_ind(self,n_type):
         return np.where(self.types == n_type)[0]
 
-    def node_synapse_by_type(self, v, direction: str = "both"):
-        if direction == "out":
-            edges = self.graph.get_out_edges(v)
-        elif direction == "in":
-            edges = self.graph.get_in_edges(v)
-        elif direction == "both":
-            edges = self.graph.get_all_edges(v)
-        else:
-            raise AttributeError('Direction must be Im, Out, or Both')
-
-        # in types and ids
-        in_ids = [self.graph.vp["ids"][vertex] for vertex in edges[:, 0]]
-        in_types = [self.graph.vp["type"][vertex] for vertex in edges[:, 0]]
-        # out types and ids
-        out_ids = [self.graph.vp["ids"][vertex] for vertex in edges[:, 1]]
-        out_types = [self.graph.vp["type"][vertex] for vertex in edges[:, 1]]
-        # synapse counts
-        syn_counts = [self.graph.ep["weight"][e] for e in edges]
-        # df
-        df = pd.DataFrame(
-            {
-                "Input_id": in_ids,
-                "Input_type": in_types,
-                "Output_id": out_ids,
-                "Output_types": out_types,
-                "Synapses": syn_counts,
-            }
-        )
-        # return
-        return df
-
-    def synapses_by_type(self, subset: None | List = None, direction: str = 'out'):
-
-        # initialise output list
-        # outputs_dfs = []
-        # if subset is none use all neurons
-        if subset is None:
-            subset = self.graph.get_vertices()
-
-        df = pd.concat([self.node_synapse_by_type(v,direction = direction) for v in tqdm(subset)])
-
-        return df
 
 def _get_property_type(prop):
     """dumb function to get string for property maps given some property"""

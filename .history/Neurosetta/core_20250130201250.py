@@ -5,7 +5,6 @@ import graph_tool.all as gt
 import numpy as np
 import pandas as pd
 from typing import List
-from tqdm import tqdm
 
 # Main core class
 
@@ -512,7 +511,7 @@ class Forest_graph(Stone):
                         + " property, so skipping"
                     )
 
-    def add_type_lookup(self):
+    def type_lookup(self):
         self.types = np.array([self.graph.vp['type'][i] for i in self.graph.iter_vertices()],dtype = str)
 
     def type_subset_ind(self,n_type):
@@ -530,10 +529,10 @@ class Forest_graph(Stone):
 
         # in types and ids
         in_ids = [self.graph.vp["ids"][vertex] for vertex in edges[:, 0]]
-        in_types = [self.graph.vp["type"][vertex] for vertex in edges[:, 0]]
+        in_types = [self.graph.vp["types"][vertex] for vertex in edges[:, 0]]
         # out types and ids
         out_ids = [self.graph.vp["ids"][vertex] for vertex in edges[:, 1]]
-        out_types = [self.graph.vp["type"][vertex] for vertex in edges[:, 1]]
+        out_types = [self.graph.vp["types"][vertex] for vertex in edges[:, 1]]
         # synapse counts
         syn_counts = [self.graph.ep["weight"][e] for e in edges]
         # df
