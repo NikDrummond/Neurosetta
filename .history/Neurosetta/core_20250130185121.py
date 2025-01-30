@@ -26,7 +26,8 @@ class Tree_graph(Stone):
     def __init__(self, name: str, graph: gt.Graph, units: str = "nm") -> None:
         super().__init__(name)
         self.graph = graph
-        self._type = "Neuron"
+        self._type = 'Neuron'
+        
 
 
 class Node_table(Stone):
@@ -53,9 +54,7 @@ class Neuron_mesh(Stone):
 
         super().__init__(name)
 
-
 # check properties
-
 
 def g_has_property(
     N: gt.Graph | Tree_graph, g_property: str, t: str | bool = None
@@ -84,11 +83,7 @@ def g_has_property(
         elif t == "g":
             return ("g", g_property) in g.properties
     else:
-        return (
-            (("v", g_property) in g.properties)
-            | (("e", g_property) in g.properties)
-            | (("g", g_property) in g.properties)
-        )
+        return (("v", g_property) in g.properties) | (("e", g_property) in g.properties) | (("g", g_property) in g.properties)
 
 
 # read swc
@@ -418,113 +413,77 @@ def add_vp(g, df, id_col, val_col, name, dtype):
 
 class Forest_graph(Stone):
 
-    def __init__(self, graph: gt.Graph | List | pd.DataFrame, name=None, **kwargs):
+    def __init__(self,graph: gt.Graph | List, name = None):
         super().__init__(name)
         # make graph
         if isinstance(graph, gt.Graph):
             self.graph = graph
         elif isinstance(graph, List):
             self.graph = self._make_from_list(graph)
-        elif isinstance(graph, pd.DataFrame):
-            self.graph = self._make_from_edge_table(graph, **kwargs)
         else:
-            raise TypeError("Given type for Graph is not recognised")
-        self._type = "Forest"
+            raise TypeError('Given type for Graph is not recognised')
+        self._type = 'Forest'
 
     def _make_from_list(self, N_all: List):
-        """Make a graph from a List of neurons"""
+        """ Make a graph from a List of neurons"""
         g = gt.Graph()
         # add vertices
-        g.add_vertex(len(N_all))
+        g.add_vertex(len(N_all));
         # add individual neuron class objects as vertex property
-        g.vp["Neurons"] = g.new_vp("object", N_all)
+        g.vp['Neurons'] = g.new_vp('object', N_all)
         # add core vertex properties properties
-        g.vp["ID"] = g.new_vp(
-            "string", [g.vp["Neurons"][i].graph.gp["ID"] for i in g.iter_vertices()]
-        )
+        g.vp['ID'] = g.new_vp('string',[g.vp['Neurons'][i].graph.gp['ID'] for i in g.iter_vertices()])
         # core graph properties (has an ID)
-        g.gp["ID"] = g.new_gp("string", "unnamed")
+        g.gp['ID'] = g.new_gp('string','unnamed')
 
         return g
-
-    def _make_from_edge_table(self, edges, add_weights=True, add_types=True):
+    
+    def _make_from_edge_table(self,edges, add_weights = True, add_types = True):
 
         # make graph
         if not add_weights:
-            edges = edges[["pre", "post"]].values
+            edges = edges[['pre','post']].values
             g = gt.Graph(edges, hashed=True, hash_type="int")
         else:
             g = gt.Graph(
-                edges[["pre", "post", "weight"]].values,
-                hashed=True,
-                eprops=[("weight", "int")],
-                hash_type="int",
+                edges[['pre','post','weight']].values, hashed=True, eprops=[('weight', "int")], hash_type="int"
             )
-
+        
         # if we want to add types try to add them
         if add_types:
-            if "Input_type" in edges.columns and "Output_type" in edges.columns:
-                type_vp = g.new_vp("string")
+            if 'Input_type' in edges.columns and 'Output_type' in edges.columns:
+                type_vp = g.new_vp('string')
 
                 for v in g.iter_vertices():
-                    type_vp[v] = _find_n_type(g.vp["ids"][v], edges)
+                    type_vp[v] = _find_n_type(g.vp['ids'][v], edges)
 
-                g.vp["type"] = type_vp
+                g.vp['type'] = type_vp
             else:
-                raise AttributeError("Input_type and Output_type not in edges column")
-
+                raise AttributeError('Input_type and Output_type not in edges column')
+            
         return g
-
+    
     ### Propagate properties from a gp key or list of keys
-    def propagate_vp_to_gp(self, props):
+    def propegate_vp_to_gp(self, props):
         if isinstance(props, str):
-            if g_has_property(self.graph.vp["Neurons"][0], props):
-                curr_type = _get_property_type(
-                    self.graph.vp["Neurons"][0].graph.gp[props]
-                )
-                self.graph.vp[props] = self.graph.new_vp(
-                    curr_type,
-                    [
-                        self.graph.vp["Neurons"][i].graph.gp[props]
-                        for i in self.graph.iter_vertices()
-                    ],
-                )
+            if g_has_property(self.graph.vp['Neurons'][0], props):
+                curr_type = _get_property_type(self.graph.vp['Neurons'][0].graph.gp[props])
+                self.graph.vp[props] = self.graph.new_vp(curr_type,[self.graph.vp['Neurons'][i].graph.gp[props] for i in self.graph.iter_vertices()])
             else:
-                print("First neuron does not have " + props + " property, so skipping")
+                print('First neuron does not have ' + props + ' property, so skipping')
         elif isinstance(props, List):
             for current_prop in props:
-                if g_has_property(self.graph.vp["Neurons"][0], current_prop):
-                    curr_type = _get_property_type(
-                        self.graph.vp["Neurons"][0].graph.gp[current_prop]
-                    )
-                    self.graph.vp[current_prop] = self.graph.new_vp(
-                        curr_type,
-                        [
-                            self.graph.vp["Neurons"][i].graph.gp[current_prop]
-                            for i in self.graph.iter_vertices()
-                        ],
-                    )
+                if g_has_property(self.graph.vp['Neurons'][0], current_prop):
+                    curr_type = _get_property_type(self.graph.vp['Neurons'][0].graph.gp[current_prop])
+                    self.graph.vp[current_prop] = self.graph.new_vp(curr_type,[self.graph.vp['Neurons'][i].graph.gp[current_prop] for i in self.graph.iter_vertices()])
                 else:
-                    print(
-                        "First neuron does not have "
-                        + current_prop
-                        + " property, so skipping"
-                    )
-
+                    print('First neuron does not have ' + current_prop + ' property, so skipping')
 
 def _get_property_type(prop):
     """dumb function to get string for property maps given some property"""
     if isinstance(prop, str):
-        return "string"
+        return 'string'
     elif isinstance(prop, int):
-        return "int"
+        return 'int'
     elif isinstance(prop, float):
-        return "double"
-
-
-def _find_n_type(n_id, edges):
-    try:
-        t = edges.loc[edges.pre == n_id, "Input_type"].values[0]
-    except:
-        t = edges.loc[edges.post == n_id, "Output_type"].values[0]
-    return t
+        return 'double'
