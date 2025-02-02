@@ -1145,7 +1145,7 @@ def node_asymmetry(N: Tree_graph | gt.Graph, L: List | np.ndarray | None = None,
     asymmetries = g.new_vp('double', np.ones_like(g.get_vertices()))
     # iterate through internal nodes
     for v in g_branch_inds(g):
-        asymmetries[v] = _node_asymmetry(g, v, L, weight = weight)
+        asymmetries[v] = _node_asymmetry(g, L, weight = weight)
 
     if bind:
         if weight:

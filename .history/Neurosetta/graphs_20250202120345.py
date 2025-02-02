@@ -5,8 +5,6 @@ from scipy.spatial.distance import squareform, pdist
 import hdbscan
 from typing import List, Any, Literal
 import vedo as vd
-import itertools
-
 
 from numpy import floating
 
@@ -1052,7 +1050,9 @@ def bf_MST(coords, root = True, bf = 0.2):
 
 ### Node / Neuron Asymmetry
 
-def _node_asymmetry(N: Tree_graph | gt.Graph,v: int, L: List | np.ndarray | None = None, weight: bool = True) -> Any | floating[Any] | Literal[1]:
+
+
+def _node_asymmetry(N: nr.Tree_graph | gt.Graph,v: int, L: List | np.ndarray | None = None, weight: bool = True) -> Any | floating[Any] | Literal[1]:
     """
     Calculate weighted or unweighted asymmetry for a given vertex
 
@@ -1145,7 +1145,7 @@ def node_asymmetry(N: Tree_graph | gt.Graph, L: List | np.ndarray | None = None,
     asymmetries = g.new_vp('double', np.ones_like(g.get_vertices()))
     # iterate through internal nodes
     for v in g_branch_inds(g):
-        asymmetries[v] = _node_asymmetry(g, v, L, weight = weight)
+        asymmetries[v] = node_asymmetry(g, v, L = L, weight = weight)
 
     if bind:
         if weight:

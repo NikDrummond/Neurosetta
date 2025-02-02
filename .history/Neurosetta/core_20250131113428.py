@@ -516,8 +516,7 @@ class Forest_graph(Stone):
         self.types = np.array([self.graph.vp['type'][i] for i in self.graph.iter_vertices()],dtype = str)
 
     def add_id_lookup(self):
-        self.ids = np.array([self.graph.vp['ids'][i] for i in self.graph.iter_vertices()],dtype = int)
-        
+        self.ids
     def type_subset_ind(self,n_type):
         if not hasattr(self,'types'):
             self.add_type_lookup()

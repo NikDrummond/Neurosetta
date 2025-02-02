@@ -5,8 +5,6 @@ from scipy.spatial.distance import squareform, pdist
 import hdbscan
 from typing import List, Any, Literal
 import vedo as vd
-import itertools
-
 
 from numpy import floating
 
@@ -1052,7 +1050,9 @@ def bf_MST(coords, root = True, bf = 0.2):
 
 ### Node / Neuron Asymmetry
 
-def _node_asymmetry(N: Tree_graph | gt.Graph,v: int, L: List | np.ndarray | None = None, weight: bool = True) -> Any | floating[Any] | Literal[1]:
+
+
+def _node_asymmetry(N: nr.Tree_graph | gt.Graph,v: int, L: List | np.ndarray | None = None, weight: bool = True) -> Any | floating[Any] | Literal[1]:
     """
     Calculate weighted or unweighted asymmetry for a given vertex
 
@@ -1073,19 +1073,19 @@ def _node_asymmetry(N: Tree_graph | gt.Graph,v: int, L: List | np.ndarray | None
         Weighted or unweighted asymmetry for vertex v
     """
     # check input
-    if isinstance(N,Tree_graph):
+    if isinstance(N,nr.Tree_graph):
         g = N.graph
     elif isinstance(N,gt.Graph):
         g = N
 
     # check we have the reachable leaves property    
-    if not g_has_property(g, 'reachable_leaves'):
-        g_reachable_leaves(g,bind = True)
+    if not nr.g_has_property(g, 'reachable_leaves'):
+        nr.g_reachable_leaves(g,bind = True)
         
     # get number of leaves if weight is True and L not provided
     if weight == True:
         if L is None:
-            L = len(g_leaf_inds(g))
+            L = len(nr.g_leaf_inds(N))
     # get out neighbours
     neig = g.get_out_neighbours(v)
     # if we are at a transitory node or leaf, set to 1
@@ -1117,7 +1117,7 @@ def _node_asymmetry(N: Tree_graph | gt.Graph,v: int, L: List | np.ndarray | None
     return sym
 
 
-def node_asymmetry(N: Tree_graph | gt.Graph, L: List | np.ndarray | None = None, weight = True, bind = True) -> gt.VertexPropertyMap | None:
+def node_asymmetry(N: nr.Tree_graph | gt.Graph, L: List | np.ndarray | None = None, weight = True, bind = True) -> gt.VertexPropertyMap | None:
     """_summary_
 
     Parameters
@@ -1137,21 +1137,18 @@ def node_asymmetry(N: Tree_graph | gt.Graph, L: List | np.ndarray | None = None,
         If bind is False, returns vertex property map for given neuron. If bind is True, and weighted is True, 'Weighted_asymmetry' vertex property map is added to N,
         if weight is False, 'Asymmetry' vertex property map is bound to N
     """
-    if isinstance(N, Tree_graph):
-        g = N.graph
-    elif isinstance(N, gt.Graph):
-        g = N
+    if isinstance(N, Tree_graph
     # initialise vp of ones
     asymmetries = g.new_vp('double', np.ones_like(g.get_vertices()))
     # iterate through internal nodes
-    for v in g_branch_inds(g):
-        asymmetries[v] = _node_asymmetry(g, v, L, weight = weight)
+    for v in g_branch_inds(N):
+        asymmetries[v] = node_asymmetry(N.graph.vp['Neurons'][0],v, L,weight = weight)
 
     if bind:
         if weight:
-            g.vp['Weighted_asymmetry'] = asymmetries
+            N.graph.vp['Weighted_asymmetry'] = asymmetries
         else:
-            g.vp['Asymmetry'] = asymmetries
+            N.graph.vp['Asymmetry'] = asymmetries
     else:
         return asymmetries
     
