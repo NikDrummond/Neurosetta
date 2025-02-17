@@ -568,11 +568,7 @@ class Forest_graph(Stone):
 
     def all_coords(self):
         """ get the point cloud of all points"""
-        coords = []
-        for v in self.graph.iter_vertices():
-            N = self.graph.vp['Neurons'][v]
-            coords.append(N.graph.vp['coordinates'].get_2d_array().T)
-        return np.vstack(coords)
+        coords = np.array([nr.g_vert_coords()])
 
 def _get_property_type(prop):
     """dumb function to get string for property maps given some property"""
