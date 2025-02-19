@@ -1,7 +1,7 @@
 from .core import *
 from .sets import *
 from .graphs import *
-from .forests import *
+from .forests
 from .rotations import *
 from .transformations import *
 from .connectivity import *
