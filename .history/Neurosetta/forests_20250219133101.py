@@ -144,30 +144,21 @@ def _get_neuron_output_table(N_all: Forest_graph, include_partner_type: bool = T
         return df
 
 def Neuron_synapse_table(N_all: Forest_graph, direction:str = 'all', include_partner_type:bool = True,return_missing:bool = False):
-    """
-    Generate a table of neuron synapses from a forest graph.
+    """Generate a synapse table for neurons based on the specified direction.
 
-    Parameters
-    ----------
-    N_all : Forest_graph
-        Forest graph containing neuron and synapse data.
-    direction : str, optional
-        Synapse direction to retrieve ('all', 'inputs', or 'outputs'), by default 'all'.
-    include_partner_type : bool, optional
-        If True, includes partner type information, by default True.
-    return_missing : bool, optional
-        If True, returns lists of neuron IDs missing corresponding synapse tables, by default False.
+    Parameters:
+        N_all (Forest_graph): A Forest_graph instance containing neurons with their synaptic data.
+        direction (str): The direction of synapse table to generate. Options are 'inputs', 'outputs', or 'all'.
+        return_missing (bool): If True, also return lists of neuron IDs missing respective properties.
 
-    Returns
-    -------
-    DataFrame or tuple
-        A DataFrame with synapse information. When direction is 'all' and return_missing is True,
-        returns a tuple with the DataFrame, missing input IDs, and missing output IDs.
+    Returns:
+        pd.DataFrame:
+            If return_missing is False, returns a concatenated table of synapse information.
+        tuple:
+            When direction is 'all' and return_missing is True, returns a tuple containing the table and lists of missing input and output property IDs.
 
-    Raises
-    ------
-    ValueError
-        If the provided direction is not one of 'all', 'inputs', or 'outputs'.
+    Raises:
+        ValueError: If an invalid direction is provided.
     """
     valid_directions = ['all','inputs','outputs']
     if direction == 'inputs':

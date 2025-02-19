@@ -144,31 +144,31 @@ def _get_neuron_output_table(N_all: Forest_graph, include_partner_type: bool = T
         return df
 
 def Neuron_synapse_table(N_all: Forest_graph, direction:str = 'all', include_partner_type:bool = True,return_missing:bool = False):
-    """
-    Generate a table of neuron synapses from a forest graph.
+"""
+Generate a table of neuron synapses from a forest graph.
 
-    Parameters
-    ----------
-    N_all : Forest_graph
-        Forest graph containing neuron and synapse data.
-    direction : str, optional
-        Synapse direction to retrieve ('all', 'inputs', or 'outputs'), by default 'all'.
-    include_partner_type : bool, optional
-        If True, includes partner type information, by default True.
-    return_missing : bool, optional
-        If True, returns lists of neuron IDs missing corresponding synapse tables, by default False.
+Parameters
+----------
+N_all : Forest_graph
+    Forest graph containing neuron and synapse data.
+direction : str, optional
+    Synapse direction to retrieve ('all', 'inputs', or 'outputs'), by default 'all'.
+include_partner_type : bool, optional
+    If True, includes partner type information, by default True.
+return_missing : bool, optional
+    If True, returns lists of neuron IDs missing corresponding synapse tables, by default False.
 
-    Returns
-    -------
-    DataFrame or tuple
-        A DataFrame with synapse information. When direction is 'all' and return_missing is True,
-        returns a tuple with the DataFrame, missing input IDs, and missing output IDs.
+Returns
+-------
+DataFrame or tuple
+    A DataFrame with synapse information. When direction is 'all' and return_missing is True,
+    returns a tuple with the DataFrame, missing input IDs, and missing output IDs.
 
-    Raises
-    ------
-    ValueError
-        If the provided direction is not one of 'all', 'inputs', or 'outputs'.
-    """
+Raises
+------
+ValueError
+    If the provided direction is not one of 'all', 'inputs', or 'outputs'.
+"""
     valid_directions = ['all','inputs','outputs']
     if direction == 'inputs':
         return _get_neuron_input_table(N_all, include_partner_type=include_partner_type,return_missing=return_missing)
