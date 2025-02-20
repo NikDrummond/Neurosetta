@@ -189,9 +189,7 @@ def Neuron_synapse_table(N_all: Forest_graph, direction:str = 'all', include_par
         raise ValueError(f"Invalid direction '{direction}'. Expected one of {valid_directions}.")
 
 def get_all_roots(forest: Forest_graph) -> ndarray:
-    """Get all neuron root coordinates.
-
-    Currently a slow implementation
+    """Get all neuron root coordinates
 
     Parameters
     ----------
@@ -200,8 +198,8 @@ def get_all_roots(forest: Forest_graph) -> ndarray:
 
     Returns
     -------
-    np.ndarray
-        array of neuron root coordinates in order of neurons in Forest
+    _type_
+        _description_
     """
     coords = zeros((forest.graph.num_vertices(),3))
     for v in forest.graph.iter_vertices():

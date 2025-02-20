@@ -1,6 +1,6 @@
 import pandas as pd
 from typing import List
-from numpy import array, where, zeros, ndarray
+from numpy import array, where, zeros
 
 from Neurosetta import Forest_graph, g_has_property, g_vert_coords, g_root_ind
 
@@ -188,25 +188,10 @@ def Neuron_synapse_table(N_all: Forest_graph, direction:str = 'all', include_par
     else:
         raise ValueError(f"Invalid direction '{direction}'. Expected one of {valid_directions}.")
 
-def get_all_roots(forest: Forest_graph) -> ndarray:
-    """Get all neuron root coordinates.
+def get_all_roots(forest: Forest_graph):
+    coords = np.zeros((T4s.graph.num_vertices(),3))
 
-    Currently a slow implementation
+    for v in T4s.graph.iter_vertices():
 
-    Parameters
-    ----------
-    forest : Forest_graph
-        neurons to get root from
-
-    Returns
-    -------
-    np.ndarray
-        array of neuron root coordinates in order of neurons in Forest
-    """
-    coords = zeros((forest.graph.num_vertices(),3))
-    for v in forest.graph.iter_vertices():
-
-        N = forest.graph.vp['Neurons'][v]
-        coords[v] = g_vert_coords(N, g_root_ind(N))[0]
-    
-    return coords
+        N = T4s.graph.vp['Neurons'][v]
+        coords[v] = nr.g_vert_coords(N, nr.g_root_ind(N))[0]
