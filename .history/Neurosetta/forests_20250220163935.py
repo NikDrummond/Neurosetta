@@ -211,7 +211,7 @@ def get_all_roots(forest: Forest_graph) -> ndarray:
     
     return coords
 
-def get_all_centres(forest: Forest_graph) -> ndarray:
+def get_all_roots(forest: Forest_graph) -> ndarray:
     """Get all neuron root coordinates.
 
     Currently a slow implementation
@@ -230,6 +230,6 @@ def get_all_centres(forest: Forest_graph) -> ndarray:
     for v in forest.graph.iter_vertices():
 
         N = forest.graph.vp['Neurons'][v]
-        coords[v] = g_vert_coords(N, g_root_ind(N)).mean(axis = 0)
+        coords[v] = g_vert_coords(N, g_root_ind(N))[0]
     
     return coords
