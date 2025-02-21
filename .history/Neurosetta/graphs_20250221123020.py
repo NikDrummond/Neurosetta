@@ -3,11 +3,9 @@ import numpy as np
 from scipy.spatial import KDTree
 from scipy.spatial.distance import squareform, pdist
 import hdbscan
-from typing import List, Any, Literal, Tuple
+from typing import List, Any, Literal
 import vedo as vd
 import itertools
-import GeoJax
-import vg
 
 
 from numpy import floating

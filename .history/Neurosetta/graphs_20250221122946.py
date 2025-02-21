@@ -3,11 +3,9 @@ import numpy as np
 from scipy.spatial import KDTree
 from scipy.spatial.distance import squareform, pdist
 import hdbscan
-from typing import List, Any, Literal, Tuple
+from typing import List, Any, Literal
 import vedo as vd
 import itertools
-import GeoJax
-import vg
 
 
 from numpy import floating
@@ -1210,7 +1208,7 @@ def expected_asymmetry(N: Tree_graph | gt.Graph | gt.VertexPropertyMap,method: s
 
 ### Branching Angles    
 
-def get_child_angles(N:Tree_graph, to_degree:bool = True, bind:bool = True) -> np.ndarray | None:
+def get_child_angles(N:nr.Tree_graph, to_degree:bool = True, bind:bool = True) -> np.ndarray | None:
     """
     Computes the angles between child branches at bifurcation points in a tree graph.
 
@@ -1251,13 +1249,13 @@ def get_child_angles(N:Tree_graph, to_degree:bool = True, bind:bool = True) -> n
     >>> print(my_tree_graph.graph.ep['Child_angles'])  # Access stored angles
     """
     # get all edges
-    edges = get_edges(N)
+    edges = nr.get_edges(N)
     # get all coordinates
-    coords = g_vert_coords(N)
+    coords = nr.g_vert_coords(N)
     # get all branches
-    branch_inds = g_branch_inds(N)
+    branch_inds = nr.g_branch_inds(N)
     # subset out root
-    branch_inds = branch_inds[branch_inds != g_root_ind(N)]
+    branch_inds = branch_inds[branch_inds != nr.g_root_ind(N)]
     # keep only bifurications
     branch_inds = branch_inds[np.where(N.graph.get_out_degrees(branch_inds) == 2)]
     # get child edges, as in the source is branch - we index to only get the target of the edge
@@ -1313,7 +1311,7 @@ def get_child_angles(N:Tree_graph, to_degree:bool = True, bind:bool = True) -> n
     else:
         return angles
 
-def get_parent_child_angles(N:Tree_graph, to_degree:bool = True, bind:bool = True) -> Tuple[np.ndarray, np.ndarray] | None:
+def get_parent_child_angles(N:nr.Tree_graph, to_degree:bool = True, bind:bool = True) -> Tuple[np.ndarray, np.ndarray] | None:
     """
     Computes the angles between parent and child branches at bifurcation points in a tree graph.
 
@@ -1359,13 +1357,13 @@ def get_parent_child_angles(N:Tree_graph, to_degree:bool = True, bind:bool = Tru
     >>> print(my_tree_graph.graph.ep['Parent_angles'])  # Access stored angles
     """
     # get all edges
-    edges = get_edges(N)
+    edges = nr.get_edges(N)
     # get all coordinates
-    coords = g_vert_coords(N)
+    coords = nr.g_vert_coords(N)
     # get all branches
-    branch_inds = g_branch_inds(N)
+    branch_inds = nr.g_branch_inds(N)
     # subset out root
-    branch_inds = branch_inds[branch_inds != g_root_ind(N)]
+    branch_inds = branch_inds[branch_inds != nr.g_root_ind(N)]
     # keep only bifurications
     branch_inds = branch_inds[np.where(N.graph.get_out_degrees(branch_inds) == 2)]
     # get child edges, as in the source is branch - we index to only get the target of the edge
