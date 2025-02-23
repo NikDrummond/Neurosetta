@@ -801,6 +801,7 @@ def get_edges(N:Tree_graph, root: int | None = None, subset: str | None = None) 
     else:
         raise ValueError(f'Given Subset {subset} is not valid, expected one of {expected_subsets}')
 
+
 def graph_height(N: Tree_graph,map_to:str = 'edge',bind:bool = False):
     """_summary_
 

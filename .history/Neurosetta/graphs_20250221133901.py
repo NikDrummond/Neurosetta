@@ -789,18 +789,58 @@ def get_edges(N:Tree_graph, root: int | None = None, subset: str | None = None) 
         edges = gt.dfs_iterator(g, root, array = True)
 
     ### Subset if needed
-    expected_subsets = ['None','Internal','External']
-    if subset == None:
+    if subset is None:
         return edges
-    elif subset == 'Internal':
+    elif isinstance(subset, str):
         l_inds = g_leaf_inds(N)
-        return edges[~np.isin(edges[:,1],l_inds)]   
-    elif subset == 'External':
-        l_inds = g_leaf_inds(N)
-        return edges[np.isin(edges[:,1],l_inds)]
+        # mask = np.array([1 if i in l_inds else 0 for i in edges[:,1]],dtype = bool)
+        if subset is 'Internal':
+            return edges[~np.isin(edges[:,1],l_inds)]   
+        elif subset is 'External':    
+            return edges[np.isin(edges[:,1],l_inds)]   
+        else:
+            raise AttributeError('Specified subset must be Internal, or External')
     else:
-        raise ValueError(f'Given Subset {subset} is not valid, expected one of {expected_subsets}')
+        raise AttributeError('Subset must be None, Internal, or External')
 
+    # ### subset if needed
+    # if root is None:
+    #     if isinstance(N, Tree_graph):
+    #         edges =  N.graph.get_edges()
+    #     elif isinstance(N, gt.Graph):
+    #         edges = N.get_edges()    
+    #     if subset is None:
+    #         return edges
+    #     elif isinstance(subset,str):
+    #         l_inds = g_leaf_inds(N)
+    #         mask = np.array([1 if i in l_inds else 0 for i in edges[:,1]],dtype = bool)
+    #         if subset is 'Internal':
+    #             return edges[~mask]    
+    #         elif subset is 'External':    
+    #             return edges[mask]
+    #         else:
+    #             raise AttributeError('Specified subset must be Internal, or External')
+    #     else:
+    #         raise AttributeError('Subset must be None, to return all edges, or Internal or External')
+    # else:
+    #     if isinstance(N, Tree_graph):
+    #         edges =  gt.dfs_iterator(N.graph,root,array = True)
+    #     elif isinstance(N, gt.Graph):
+    #         edges = gt.dfs_iterator(N,root,array = True) 
+    #     if subset is None:
+    #         return edges
+    #     # if we want a subset
+    #     elif isinstance(subset,str):
+    #         l_inds = g_leaf_inds(N)
+    #         # mask = np.array([1 if i in l_inds else 0 for i in edges[:,1]],dtype = bool)
+    #         if subset is 'Internal':
+    #             return edges[~np.isin(edges[:,1],l_inds)]   
+    #         elif subset is 'External':    
+    #             return edges[np.isin(edges[:,1],l_inds)]   
+    #         else:
+    #             raise AttributeError('Specified subset must be Internal, or External')
+    #     else:
+    #         raise AttributeError('Subset must be None, to return all edges, or Internal or External')
 def graph_height(N: Tree_graph,map_to:str = 'edge',bind:bool = False):
     """_summary_
 
@@ -1389,49 +1429,3 @@ def get_parent_child_angles(N:Tree_graph, to_degree:bool = True, bind:bool = Tru
 
     else:
         return angles_even, angles_odd
-
-def unpack_parent_child_angles(N:Tree_graph, split: bool = True) -> np.ndarray | Tuple[np.ndarray,np.ndarray]:
-    """retrieve np.ndarrays of paired angles going from parent edge to child edge. 
-    
-    if split, As each branch node has two children, we split the angles into first and second child and return an array for each.
-
-    This means arr1[i] and arr2[i] come from the same parent
-
-    If split is false, we return a single array, however adjacent odd and even rows come from the same parent.
-
-    If N does not have the 'Parent_angle' property, it will be calculated and added.
-
-    Parameters
-    ----------
-    N : nr.Tree_graph
-        Tree_graph representation of Neuron
-    split: bool
-        if we want to split the output or not, by default True
-    Returns
-    -------
-    Tuple[np.ndarray,np.ndarray]
-        Arrays of angles between parent vector and child vector, paired as described above.
-    """
-
-    # if we don't have the parent to child branch angle property add it to the neuron
-    if not g_has_property(N.graph, 'Parent_angle'):
-        get_parent_child_angles(N, to_degree = True, bind = True)
-
-    # get all edges
-    edges = get_edges(N)
-
-    # get all branches
-    branch_inds = g_branch_inds(N)
-    # subset out root
-    branch_inds = branch_inds[branch_inds != g_root_ind(N)]
-    # keep only bifurications
-    branch_inds = branch_inds[np.where(N.graph.get_out_degrees(branch_inds) == 2)]
-    # get child edges, as in the source is branch - we index to only get the target of the edge
-    source_inds = np.isin(edges[:,0],branch_inds)
-    child_edges = edges[source_inds]
-
-    angles = np.array([N.graph.ep['Parent_angle'][e] for e in child_edges])
-    if split:
-        return angles[::2], angles[1::2]
-    else:
-        return angles
