@@ -1436,7 +1436,7 @@ def unpack_parent_child_angles(N:Tree_graph, split: bool = True) -> np.ndarray |
     else:
         return angles
     
-def propagate_vp_to_ep(N:Tree_graph, vp:str, ep:str, by:str = 'target'):
+def propagate_vp_to_ep(N:Tree_graph, vp:str, ep:str, by:str):
     """_summary_
 
     Parameters
@@ -1444,17 +1444,16 @@ def propagate_vp_to_ep(N:Tree_graph, vp:str, ep:str, by:str = 'target'):
     N : Tree_graph
         Tree graph representation of a neuron
     vp : str
-        name of vertex property we wish to propegate
+        vertex property which N has to propegate to edges
     ep : str
-        name of new edge property which will be added to neuron
-    by : str, optional
-        Nature of the vertex to edge mapping. If target, vertex property will be mapped to edges with this vertex as its target.
-        alternatively, if source, property will be mapped to edges with with the specific vertex value as the source. By default 'target'
+        _description_
+    by : str
+        _description_
 
     Raises
     ------
     AttributeError
-        by must be either source or target
+        by must be source or target
     """
     vp = N.graph.vp[vp].a
     edges = get_edges(N)

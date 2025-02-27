@@ -1454,7 +1454,7 @@ def propagate_vp_to_ep(N:Tree_graph, vp:str, ep:str, by:str = 'target'):
     Raises
     ------
     AttributeError
-        by must be either source or target
+        _description_
     """
     vp = N.graph.vp[vp].a
     edges = get_edges(N)

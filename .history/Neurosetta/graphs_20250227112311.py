@@ -1442,19 +1442,18 @@ def propagate_vp_to_ep(N:Tree_graph, vp:str, ep:str, by:str = 'target'):
     Parameters
     ----------
     N : Tree_graph
-        Tree graph representation of a neuron
+        _description_
     vp : str
-        name of vertex property we wish to propegate
+        _description_
     ep : str
-        name of new edge property which will be added to neuron
+        _description_
     by : str, optional
-        Nature of the vertex to edge mapping. If target, vertex property will be mapped to edges with this vertex as its target.
-        alternatively, if source, property will be mapped to edges with with the specific vertex value as the source. By default 'target'
+        _description_, by default 'target'
 
     Raises
     ------
     AttributeError
-        by must be either source or target
+        _description_
     """
     vp = N.graph.vp[vp].a
     edges = get_edges(N)
