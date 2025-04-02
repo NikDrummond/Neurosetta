@@ -861,7 +861,7 @@ def graph_height(N: Tree_graph,map_to:str = 'edge',bind:bool = False):
             return h_vprop, h_eprop
 
 def Euclidean_MST(coords, root = True):
-    """generate the Euclidean minimum spanning tree from a set of coordinates
+    """_summary_
 
     Parameters
     ----------
@@ -894,54 +894,6 @@ def Euclidean_MST(coords, root = True):
         mst = gt.min_spanning_tree(g,weights = g.ep['Path_length'])
     # clean up!
     g.set_edge_filter(mst)
-    g.purge_vertices()
-    # make a copy of g and make it directed - there may be a better way to do this?
-    edges = gt.dfs_iterator(g,0,array = True)
-    g2 = gt.Graph(edges, hashed = True, hash_type = 'int')
-    # get coordinates
-    coords = np.array([g.vp["coordinates"][i] for i in g2.vp["ids"].a])
-    vprop_coords = g2.new_vp("vector<double>")
-    vprop_coords.set_2d_array(coords.T)
-    g2.vp['coordinates'] = vprop_coords
-    # re-add weights/ euclidean distance
-    get_g_distances(g2, bind = True)
-    
-    return g2
-
-def Random_ST(coords, root = True):
-    """Generate a random spanning tree from a set of coordinates
-
-    Parameters
-    ----------
-    coords : np.ndarray
-        coordinates to find the Random spanning tree of. Note, if root is true we assume that the 
-        first coordinate is the root!
-    root : bool, optional
-        If True, we assume the first coordinate is the root. otherwise returns the unrooted RST, by default True
-
-    Returns
-    -------
-    gt.Graph
-        returns a random spanning tree graph of the provided point cloud
-    """
-    # Note, we are assuming that the first coordinate is the root (if root is true)!
-    
-    # generate complete graph
-    g = gt.complete_graph(coords.shape[0], self_loops = False, directed = False)
-    # add coordinates as vertex property
-    vprop_coords = g.new_vp('vector<double>')
-    vprop_coords.set_2d_array(coords.T)
-    g.vp['coordinates'] = vprop_coords
-    # add weights/ euclidean distance
-    get_g_distances(g, bind = True)
-    # Create MST edge property map (will filter after)
-    if root:
-        rst = gt.random_spanning_tree(g,weights = g.ep['Path_length'], root = 0)
-    else:
-        # calculate the MST - returned here is a mask edge property
-        rst = gt.random_spanning_tree(g,weights = g.ep['Path_length'])
-    # clean up!
-    g.set_edge_filter(rst)
     g.purge_vertices()
     # make a copy of g and make it directed - there may be a better way to do this?
     edges = gt.dfs_iterator(g,0,array = True)
@@ -1513,20 +1465,3 @@ def propagate_vp_to_ep(N:Tree_graph, vp:str, ep:str, by:str = 'target'):
     else:
         raise AttributeError(f'by method {by} not applicable, expected source or target')
     N.graph.ep[ep] = N.graph.new_ep('int',vp[e_ind])
-
-def get_subtree_cable_length(N: Tree_graph, v:int) -> float:
-    """Returns the total cable length of the subtree in a neuron defined with it's root at vertex v
-
-    Parameters
-    ----------
-    N : neurosetta.Tree_graph
-        neuron sub-tree is from
-    v : int
-        Index of vertex which gives the root of the sub-tree
-
-    Returns
-    -------
-    float
-        Total cable length of sub-tree
-    """
-    return sum([N.graph.ep['Path_length'][e] for e in gt.dfs_iterator(N.graph, v)])
