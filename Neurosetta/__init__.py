@@ -10,3 +10,4 @@ from .tree_surgery import *
 from .meshes import *
 from .plotting import *
 from .scroll_plot import *
+from .parallelisation import *
