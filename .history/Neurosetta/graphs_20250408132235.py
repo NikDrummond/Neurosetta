@@ -817,7 +817,7 @@ def count_edges(N: Tree_graph, root: int | None = None, subset: str | None = Non
     Returns
     -------
     int
-        count of the number of edges in N
+        _description_
     """
     return get_edges(N, root, subset).shape[0]
 

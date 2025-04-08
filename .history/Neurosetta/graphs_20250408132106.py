@@ -807,17 +807,16 @@ def count_edges(N: Tree_graph, root: int | None = None, subset: str | None = Non
     Parameters
     ----------
     N : Tree_graph
-        Tree_graph representation of Neuron
+        Tree_
     root : int | None, optional
-        If provided, will return number of edges downstream from given root, by default None
+        _description_, by default None
     subset : str | None, optional
-        If Internal, will provide count for only internal edges, if External, will provide count for only external edges. 
-        If None, all edges are included, by default None
+        _description_, by default None
 
     Returns
     -------
     int
-        count of the number of edges in N
+        _description_
     """
     return get_edges(N, root, subset).shape[0]
 

@@ -801,27 +801,9 @@ def get_edges(N:Tree_graph, root: int | None = None, subset: str | None = None) 
     else:
         raise ValueError(f'Given Subset {subset} is not valid, expected one of {expected_subsets}')
 
-def count_edges(N: Tree_graph, root: int | None = None, subset: str | None = None) -> int:
-    """Return count of the number of edges in N
+def count_edges
 
-    Parameters
-    ----------
-    N : Tree_graph
-        Tree_graph representation of Neuron
-    root : int | None, optional
-        If provided, will return number of edges downstream from given root, by default None
-    subset : str | None, optional
-        If Internal, will provide count for only internal edges, if External, will provide count for only external edges. 
-        If None, all edges are included, by default None
-
-    Returns
-    -------
-    int
-        count of the number of edges in N
-    """
-    return get_edges(N, root, subset).shape[0]
-
-def graph_height(N: Tree_graph, map_to:str = 'edge',bind:bool = False):
+def graph_height(N: Tree_graph,map_to:str = 'edge',bind:bool = False):
     """_summary_
 
     Parameters
