@@ -532,12 +532,12 @@ def angular_displacement(N1:Tree_graph, N2:Tree_graph, units: str = 'radians') -
             ref = np.array([0, 1, 0])
         else:
             ref = np.array([1, 0, 0])
-        normal = GeoJax.cross(simp_vec, ref)
+        normal = gj.cross(simp_vec, ref)
         if units == 'radians':
             # calculate signed angle (radians) and extend our list
-            ang_data.extend(np.array(GeoJax.signed_angle(simp_vec, full_vec, normal, to_degree = False)))
+            ang_data.extend(np.array(gj.signed_angle(simp_vec, full_vec, normal, to_degree = False)))
         elif units == 'degrees':
-            ang_data.extend(np.array(GeoJax.signed_angle(simp_vec, full_vec, normal, to_degree = True)))
+            ang_data.extend(np.array(gj.signed_angle(simp_vec, full_vec, normal, to_degree = True)))
         else:
             raise AttributeError('units must be radians or degrees')
     return np.array(ang_data)
