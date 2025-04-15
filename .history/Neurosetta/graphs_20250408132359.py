@@ -460,24 +460,6 @@ def nearest_vertex(
     else:
         return nearest_v
 
-def map_vertices(N1:Tree_graph, N2:Tree_graph) -> dict:
-    """Given two neurons, provide a dictionary mapping vertices in N1 to vertices in N2 using nearest neighbours.
-
-    Parameters
-    ----------
-    N1 : nr.Tree_graph
-        Neuron to map vertices from
-    N2 : nr.Tree_graph
-        Neuron to map vertices to
-
-    Returns
-    -------
-    dict
-        dictionary of index : index for vertex mapping from N1 to N2
-    """
-    v1 = N1.graph.get_vertices()
-    v2 = nearest_vertex(N2, g_vert_coords(N1))
-    return dict(zip(v1,v2))
 
 def NP_segment(
     g: gt.Graph | Tree_graph | Node_table, mesh: vd.Mesh, invert: bool = False
