@@ -17,6 +17,7 @@ from .core import Tree_graph, Node_table, infer_node_types, g_has_property
 from .sets import Sfamily_intersect, Sfamily_XOR
 
 
+
 # function to get node coordinates from a graph
 
 
@@ -50,7 +51,7 @@ def g_vert_coords(
             subset = [subset]
         coords = g.vp["coordinates"].get_2d_array().T
         coords = coords[subset]
-
+        
     return coords
 
 
@@ -78,8 +79,8 @@ def get_g_distances(
 
     edges = g.get_edges()
     coords = g_vert_coords(g)
-    eprop_w.a = np.linalg.norm(coords[edges[:, 0]] - coords[edges[:, 1]], axis=1)
-
+    eprop_w.a = np.linalg.norm(coords[edges[:,0]] - coords[edges[:,1]], axis = 1)
+    
     # bind this as an edge property to the graph
     if bind:
         g.ep[name] = eprop_w
@@ -120,9 +121,7 @@ def g_branch_inds(N: Tree_graph | gt.Graph) -> np.ndarray[int]:
     return np.where(g.degree_property_map("out").a > 1)[0]
 
 
-def g_lb_inds(
-    N: Tree_graph | gt.Graph, return_types: bool = False, root: bool = False
-) -> np.ndarray[int]:
+def g_lb_inds(N: Tree_graph | gt.Graph, return_types: bool = False, root:bool = False) -> np.ndarray[int]:
     """
     Returns indices of all leaf and branch nodes
 
@@ -143,11 +142,11 @@ def g_lb_inds(
     # if root is false we are removing it
     if ~root:
         inds = inds[inds != g_root_ind(N)]
-
+    
     return inds
 
 
-def g_root_ind(N: Tree_graph | gt.Graph, all_roots=False) -> int:
+def g_root_ind(N: Tree_graph | gt.Graph, all_roots = False) -> int:
     """
     Return integer of root node index
     """
@@ -158,9 +157,9 @@ def g_root_ind(N: Tree_graph | gt.Graph, all_roots=False) -> int:
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
-
+    
     if all_roots:
-        return np.where(g.degree_property_map("in").a == 0)[0]
+        return np.where(g.degree_property_map('in').a == 0)[0]
     else:
         return np.where(g.degree_property_map("in").a == 0)[0][0]
 
@@ -251,7 +250,7 @@ def dist_mat(
         g = N
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
-
+    
     if inds is None:
         inds = g.get_vertices()
 
@@ -461,8 +460,7 @@ def nearest_vertex(
     else:
         return nearest_v
 
-
-def map_vertices(N1: Tree_graph, N2: Tree_graph) -> dict:
+def map_vertices(N1:Tree_graph, N2:Tree_graph) -> dict:
     """Given two neurons, provide a dictionary mapping vertices in N1 to vertices in N2 using nearest neighbours.
 
     Parameters
@@ -479,12 +477,9 @@ def map_vertices(N1: Tree_graph, N2: Tree_graph) -> dict:
     """
     v1 = N1.graph.get_vertices()
     v2 = nearest_vertex(N2, g_vert_coords(N1))
-    return dict(zip(v1, v2))
+    return dict(zip(v1,v2))
 
-
-def angular_displacement(
-    N1: Tree_graph, N2: Tree_graph, units: str = "radians"
-) -> np.ndarray:
+def angular_displacement(N1:Tree_graph, N2:Tree_graph, units: str = 'radians') -> np.ndarray:
     """Given two neurons, really one simplified and one not, map vertices then calculate the angular displacement between edges.
     (As in, angles between mapped edges in N1 and N2)
 
@@ -523,9 +518,9 @@ def angular_displacement(
         # find the vertices in the full graph
         v1 = v_map[e[0]]
         v2 = v_map[e[1]]
-        v_path, e_path = gt.shortest_path(N1.graph, v1, v2)
+        v_path, e_path = gt.shortest_path(N1.graph,v1,v2)
         # initialise array for full vectors
-        full_vec = np.zeros((len(e_path), 3))
+        full_vec = np.zeros((len(e_path),3))
         # get edge vectors in full path
         for i in range(len(e_path)):
             e_full = e_path[i]
@@ -538,23 +533,14 @@ def angular_displacement(
         else:
             ref = np.array([1, 0, 0])
         normal = GeoJax.cross(simp_vec, ref)
-        if units == "radians":
+        if units == 'radians':
             # calculate signed angle (radians) and extend our list
-            ang_data.extend(
-                np.array(
-                    GeoJax.signed_angle(simp_vec, full_vec, normal, to_degree=False)
-                )
-            )
-        elif units == "degrees":
-            ang_data.extend(
-                np.array(
-                    GeoJax.signed_angle(simp_vec, full_vec, normal, to_degree=True)
-                )
-            )
+            ang_data.extend(np.array(GeoJax.signed_angle(simp_vec, full_vec, normal, to_degree = False)))
+        elif units == 'degrees':
+            ang_data.extend(np.array(GeoJax.signed_angle(simp_vec, full_vec, normal, to_degree = True)))
         else:
-            raise AttributeError("units must be radians or degrees")
+            raise AttributeError('units must be radians or degrees')
     return np.array(ang_data)
-
 
 def NP_segment(
     g: gt.Graph | Tree_graph | Node_table, mesh: vd.Mesh, invert: bool = False
@@ -696,10 +682,10 @@ def downstream_vertices(N: Tree_graph | gt.Graph, source: int) -> np.ndarray:
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
 
-    return np.unique(gt.dfs_iterator(g, source, array=True), dtype=np.int64)
+    return np.unique(gt.dfs_iterator(g, source, array=True),dtype = np.int64)
 
 
-def edge_length(i, g, weight="Path_length"):
+def edge_length(i, g, weight = 'Path_length'):
     return g.ep[weight][i]
 
 
@@ -742,10 +728,7 @@ def g_cable_length(N: Tree_graph | gt.Graph, source: int = 0) -> float:
             cable = np.apply_along_axis(edge_length, 1, sub_tree, g).sum()
     return cable
 
-
-def path_length(
-    N: Tree_graph | gt.Graph, source: int, target: int, weight: str = "Path_length"
-):
+def path_length(N:Tree_graph | gt.Graph,source: int, target : int, weight:str = 'Path_length'):
     """
     Weighted distance between two vertices
     """
@@ -757,26 +740,26 @@ def path_length(
     else:
         raise TypeError("N must be Tree_graph or gt.Graph")
 
-    if not g_has_property(g, weight, "e"):
-        if weight == "Path_length":
-            get_g_distances(g, bind=True)
-        else:
-            raise AttributeError("Input graph has no " + weight + " Edge property")
-
-    dist = gt.shortest_distance(
-        g, source=source, target=target, weights=g.ep[weight], directed=False
-    )
+    if not g_has_property(g,weight,'e'):
+        if weight == 'Path_length':
+            get_g_distances(g, bind = True)
+        else:    
+            raise AttributeError('Input graph has no ' + weight + ' Edge property')   
+    
+    dist = gt.shortest_distance(g,
+                    source = source,
+                    target = target,
+                    weights = g.ep[weight],
+                    directed = False)
 
     # if the length is still inf then there is no path
     if dist == np.inf:
-        raise ValueError("No path exists between source and target vertex")
+        raise ValueError('No path exists between source and target vertex') 
     else:
         return dist
+    
 
-
-def root_dist(
-    N: Tree_graph | gt.Graph, weight: str = "Path_length", bind=True, norm=False
-):
+def root_dist(N: Tree_graph | gt.Graph, weight: str = 'Path_length', bind = True, norm = False):
     """
 
     Parameters
@@ -798,35 +781,35 @@ def root_dist(
     TypeError
         _description_
     """
-
+    
     if isinstance(N, Tree_graph):
         # get edges
         edges = N.graph.get_edges()
     elif isinstance(N, gt.Graph):
         edges = N.get_edges()
     else:
-        raise TypeError("N must be Tree_graph or gt.Graph")
+        raise TypeError("N must be Tree_graph or gt.Graph")        
     # get root
     root = g_root_ind(N)
     # initialise
-    root_dist = N.graph.new_vp("double")
+    root_dist = N.graph.new_vp('double')
     # dfs
     for e in gt.dfs_iterator(N.graph):
         if e.source() == root:
-            root_dist[e.target()] = N.graph.ep["Path_length"][e]
-        else:
-            root_dist[e.target()] = N.graph.ep["Path_length"][e] + root_dist[e.source()]
+            root_dist[e.target()] = N.graph.ep['Path_length'][e]
+        else:    
+            root_dist[e.target()] = N.graph.ep['Path_length'][e] + root_dist[e.source()]
 
     if norm:
-        root_dist.a = root_dist.a / sum(N.graph.ep["Path_length"].a)
+        root_dist.a = root_dist.a / sum(N.graph.ep['Path_length'].a)
 
     if bind:
-        N.graph.vp["Root_distance"] = root_dist
+        N.graph.vp['Root_distance'] = root_dist
     else:
         return root_dist
+        
 
-
-def get_edge_coords(N: Tree_graph) -> tuple[np.ndarray, np.ndarray]:
+def get_edge_coords(N:Tree_graph) -> tuple[np.ndarray,np.ndarray]:
     """_summary_
 
     Parameters
@@ -841,14 +824,11 @@ def get_edge_coords(N: Tree_graph) -> tuple[np.ndarray, np.ndarray]:
     """
     edges = N.graph.get_edges()
     coords = g_vert_coords(N)
-    p1 = coords[edges[:, 0]]
-    p2 = coords[edges[:, 1]]
-    return p1, p2
+    p1 = coords[edges[:,0]]
+    p2 = coords[edges[:,1]]
+    return p1,p2
 
-
-def get_edges(
-    N: Tree_graph, root: int | None = None, subset: str | None = None
-) -> np.ndarray:
+def get_edges(N:Tree_graph, root: int | None = None, subset: str | None = None) -> np.ndarray:
     """Return array of edges within a given neuron. If subset is not None, 'Internal' or 'External' must be specified
 
     In such a case, either edges with a leaf node as the target are returned ('External")
@@ -860,7 +840,7 @@ def get_edges(
         neurosetta Tree_graph representing a neuron
     subset : str | None
         If None (default) np.ndarray of all edges is returned. If "Internal" only edges with no leaf nodes are returned.
-        If 'External" only edges with a leaf node are returned
+        If 'External" only edges with a leaf node are returned 
 
     Returns
     -------
@@ -881,33 +861,28 @@ def get_edges(
     elif isinstance(N, gt.Graph):
         g = N
     else:
-        raise TypeError("N must be neurosetta.Tree_graph or gt.Graph")
-
+        raise TypeError('N must be neurosetta.Tree_graph or gt.Graph')
+    
     ### Get edges
     if root is None:
         edges = g.get_edges()
     else:
-        edges = gt.dfs_iterator(g, root, array=True)
+        edges = gt.dfs_iterator(g, root, array = True)
 
     ### Subset if needed
-    expected_subsets = ["None", "Internal", "External"]
+    expected_subsets = ['None','Internal','External']
     if subset == None:
         return edges
-    elif subset == "Internal":
+    elif subset == 'Internal':
         l_inds = g_leaf_inds(N)
-        return edges[~np.isin(edges[:, 1], l_inds)]
-    elif subset == "External":
+        return edges[~np.isin(edges[:,1],l_inds)]   
+    elif subset == 'External':
         l_inds = g_leaf_inds(N)
-        return edges[np.isin(edges[:, 1], l_inds)]
+        return edges[np.isin(edges[:,1],l_inds)]
     else:
-        raise ValueError(
-            f"Given Subset {subset} is not valid, expected one of {expected_subsets}"
-        )
+        raise ValueError(f'Given Subset {subset} is not valid, expected one of {expected_subsets}')
 
-
-def count_edges(
-    N: Tree_graph, root: int | None = None, subset: str | None = None
-) -> int:
+def count_edges(N: Tree_graph, root: int | None = None, subset: str | None = None) -> int:
     """Return count of the number of edges in N
 
     Parameters
@@ -917,7 +892,7 @@ def count_edges(
     root : int | None, optional
         If provided, will return number of edges downstream from given root, by default None
     subset : str | None, optional
-        If Internal, will provide count for only internal edges, if External, will provide count for only external edges.
+        If Internal, will provide count for only internal edges, if External, will provide count for only external edges. 
         If None, all edges are included, by default None
 
     Returns
@@ -927,8 +902,7 @@ def count_edges(
     """
     return get_edges(N, root, subset).shape[0]
 
-
-def graph_height(N: Tree_graph, map_to: str = "edge", bind: bool = False):
+def graph_height(N: Tree_graph, map_to:str = 'edge',bind:bool = False):
     """generates edge (or Vertex) height property in N
 
     Parameters
@@ -936,7 +910,7 @@ def graph_height(N: Tree_graph, map_to: str = "edge", bind: bool = False):
     N : Tree_graph
         Neuron to generate property map of tree heights from
     map_to : str, optional
-        If 'vertex' will map height property to nodes within the graph,
+        If 'vertex' will map height property to nodes within the graph, 
         If 'edge' will map property to the edges. If 'all' returns both an edge and vertex property map.   by default 'edge'
     bind : bool, optional
         Map property directly to the neuron object if True, otherwise returns a property map, by default False
@@ -951,50 +925,49 @@ def graph_height(N: Tree_graph, map_to: str = "edge", bind: bool = False):
     AttributeError
         In the case where map_to is not 'edge", 'vertex', or 'all'
     """
-    if map_to not in ["edge", "vertex", "all"]:
+    if map_to not in ['edge','vertex','all']:
         raise AttributeError('map_to argument must be "edge", "vertex", or "all"')
     # initialise a vertex property
-    h_vprop = N.graph.new_vp("int")
+    h_vprop = N.graph.new_vp('int')
     # get root ind and leaf/branch inds
     root = g_root_ind(N)
     lb_inds = g_lb_inds(N)
     # this is slower than it should be, but iterate over all verts
     for v in N.graph.iter_vertices():
         # get path
-        path = gt.shortest_path(N.graph, root, v)[0]
+        path = gt.shortest_path(N.graph,root,v)[0]
         # convert to index for next bit
         path = [N.graph.vertex_index[v] for v in path]
         # length of take intersection with leaves/branches
-        h_vprop[v] = len(np.intersect1d(path, lb_inds))
+        h_vprop[v] = len(np.intersect1d(path,lb_inds))
 
-    # if we want to return this as an edge property
-    if map_to in ["edge", "all"]:
-        h_eprop = N.graph.new_ep("int", h_vprop.a[get_edges(N)[:, 1]])
+    # if we want to return this as an edge property    
+    if map_to in  ['edge','all']:
+        h_eprop = N.graph.new_ep('int',h_vprop.a[get_edges(N)[:,1]])
 
     if bind:
-        if map_to == "edge":
-            N.graph.ep["Edge_Height"] = h_eprop
-        elif map_to == "vertex":
-            N.graph.vp["Vertex_Height"] = h_vprop
-        elif map_to == "all":
-            N.graph.vp["Vertex_Height"] = h_vprop
-            N.graph.ep["Edge_height"] = h_eprop
-    else:
-        if map_to == "edge":
+        if map_to == 'edge':
+            N.graph.ep['Edge_Height'] = h_eprop
+        elif map_to == 'vertex':
+            N.graph.vp['Vertex_Height'] = h_vprop
+        elif map_to == 'all':
+            N.graph.vp['Vertex_Height'] = h_vprop   
+            N.graph.ep['Edge_height'] = h_eprop
+    else:                
+        if map_to == 'edge':
             return h_eprop
-        elif map_to == "vertex":
+        elif map_to == 'vertex':
             return h_vprop
-        elif map_to == "all":
+        elif map_to == 'all':
             return h_vprop, h_eprop
 
-
-def Euclidean_MST(coords, root=True):
+def Euclidean_MST(coords, root = True):
     """generate the Euclidean minimum spanning tree from a set of coordinates
 
     Parameters
     ----------
     coords : np.ndarray
-        coordinates to find the euclidean MST of. Note, if root is true we assume that the
+        coordinates to find the euclidean MST of. Note, if root is true we assume that the 
         first coordinate is the root!
     root : bool, optional
         If True, we assume the first coordinate is the root. otherwise returns the unrooted MST, by default True
@@ -1005,45 +978,44 @@ def Euclidean_MST(coords, root=True):
         returns the Minimum Spanning Tree graph of the provided point cloud
     """
     # Note, we are assuming that the first coordinate is the root (if root is true)!
-
+    
     # generate complete graph
-    g = gt.complete_graph(coords.shape[0], self_loops=False, directed=False)
+    g = gt.complete_graph(coords.shape[0], self_loops = False, directed = False)
     # add coordinates as vertex property
-    vprop_coords = g.new_vp("vector<double>")
+    vprop_coords = g.new_vp('vector<double>')
     vprop_coords.set_2d_array(coords.T)
-    g.vp["coordinates"] = vprop_coords
+    g.vp['coordinates'] = vprop_coords
     # add weights/ euclidean distance
-    get_g_distances(g, bind=True)
+    get_g_distances(g, bind = True)
     # Create MST edge property map (will filter after)
     if root:
-        mst = gt.min_spanning_tree(g, weights=g.ep["Path_length"], root=0)
+        mst = gt.min_spanning_tree(g,weights = g.ep['Path_length'], root = 0)
     else:
         # calculate the MST - returned here is a mask edge property
-        mst = gt.min_spanning_tree(g, weights=g.ep["Path_length"])
+        mst = gt.min_spanning_tree(g,weights = g.ep['Path_length'])
     # clean up!
     g.set_edge_filter(mst)
     g.purge_vertices()
     # make a copy of g and make it directed - there may be a better way to do this?
-    edges = gt.dfs_iterator(g, 0, array=True)
-    g2 = gt.Graph(edges, hashed=True, hash_type="int")
+    edges = gt.dfs_iterator(g,0,array = True)
+    g2 = gt.Graph(edges, hashed = True, hash_type = 'int')
     # get coordinates
     coords = np.array([g.vp["coordinates"][i] for i in g2.vp["ids"].a])
     vprop_coords = g2.new_vp("vector<double>")
     vprop_coords.set_2d_array(coords.T)
-    g2.vp["coordinates"] = vprop_coords
+    g2.vp['coordinates'] = vprop_coords
     # re-add weights/ euclidean distance
-    get_g_distances(g2, bind=True)
-
+    get_g_distances(g2, bind = True)
+    
     return g2
 
-
-def Random_ST(coords, root=True):
+def Random_ST(coords, root = True):
     """Generate a random spanning tree from a set of coordinates
 
     Parameters
     ----------
     coords : np.ndarray
-        coordinates to find the Random spanning tree of. Note, if root is true we assume that the
+        coordinates to find the Random spanning tree of. Note, if root is true we assume that the 
         first coordinate is the root!
     root : bool, optional
         If True, we assume the first coordinate is the root. otherwise returns the unrooted RST, by default True
@@ -1054,39 +1026,38 @@ def Random_ST(coords, root=True):
         returns a random spanning tree graph of the provided point cloud
     """
     # Note, we are assuming that the first coordinate is the root (if root is true)!
-
+    
     # generate complete graph
-    g = gt.complete_graph(coords.shape[0], self_loops=False, directed=False)
+    g = gt.complete_graph(coords.shape[0], self_loops = False, directed = False)
     # add coordinates as vertex property
-    vprop_coords = g.new_vp("vector<double>")
+    vprop_coords = g.new_vp('vector<double>')
     vprop_coords.set_2d_array(coords.T)
-    g.vp["coordinates"] = vprop_coords
+    g.vp['coordinates'] = vprop_coords
     # add weights/ euclidean distance
-    get_g_distances(g, bind=True)
+    get_g_distances(g, bind = True)
     # Create MST edge property map (will filter after)
     if root:
-        rst = gt.random_spanning_tree(g, weights=g.ep["Path_length"], root=0)
+        rst = gt.random_spanning_tree(g,weights = g.ep['Path_length'], root = 0)
     else:
         # calculate the MST - returned here is a mask edge property
-        rst = gt.random_spanning_tree(g, weights=g.ep["Path_length"])
+        rst = gt.random_spanning_tree(g,weights = g.ep['Path_length'])
     # clean up!
     g.set_edge_filter(rst)
     g.purge_vertices()
     # make a copy of g and make it directed - there may be a better way to do this?
-    edges = gt.dfs_iterator(g, 0, array=True)
-    g2 = gt.Graph(edges, hashed=True, hash_type="int")
+    edges = gt.dfs_iterator(g,0,array = True)
+    g2 = gt.Graph(edges, hashed = True, hash_type = 'int')
     # get coordinates
     coords = np.array([g.vp["coordinates"][i] for i in g2.vp["ids"].a])
     vprop_coords = g2.new_vp("vector<double>")
     vprop_coords.set_2d_array(coords.T)
-    g2.vp["coordinates"] = vprop_coords
+    g2.vp['coordinates'] = vprop_coords
     # re-add weights/ euclidean distance
-    get_g_distances(g2, bind=True)
-
+    get_g_distances(g2, bind = True)
+    
     return g2
 
-
-def synapse_MST(N: Tree_graph, synapses: str = "All", root: bool = True) -> Tree_graph:
+def synapse_MST(N:Tree_graph, synapses:str = 'All', root: bool = True) -> Tree_graph:
     """_summary_
 
     Parameters
@@ -1104,111 +1075,95 @@ def synapse_MST(N: Tree_graph, synapses: str = "All", root: bool = True) -> Tree
     nr.Tree_graph
         Tree_graph of the Euclidean Spanning Tree of given subset of synapses for the given neuron.
     """
-    assert isinstance(N, Tree_graph), "Input must be neurosetta.Tree_graph"
+    assert isinstance(N,Tree_graph), "Input must be neurosetta.Tree_graph"
 
     ### Get coordinates according to include
-    if synapses == "Inputs":
-        assert g_has_property(
-            N, "inputs"
-        ), "Given neuron must have inputs property to make MST of Input Synapses"
-        coords = N.graph.gp["inputs"][["graph_x", "graph_y", "graph_z"]].values
-    elif synapses == "Outputs":
-        assert g_has_property(
-            N, "outputs"
-        ), "Given neuron must have outputs property to make MST of Output Synapses"
-        coords = N.graph.gp["outputs"][["graph_x", "graph_y", "graph_z"]].values
-    elif synapses == "All":
-        assert g_has_property(N, "inputs") and g_has_property(
-            N, "outputs"
-        ), "Given neuron must have both outputs and inputs property to make MST of All Synapses"
-        input_coords = N.graph.gp["inputs"][["graph_x", "graph_y", "graph_z"]].values
-        output_coords = N.graph.gp["outputs"][["graph_x", "graph_y", "graph_z"]].values
-        coords = np.vstack((input_coords, output_coords))
-
+    if synapses == 'Inputs':
+        assert g_has_property(N,'inputs'), "Given neuron must have inputs property to make MST of Input Synapses"
+        coords = N.graph.gp['inputs'][['graph_x','graph_y','graph_z']].values
+    elif synapses == 'Outputs':
+        assert g_has_property(N,'outputs'), "Given neuron must have outputs property to make MST of Output Synapses"
+        coords = N.graph.gp['outputs'][['graph_x','graph_y','graph_z']].values
+    elif synapses == 'All':
+        assert (g_has_property(N,'inputs') and g_has_property(N,'outputs')), "Given neuron must have both outputs and inputs property to make MST of All Synapses"
+        input_coords = N.graph.gp['inputs'][['graph_x','graph_y','graph_z']].values
+        output_coords = N.graph.gp['outputs'][['graph_x','graph_y','graph_z']].values
+        coords = np.vstack((input_coords,output_coords))
+    
     # if we want to add the root
     if root:
-        root_coord = g_vert_coords(N, g_root_ind(N))[0]
-        coords = np.vstack((root_coord, coords))
+        root_coord = g_vert_coords(N,g_root_ind(N))[0]
+        coords = np.vstack((root_coord,coords))
 
     # make sure we have path lengths, and if not we add it
-    if ~g_has_property(N, "Path_length"):
-        get_g_distances(N, bind=True)
-
+    if ~ g_has_property(N,'Path_length'):
+        get_g_distances(N, bind = True)
+    
     # build MST
-    g = Euclidean_MST(coords, root=root)
+    g = Euclidean_MST(coords,root = root)
 
     # pack this into a neuron object
-    g = Tree_graph(name=N.name + "_MST", graph=g)
+    g = Tree_graph(name = N.name + '_MST', graph = g)
 
     return g
 
-
-def bf_MST(coords, root=True, bf=0.2):
+def bf_MST(coords, root = True, bf = 0.2):
 
     # we use this class during the BFS call later, keep it internal to the function
     class root_dist_visitor(gt.BFSVisitor):
 
-        def __init__(self, v_dist, g):
+        def __init__(self, v_dist,g):
             self.v_dist = v_dist
             self.g = g
 
         def tree_edge(self, e):
-            self.v_dist[e.target()] = (
-                self.v_dist[e.source()] + self.g.ep["Path_length"][e]
-            )
-
+            self.v_dist[e.target()] = self.v_dist[e.source()] + self.g.ep['Path_length'][e]
+            
     # generate complete graph
-    g = gt.complete_graph(coords.shape[0], self_loops=False, directed=False)
+    g = gt.complete_graph(coords.shape[0], self_loops = False,directed = False)
     # add coordinates as vertex property
-    vprop_coords = g.new_vp("vector<double>")
+    vprop_coords = g.new_vp('vector<double>')
     vprop_coords.set_2d_array(coords.T)
-    g.vp["coordinates"] = vprop_coords
+    g.vp['coordinates'] = vprop_coords
     # add pairwise euclidean distances
-    get_g_distances(g, bind=True)
+    get_g_distances(g, bind = True)
 
     # initialise vertex property map
-    root_dist_vp = g.new_vp("double")
+    root_dist_vp = g.new_vp('double')
     # lets do this long hand before doing the vistor thing
-    gt.bfs_search(g, 0, root_dist_visitor(root_dist_vp, g))
+    gt.bfs_search(g,0,root_dist_visitor(root_dist_vp,g))
     # convert out vertex property map to and edge property map
-    root_dist_ep = g.new_ep("double", root_dist_vp.a[g.get_edges()[:, 1]])
+    root_dist_ep = g.new_ep('double',root_dist_vp.a[g.get_edges()[:,1]])
     # edge weights
-    e_weights = g.ep["Path_length"].a
+    e_weights = g.ep['Path_length'].a
     # root distances
     r_weights = root_dist_ep.a
 
     # create new weights
     weights = e_weights + (bf * r_weights)
 
-    eprop_weights = g.new_ep("double", weights)
+    eprop_weights = g.new_ep('double', weights)
     # mst
-    mst = gt.min_spanning_tree(g, weights=eprop_weights, root=0)
+    mst = gt.min_spanning_tree(g,weights = eprop_weights, root = 0)
     # apply to graph
     g.set_edge_filter(mst)
     # g.purge_vertices(in_place = False)
     g.purge_edges()
     # g.reindex_edges()
 
-    edges = gt.dfs_iterator(g, 0, array=True)
-    g2 = gt.Graph(edges, hashed=True, hash_type="int")
+    edges = gt.dfs_iterator(g,0,array = True)
+    g2 = gt.Graph(edges, hashed = True, hash_type = 'int')
     # get coordinates
     coords = np.array([g.vp["coordinates"][i] for i in g2.vp["ids"].a])
     vprop_coords = g2.new_vp("vector<double>")
     vprop_coords.set_2d_array(coords.T)
-    g2.vp["coordinates"] = vprop_coords
+    g2.vp['coordinates'] = vprop_coords
 
     return g2
 
-
 ### Node / Neuron Asymmetry
 
-
-def _node_asymmetry(
-    N: Tree_graph | gt.Graph,
-    v: int,
-    L: List | np.ndarray | None = None,
-    weight: bool = True,
-) -> Any | floating[Any] | Literal[1]:
+def _node_asymmetry(N: Tree_graph | gt.Graph,v: int, L: List | np.ndarray | None = None, weight: bool = True) -> Any | floating[Any] | Literal[1]:
     """
     Calculate weighted or unweighted asymmetry for a given vertex
 
@@ -1229,15 +1184,15 @@ def _node_asymmetry(
         Weighted or unweighted asymmetry for vertex v
     """
     # check input
-    if isinstance(N, Tree_graph):
+    if isinstance(N,Tree_graph):
         g = N.graph
-    elif isinstance(N, gt.Graph):
+    elif isinstance(N,gt.Graph):
         g = N
 
-    # check we have the reachable leaves property
-    if not g_has_property(g, "reachable_leaves"):
-        g_reachable_leaves(g, bind=True)
-
+    # check we have the reachable leaves property    
+    if not g_has_property(g, 'reachable_leaves'):
+        g_reachable_leaves(g,bind = True)
+        
     # get number of leaves if weight is True and L not provided
     if weight == True:
         if L is None:
@@ -1247,35 +1202,33 @@ def _node_asymmetry(
     # if we are at a transitory node or leaf, set to 1
     if len(neig) < 2:
         sym = 1
-    # if we have two children
-    elif len(neig) == 2:
-        r = g.vp["reachable_leaves"][neig[0]]
-        s = g.vp["reachable_leaves"][neig[1]]
+    # if we have two children    
+    elif len(neig) == 2:    
+        r = g.vp['reachable_leaves'][neig[0]]
+        s = g.vp['reachable_leaves'][neig[1]]
         if weight:
             w = (r + s) / L
             sym = w * ((abs(r - s)) / (r + s - 1))
         else:
-            sym = (abs(r - s)) / (r + s - 1)
+            sym = (abs(r - s)) / (r + s - 1) 
     # if we have more than two children, take the mean
-    else:
+    else:             
         vals = []
-        for pair in itertools.combinations(neig, 2):
-            r = g.vp["reachable_leaves"][pair[0]]
-            s = g.vp["reachable_leaves"][pair[1]]
+        for pair in itertools.combinations(neig,2):
+            r = g.vp['reachable_leaves'][pair[0]]
+            s = g.vp['reachable_leaves'][pair[1]]
             if weight:
                 w = (r + s) / L
                 sym = w * ((abs(r - s)) / (r + s - 1))
             else:
-                sym = (abs(r - s)) / (r + s - 1)
-            vals.append(sym)
-        sym = np.mean(vals)
+                sym = (abs(r - s)) / (r + s - 1) 
+            vals.append(sym)    
+        sym = np.mean(vals)  
 
     return sym
 
 
-def node_asymmetry(
-    N: Tree_graph | gt.Graph, L: List | np.ndarray | None = None, weight=True, bind=True
-) -> gt.VertexPropertyMap | None:
+def node_asymmetry(N: Tree_graph | gt.Graph, L: List | np.ndarray | None = None, weight = True, bind = True) -> gt.VertexPropertyMap | None:
     """_summary_
 
     Parameters
@@ -1300,30 +1253,28 @@ def node_asymmetry(
     elif isinstance(N, gt.Graph):
         g = N
     # initialise vp of ones
-    asymmetries = g.new_vp("double", np.ones_like(g.get_vertices()))
+    asymmetries = g.new_vp('double', np.ones_like(g.get_vertices()))
     # iterate through internal nodes
     for v in g_branch_inds(g):
-        asymmetries[v] = _node_asymmetry(g, v, L, weight=weight)
+        asymmetries[v] = _node_asymmetry(g, v, L, weight = weight)
 
     if bind:
         if weight:
-            g.vp["Weighted_asymmetry"] = asymmetries
+            g.vp['Weighted_asymmetry'] = asymmetries
         else:
-            g.vp["Asymmetry"] = asymmetries
+            g.vp['Asymmetry'] = asymmetries
     else:
         return asymmetries
+    
 
-
-def expected_asymmetry(
-    N: Tree_graph | gt.Graph | gt.VertexPropertyMap, method: str = "mean"
-) -> float:
+def expected_asymmetry(N: Tree_graph | gt.Graph | gt.VertexPropertyMap,method: str = 'mean') -> float :
     """
     Get mean or Median graph asymmetry for N
 
     Parameters
     ----------
     N : nr.Tree_graph | gt.Graph | gt.VertexPropertyMap
-        Graph representation of neuron or vertex property map of vertex asymmetry values. If a graph or Tree_graph
+        Graph representation of neuron or vertex property map of vertex asymmetry values. If a graph or Tree_graph 
         object is given, it must have the 'Asymmetry' or 'Weighted_asymmetry' metric bound to it as an internal vertex property map
     method : str, optional
         which to calculate, the mean or median asymmetry, by default 'mean'
@@ -1348,38 +1299,32 @@ def expected_asymmetry(
     elif isinstance(N, gt.Graph):
         g = N
 
-    if g_has_property(g, "Weighted_asymmetry"):
-        arr = g.vp["Weighted_asymmetry"].a
-    elif g_has_property(g, "Asymmetry"):
-        arr = g.vp["Asymmetry"].a
+    if g_has_property(g,'Weighted_asymmetry'):
+        arr = g.vp['Weighted_asymmetry'].a
+    elif g_has_property(g, 'Asymmetry'):
+        arr = g.vp['Asymmetry'].a
     else:
-        raise AttributeError(
-            "Input neuron does not have an Asymmetry vertex property, please generate one using node_asymmetry function"
-        )
+        raise AttributeError('Input neuron does not have an Asymmetry vertex property, please generate one using node_asymmetry function')
 
     if isinstance(N, gt.VertexPropertyMap):
         arr = N.a
     if arr == None:
-        raise TypeError("Failed to generate data from N")
-
+        raise TypeError('Failed to generate data from N')
+    
     # get expectancy
-    if method == "mean":
+    if method == 'mean':
         return np.mean(arr)
-    elif method == "median":
+    elif method == 'median':
         return np.median(arr)
 
+### Branching Angles    
 
-### Branching Angles
-
-
-def get_child_angles(
-    N: Tree_graph, to_degree: bool = True, bind: bool = True
-) -> np.ndarray | None:
+def get_child_angles(N:Tree_graph, to_degree:bool = True, bind:bool = True) -> np.ndarray | None:
     """
     Computes the angles between child branches at bifurcation points in a tree graph.
 
-    This function identifies bifurcation points in the tree graph and calculates the angle
-    between the two bifurcating child branches. The angles can be returned
+    This function identifies bifurcation points in the tree graph and calculates the angle 
+    between the two bifurcating child branches. The angles can be returned 
     as a NumPy array or stored in the graph's edge property map.
 
     Parameters
@@ -1387,10 +1332,10 @@ def get_child_angles(
     N : nr.Tree_graph
         Tree_graph representation of Neuron
     to_degree : bool, optional
-        If True, the angles are returned in degrees; otherwise, they are returned in radians.
+        If True, the angles are returned in degrees; otherwise, they are returned in radians. 
         Default is True.
     bind : bool, optional
-        If True, the computed angles are stored in the graph's edge property map (`'Child_angles'`);
+        If True, the computed angles are stored in the graph's edge property map (`'Child_angles'`); 
         otherwise, the function returns a NumPy array containing the angles. Default is True.
 
     Returns
@@ -1425,13 +1370,15 @@ def get_child_angles(
     # keep only bifurications
     branch_inds = branch_inds[np.where(N.graph.get_out_degrees(branch_inds) == 2)]
     # get child edges, as in the source is branch - we index to only get the target of the edge
-    source_inds = np.isin(edges[:, 0], branch_inds)
+    source_inds = np.isin(edges[:,0],branch_inds)
     child_edges_to_keep = edges[source_inds]
-    child_edges = child_edges_to_keep[:, 1]
+    child_edges = child_edges_to_keep[:,1]
 
     # split into odd and even
     even_child = child_edges[::2]
     odd_child = child_edges[1::2]
+
+
 
     # we can now use child_edges and parent_edges to subset coords
 
@@ -1444,16 +1391,17 @@ def get_child_angles(
     v1 -= branch_coords
     v2 -= branch_coords
 
+
     # and turn into unit vectors
     v1 = GeoJax.normalise(v1)
     v2 = GeoJax.normalise(v2)
 
     # ok with v1 and v2, we want to also define a perspective for calculating the signed angle later
     # we will use a vector perpendicular from v1 and v2
-    normals = np.array(GeoJax.perpendicular(v1, v2))
+    normals = np.array(GeoJax.perpendicular(v1,v2))
 
     # get angles
-    angles = GeoJax.angle(v1, v2, normals, to_degree=to_degree)
+    angles = GeoJax.angle(v1,v2,normals, to_degree=to_degree)
 
     if bind:
         # I need an array of infinities of length(edges)
@@ -1462,29 +1410,24 @@ def get_child_angles(
 
         # then at the correct index I need to make infinity the angle for this child pair...
         # Convert both arrays into structured dtypes for easy comparison
-        arr1_struct = edges.view([("", edges.dtype)] * edges.shape[1])
-        arr2_struct = child_edges_to_keep.view(
-            [("", child_edges_to_keep.dtype)] * child_edges_to_keep.shape[1]
-        )
+        arr1_struct = edges.view([('', edges.dtype)] * edges.shape[1])
+        arr2_struct = child_edges_to_keep.view([('', child_edges_to_keep.dtype)] * child_edges_to_keep.shape[1])
 
         # Find indices in arr1 where rows match any row in arr2
         matching_indices = np.nonzero(np.isin(arr1_struct, arr2_struct))[0]
         # update data
         data[matching_indices] = np.repeat(angles, 2)
 
-        N.graph.ep["Child_angle"] = N.graph.new_ep("double", data)
+        N.graph.ep['Child_angle'] = N.graph.new_ep('double', data)
     else:
         return angles
 
-
-def get_parent_child_angles(
-    N: Tree_graph, to_degree: bool = True, bind: bool = True
-) -> Tuple[np.ndarray, np.ndarray] | None:
+def get_parent_child_angles(N:Tree_graph, to_degree:bool = True, bind:bool = True) -> Tuple[np.ndarray, np.ndarray] | None:
     """
     Computes the angles between parent and child branches at bifurcation points in a tree graph.
 
-    This function identifies bifurcation points in the tree graph and calculates the angles between
-    the parent branch and each of its two child branches at each bifurcation. The angles can be returned
+    This function identifies bifurcation points in the tree graph and calculates the angles between 
+    the parent branch and each of its two child branches at each bifurcation. The angles can be returned 
     as two separate NumPy arrays (one for each child) or stored in the graph's edge property map.
 
     Parameters
@@ -1492,11 +1435,11 @@ def get_parent_child_angles(
     N : nr.Tree_graph
         Tree_graph representation of Neuron
     to_degree : bool, optional
-        If True, the angles are returned in degrees; otherwise, they are returned in radians.
+        If True, the angles are returned in degrees; otherwise, they are returned in radians. 
         Default is True.
     bind : bool, optional
-        If True, the computed angles are stored in the graph's edge property map (`'Parent_angles'`);
-        otherwise, the function returns two NumPy arrays containing the angles for each child branch.
+        If True, the computed angles are stored in the graph's edge property map (`'Parent_angles'`); 
+        otherwise, the function returns two NumPy arrays containing the angles for each child branch. 
         Default is True.
 
     Returns
@@ -1535,14 +1478,14 @@ def get_parent_child_angles(
     # keep only bifurications
     branch_inds = branch_inds[np.where(N.graph.get_out_degrees(branch_inds) == 2)]
     # get child edges, as in the source is branch - we index to only get the target of the edge
-    source_inds = np.isin(edges[:, 0], branch_inds)
+    source_inds = np.isin(edges[:,0],branch_inds)
     child_edges_to_keep = edges[source_inds]
-    child_edges = child_edges_to_keep[:, 1]
+    child_edges = child_edges_to_keep[:,1]
     # now we want the parents of the branches - again we index, this time to only get the source
-    source_inds = np.isin(edges[:, 1], branch_inds)
-    parent_edges = edges[source_inds][:, 0]
+    source_inds = np.isin(edges[:,1], branch_inds)
+    parent_edges = edges[source_inds][:,0]
     # we want these to be present twice
-    parent_edges = np.repeat(parent_edges, 2)
+    parent_edges = np.repeat(parent_edges,2)
 
     # we can now use child_edges and parent_edges to subset coords
 
@@ -1552,7 +1495,7 @@ def get_parent_child_angles(
     v2 = coords[child_edges]
 
     # i need to subtract the branch coordinates from these so we are on [0,0,0]
-    branch_coords = coords[np.repeat(branch_inds, 2)]
+    branch_coords = coords[np.repeat(branch_inds,2)]
     v1 -= branch_coords
     v2 -= branch_coords
 
@@ -1562,21 +1505,16 @@ def get_parent_child_angles(
 
     # ok with v1 and v2, we want to also define a perspective for calculating the signed angle later
     # we will use a vector perpendicular from v1 and v2
-    normals = np.array(GeoJax.perpendicular(v1, v2))
+    normals = np.array(GeoJax.perpendicular(v1,v2))
 
     # this fucks up the sign though, as the directions of the normals will be flipped
     # to fix this lets make sure each pair of normals is aligned
-    normals[::2] = np.vstack(
-        [
-            vg.aligned_with(normals[::2][i], normals[1::2][i])
-            for i in range(int(normals.shape[0] / 2))
-        ]
-    )
+    normals[::2] = np.vstack([vg.aligned_with(normals[::2][i], normals[1::2][i]) for i in range(int(normals.shape[0] / 2))])
 
     # get angles
-    angles = GeoJax.angle(v1, v2, normals, to_degree=to_degree)
+    angles = GeoJax.angle(v1,v2,normals, to_degree=to_degree)
 
-    # split
+    # split 
     # lets split angles by odd and even
     angles_even = angles[::2]
     angles_odd = angles[1::2]
@@ -1588,27 +1526,22 @@ def get_parent_child_angles(
 
         # then at the correct index I need to make infinity the angle for this child pair...
         # Convert both arrays into structured dtypes for easy comparison
-        arr1_struct = edges.view([("", edges.dtype)] * edges.shape[1])
-        arr2_struct = child_edges_to_keep.view(
-            [("", child_edges_to_keep.dtype)] * child_edges_to_keep.shape[1]
-        )
+        arr1_struct = edges.view([('', edges.dtype)] * edges.shape[1])
+        arr2_struct = child_edges_to_keep.view([('', child_edges_to_keep.dtype)] * child_edges_to_keep.shape[1])
 
         # Find indices in arr1 where rows match any row in arr2
         matching_indices = np.nonzero(np.isin(arr1_struct, arr2_struct))[0]
         # update data
         data[matching_indices] = angles
 
-        N.graph.ep["Parent_angle"] = N.graph.new_ep("double", data)
+        N.graph.ep['Parent_angle'] = N.graph.new_ep('double', data)
 
     else:
         return angles_even, angles_odd
 
-
-def unpack_parent_child_angles(
-    N: Tree_graph, split: bool = True
-) -> np.ndarray | Tuple[np.ndarray, np.ndarray]:
-    """retrieve np.ndarrays of paired angles going from parent edge to child edge.
-
+def unpack_parent_child_angles(N:Tree_graph, split: bool = True) -> np.ndarray | Tuple[np.ndarray,np.ndarray]:
+    """retrieve np.ndarrays of paired angles going from parent edge to child edge. 
+    
     if split, As each branch node has two children, we split the angles into first and second child and return an array for each.
 
     This means arr1[i] and arr2[i] come from the same parent
@@ -1630,8 +1563,8 @@ def unpack_parent_child_angles(
     """
 
     # if we don't have the parent to child branch angle property add it to the neuron
-    if not g_has_property(N.graph, "Parent_angle"):
-        get_parent_child_angles(N, to_degree=True, bind=True)
+    if not g_has_property(N.graph, 'Parent_angle'):
+        get_parent_child_angles(N, to_degree = True, bind = True)
 
     # get all edges
     edges = get_edges(N)
@@ -1643,17 +1576,16 @@ def unpack_parent_child_angles(
     # keep only bifurications
     branch_inds = branch_inds[np.where(N.graph.get_out_degrees(branch_inds) == 2)]
     # get child edges, as in the source is branch - we index to only get the target of the edge
-    source_inds = np.isin(edges[:, 0], branch_inds)
+    source_inds = np.isin(edges[:,0],branch_inds)
     child_edges = edges[source_inds]
 
-    angles = np.array([N.graph.ep["Parent_angle"][e] for e in child_edges])
+    angles = np.array([N.graph.ep['Parent_angle'][e] for e in child_edges])
     if split:
         return angles[::2], angles[1::2]
     else:
         return angles
-
-
-def propagate_vp_to_ep(N: Tree_graph, vp: str, ep: str, by: str = "target"):
+    
+def propagate_vp_to_ep(N:Tree_graph, vp:str, ep:str, by:str = 'target'):
     """_summary_
 
     Parameters
@@ -1675,18 +1607,15 @@ def propagate_vp_to_ep(N: Tree_graph, vp: str, ep: str, by: str = "target"):
     """
     vp = N.graph.vp[vp].a
     edges = get_edges(N)
-    if by == "target":
-        e_ind = edges[:, 1]
-    elif by == "source":
+    if by == 'target':
+        e_ind = edges[:,1]
+    elif by == 'source':
         e_ind == edges[:,]
     else:
-        raise AttributeError(
-            f"by method {by} not applicable, expected source or target"
-        )
-    N.graph.ep[ep] = N.graph.new_ep("int", vp[e_ind])
+        raise AttributeError(f'by method {by} not applicable, expected source or target')
+    N.graph.ep[ep] = N.graph.new_ep('int',vp[e_ind])
 
-
-def get_subtree_cable_length(N: Tree_graph, v: int) -> float:
+def get_subtree_cable_length(N: Tree_graph, v:int) -> float:
     """Returns the total cable length of the subtree in a neuron defined with it's root at vertex v
 
     Parameters
@@ -1701,7 +1630,7 @@ def get_subtree_cable_length(N: Tree_graph, v: int) -> float:
     float
         Total cable length of sub-tree
     """
-    return sum([N.graph.ep["Path_length"][e] for e in gt.dfs_iterator(N.graph, v)])
+    return sum([N.graph.ep['Path_length'][e] for e in gt.dfs_iterator(N.graph, v)])
 
 
 def find_row_indices(n: np.ndarray, m: np.ndarray) -> np.ndarray:
@@ -1715,9 +1644,7 @@ def find_row_indices(n: np.ndarray, m: np.ndarray) -> np.ndarray:
     n = np.asarray(n)
     m = np.asarray(m)
     if n.ndim != 2 or m.ndim != 2 or n.shape[1] != m.shape[1]:
-        raise ValueError(
-            "Both inputs must be 2D arrays with the same number of columns"
-        )
+        raise ValueError("Both inputs must be 2D arrays with the same number of columns")
 
     # 1) Create a void dtype that packs each row into a single scalar
     dtype_void = np.dtype((np.void, n.dtype.itemsize * n.shape[1]))
@@ -1727,7 +1654,7 @@ def find_row_indices(n: np.ndarray, m: np.ndarray) -> np.ndarray:
     m_view = np.ascontiguousarray(m).view(dtype_void).ravel()
 
     # 3) Sort `n_view`, keeping track of original indices
-    order = np.argsort(n_view)
+    order    = np.argsort(n_view)
     n_sorted = n_view[order]
 
     # 4) For each row in m, binary‑search its packed value in the sorted array
@@ -1736,9 +1663,8 @@ def find_row_indices(n: np.ndarray, m: np.ndarray) -> np.ndarray:
     # 5) Map back to original positions in n
     return order[pos_in_sorted]
 
-
 ### we want first, a function that creates an edge and vertex mask for downstream nodes from some given node
-def g_subtree(N: Tree_graph, root: int) -> tuple[np.ndarray, np.ndarray]:
+def g_subtree(N: Tree_graph, root:int) -> tuple[np.ndarray,np.ndarray]:
     """From some given node, return the edges and vertices in the sub-tree defined by that node (all nodes and edges downstream)
 
     Parameters
@@ -1753,15 +1679,12 @@ def g_subtree(N: Tree_graph, root: int) -> tuple[np.ndarray, np.ndarray]:
     tuple[np.ndarray,np.ndarray]
         Array of vertex indicies and edges.
     """
-    edges = gt.dfs_iterator(N.graph, root, array=True)
+    edges = gt.dfs_iterator(N.graph, root, array = True)
     verts = np.unique(edges)
     return verts, edges
 
-
 # make subtree mask
-def g_subtree_mask(
-    N: Tree_graph, root: int, bind: bool = True
-) -> tuple[gt.VertexPropertyMap, gt.EdgePropertyMap]:
+def g_subtree_mask(N: nr.Tree_graph, root: int, bind: bool = True) -> tuple[gt.VertexPropertyMap, gt.EdgePropertyMap]:
     """Generate boolian edge and vertex masks for sub tree in N defined by root
 
     Parameters
@@ -1779,7 +1702,7 @@ def g_subtree_mask(
         Boolian vertex and edge property maps where True is in the subtree defined by root.
     """
     v, e = g_subtree(N, root)
-    edges = get_edges(N)
+    edges = nr.get_edges(N)
 
     e_mask = np.zeros(N.graph.num_vertices())
     v_mask = np.zeros(N.graph.num_edges())
@@ -1788,9 +1711,9 @@ def g_subtree_mask(
     e_mask[find_row_indices(edges, e)] = 1
 
     if bind:
-        N.graph.vp["subtree_mask"] = N.graph.new_vp("bool", v_mask)
-        N.graph.ep["subtree_mask"] = N.graph.new_ep("bool", e_mask)
+        N.graph.vp['subtree_mask'] = N.graph.new_vp('bool', v_mask)
+        N.graph.ep['subtree_mask'] = N.graph.new_ep('bool',e_mask)
     else:
-        v_mask = N.graph.new_vp("bool", v_mask)
-        e_mask = N.graph.new_ep("bool", e_mask)
-        return v_mask, e_mask
+        v_mask = N.graph.new_vp('bool', v_mask)
+        e_mask = N.graph.new_ep('bool',e_mask)
+        return v_mask, e_mask 
