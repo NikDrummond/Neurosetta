@@ -575,7 +575,6 @@ class Forest_graph(Stone):
         return np.vstack(coords)
     
     def iter_vertices(self):
-        """ Iterate over vertices"""
         return self.graph.iter_vertices()
 
 def _get_property_type(prop):

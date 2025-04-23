@@ -574,8 +574,7 @@ class Forest_graph(Stone):
             coords.append(N.graph.vp['coordinates'].get_2d_array().T)
         return np.vstack(coords)
     
-    def iter_vertices(self):
-        """ Iterate over vertices"""
+    def iter-vertices(self):
         return self.graph.iter_vertices()
 
 def _get_property_type(prop):
