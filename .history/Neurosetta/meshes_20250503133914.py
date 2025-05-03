@@ -9,18 +9,7 @@ from sklearn.neighbors import NearestNeighbors
 from scipy.spatial.distance import pdist
 import trimesh
 from scipy.spatial import Delaunay
-try:
-    import open3d as o3d
-    HAS_OPEN3D = True
-except ImportError:
-    HAS_OPEN3D = False
 
-try:
-    import vtkmodules.all as vtk
-    from vtkmodules.util.numpy_support import numpy_to_vtk
-    HAS_VTK = True
-except ImportError:
-    HAS_VTK = False
 
 def point_inside(mesh: vd.mesh.Mesh, points, invert: bool = False, **kwargs) -> np.ndarray:
     """
@@ -298,7 +287,7 @@ def compute_alpha_shape_3d(points: np.ndarray, alpha: float, use_graph_tool=True
     faces = trimesh.grouping.group_rows(np.sort(faces, axis=1), require_count=1)[0]
     return trimesh.Trimesh(vertices=points, faces=faces, process=True)
 
-def reconstruct_surface(points: np.ndarray, depth=9, normal_radius=0.1, backend='auto', density_quantile=0.1, **kwargs) -> object:
+def poisson_surface_reconstruction(points: np.ndarray, depth=9, normal_radius=0.1, backend='auto', density_quantile=0.1, **kwargs) -> object:
     """
     Perform Poisson surface reconstruction using Open3D or VTK.
 

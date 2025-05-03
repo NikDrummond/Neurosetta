@@ -9,18 +9,7 @@ from sklearn.neighbors import NearestNeighbors
 from scipy.spatial.distance import pdist
 import trimesh
 from scipy.spatial import Delaunay
-try:
-    import open3d as o3d
-    HAS_OPEN3D = True
-except ImportError:
-    HAS_OPEN3D = False
 
-try:
-    import vtkmodules.all as vtk
-    from vtkmodules.util.numpy_support import numpy_to_vtk
-    HAS_VTK = True
-except ImportError:
-    HAS_VTK = False
 
 def point_inside(mesh: vd.mesh.Mesh, points, invert: bool = False, **kwargs) -> np.ndarray:
     """
