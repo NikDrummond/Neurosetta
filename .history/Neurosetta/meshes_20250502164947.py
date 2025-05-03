@@ -155,16 +155,7 @@ def triangulation(pnts, method='delaunay', threshold=True, t=None, return_tetra=
         # edge mask
         mask = np.ones(g.num_edges(), dtype=bool)
         mask[np.where(d >= t)] = 0
-        e_mask = g.new_ep('bool', mask)
-        # vertex mask
-        mask = np.ones(g.num_vertices(), dtype = bool)
-        mask[np.unique(g.get_edges()[np.where(d >= t)])] = 0
-        v_mask = g.new_vp('bool', mask)
-        # set filters
-        g.set_filters(e_mask, v_mask)
-        # purge
-        g.purge_edges()
-        g.purge_vertices(in_place = True)
+        g.set_edge_filter(g.new_ep('bool', mask))
 
 
     edges = g.get_edges()

@@ -262,7 +262,7 @@ def compute_alpha_shape_3d(points: np.ndarray, alpha: float, use_graph_tool=True
         Alpha shape mesh.
     """
     if use_graph_tool:
-        tets = triangulation(points, method='delaunay', return_tetra=True)
+        tets = gt_triangulation(points, method='delaunay', return_tetra=True)
     else:
         from scipy.spatial import Delaunay
         tets = Delaunay(points).simplices

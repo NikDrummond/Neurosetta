@@ -162,10 +162,12 @@ def triangulation(pnts, method='delaunay', threshold=True, t=None, return_tetra=
         v_mask = g.new_vp('bool', mask)
         # set filters
         g.set_filters(e_mask, v_mask)
-        # purge
+        # purge?
         g.purge_edges()
         g.purge_vertices(in_place = True)
-
+        # vertex mask
+    
+        # purge
 
     edges = g.get_edges()
     return _find_tetrahedra(edges) if return_tetra else _find_triangles(edges)
