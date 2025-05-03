@@ -2,7 +2,7 @@ import vedo as vd
 from collections import defaultdict
 from graph_tool.all import triangulation as gt_triangulation
 import numpy as np
-from .graphs import get_g_distances
+from Neurosetta import get_g_distances
 import jax.numpy as jnp
 from jax.ops import segment_sum
 from jax import vmap
