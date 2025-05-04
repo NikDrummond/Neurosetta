@@ -5,7 +5,7 @@ import numpy as np
 from .graphs import get_g_distances
 import jax.numpy as jnp
 from jax.ops import segment_sum
-from jax import vmap, jit, lax
+from jax import vmap, jit
 from sklearn.neighbors import NearestNeighbors
 from scipy.spatial.distance import pdist
 import trimesh
@@ -567,43 +567,6 @@ def generate_voxel_grid(
 
     return grid, offset, voxel_size
 
-def voxel_grid_to_volume(
-    grid: np.ndarray,
-    offset: np.ndarray,
-    voxel_size: float,
-    as_uint8: bool = True,
-) -> vd.Volume:
-    """
-    Convert a binary voxel grid into a vedo.Volume.
-
-    Parameters
-    ----------
-    grid : np.ndarray
-        3D boolean array of shape (nz, ny, nx).
-    offset : np.ndarray
-        The (x,y,z) coordinate of the voxel grid origin.
-    voxel_size : float
-        Edge length of each voxel.
-    as_uint8 : bool
-        Whether to cast the grid to uint8 (0/1) for the Volume scalar field.
-
-    Returns
-    -------
-    vd.Volume
-        A volumetric object with correct spacing and position.
-    """
-    # 1. Prepare scalar data (0–1) in the order Vedo expects (z fastest)
-    data = grid.astype(np.uint8 if as_uint8 else float)
-    # Vedo will interpret the first axis as z, then y, then x
-    # so no need to transpose if grid is (nz, ny, nx).
-
-    # 2. Create the Volume with proper spacing
-    vol = vd.Volume(data, spacing=(voxel_size, voxel_size, voxel_size))
-
-    # 3. Shift it so that its minimum corner is at `offset`
-    vol.pos(offset.tolist())
-
-    return vol
 
 def surface_from_voxel_grid(
     grid: np.ndarray, offset: np.ndarray, voxel_size: float = 1.0
@@ -762,7 +725,7 @@ MAX_DDA_STEPS = 512
 
 
 @jit
-def dda_fixed_steps(start, end, offset, voxel_size, dims):
+def dda_fixed_steps(start, end, offset, voxel_size):
     start_vox = jnp.floor((start - offset) / voxel_size).astype(jnp.int32)
     end_vox = jnp.floor((end - offset) / voxel_size).astype(jnp.int32)
     direction = end - start
@@ -805,7 +768,7 @@ def trace_lines_to_voxels(starts, ends, offset, voxel_size, dims_tuple):
     num_segments = nz * ny * nx
 
     trace_fn = lambda s, e: dda_fixed_steps(s, e, offset, voxel_size, dims)
-    voxels_all, masks_all = vmap(trace_fn)(starts, ends)
+    voxels_all, masks_all = jax.vmap(trace_fn)(starts, ends)
 
     voxels_flat = voxels_all.reshape(-1, 3)
     masks_flat = masks_all.reshape(-1)
@@ -849,6 +812,4 @@ def voxel_line_intersections(
     ends = jnp.array(line_ends, dtype=jnp.float32)
     offset_j = jnp.array(offset, dtype=jnp.float32)
     dims_tuple = tuple(grid.shape)
-    counts = trace_lines_to_voxels(starts, ends, offset_j, voxel_size, dims_tuple)
-    counts = np.asarray(counts, dtype = int)
-    return counts
+    return trace_lines_to_voxels(starts, ends, offset_j, voxel_size, dims_tuple)

@@ -849,6 +849,4 @@ def voxel_line_intersections(
     ends = jnp.array(line_ends, dtype=jnp.float32)
     offset_j = jnp.array(offset, dtype=jnp.float32)
     dims_tuple = tuple(grid.shape)
-    counts = trace_lines_to_voxels(starts, ends, offset_j, voxel_size, dims_tuple)
-    counts = np.asarray(counts, dtype = int)
-    return counts
+    return trace_lines_to_voxels(starts, ends, offset_j, voxel_size, dims_tuple)

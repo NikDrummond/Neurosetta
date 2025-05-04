@@ -5,7 +5,7 @@ import numpy as np
 from .graphs import get_g_distances
 import jax.numpy as jnp
 from jax.ops import segment_sum
-from jax import vmap, jit, lax
+from jax import vmap, jit
 from sklearn.neighbors import NearestNeighbors
 from scipy.spatial.distance import pdist
 import trimesh
@@ -459,7 +459,7 @@ def reconstruct_surface_poisson(
     density_quantile: float = 0.1,
     max_nn: int = 30,
     scale: float = 1.01,
-) -> vd.Mesh:
+) -> trimesh.Trimesh:
     """
     Surface reconstruction using Poisson reconstruction from Open3D.
 
@@ -567,47 +567,10 @@ def generate_voxel_grid(
 
     return grid, offset, voxel_size
 
-def voxel_grid_to_volume(
-    grid: np.ndarray,
-    offset: np.ndarray,
-    voxel_size: float,
-    as_uint8: bool = True,
-) -> vd.Volume:
-    """
-    Convert a binary voxel grid into a vedo.Volume.
-
-    Parameters
-    ----------
-    grid : np.ndarray
-        3D boolean array of shape (nz, ny, nx).
-    offset : np.ndarray
-        The (x,y,z) coordinate of the voxel grid origin.
-    voxel_size : float
-        Edge length of each voxel.
-    as_uint8 : bool
-        Whether to cast the grid to uint8 (0/1) for the Volume scalar field.
-
-    Returns
-    -------
-    vd.Volume
-        A volumetric object with correct spacing and position.
-    """
-    # 1. Prepare scalar data (0–1) in the order Vedo expects (z fastest)
-    data = grid.astype(np.uint8 if as_uint8 else float)
-    # Vedo will interpret the first axis as z, then y, then x
-    # so no need to transpose if grid is (nz, ny, nx).
-
-    # 2. Create the Volume with proper spacing
-    vol = vd.Volume(data, spacing=(voxel_size, voxel_size, voxel_size))
-
-    # 3. Shift it so that its minimum corner is at `offset`
-    vol.pos(offset.tolist())
-
-    return vol
 
 def surface_from_voxel_grid(
     grid: np.ndarray, offset: np.ndarray, voxel_size: float = 1.0
-) -> vd.Mesh:
+) -> trimesh.Trimesh:
     """
     Generate a mesh from a binary voxel grid using marching cubes.
 
@@ -631,44 +594,38 @@ def surface_from_voxel_grid(
     verts += offset
     return trimesh.Trimesh(vertices=verts, faces=faces, process=True)
 
-def clean_mesh(mesh, voxel_size: float = None) -> vd.Mesh:
+
+def clean_mesh(mesh: trimesh.Trimesh, voxel_size: float = None) -> trimesh.Trimesh:
     """
     Clean mesh by removing degenerate elements and optionally revoxelizing.
 
     Parameters
     ----------
-    mesh : trimesh.Trimesh or vd.Mesh
+    mesh : trimesh.Trimesh
         Input mesh.
     voxel_size : float or None
         If not watertight, revoxelize at this resolution.
 
     Returns
     -------
-    vd.Mesh
+    trimesh.Trimesh
         Cleaned, watertight mesh.
     """
-    #  Close holes and split into connected components
     mesh.fill_holes()
-    components = mesh.split()
+    components = mesh.split(only_watertight=False)
     if not components:
-        raise ValueError("Mesh.split() returned no components.")
-    # 3. Keep only the largest component by volume
+        raise ValueError("Mesh split returned no components.")
     mesh = max(components, key=lambda m: m.volume)
     mesh.remove_unreferenced_vertices()
 
-    # 4. If still non-watertight, re-voxelise & re-march
-    if not mesh.is_watertight and voxel_size is not None:
+    if not mesh.is_watertight and voxel_size:
         vox = mesh.voxelized(pitch=voxel_size)
         mesh = vox.marching_cubes
 
-    # 5. Final clean/check
     mesh.process(validate=False)
     if mesh.volume < 0:
         mesh.invert()
-
-    # 6. Return as your vd.Mesh wrapper
     return mesh
-
 
 
 def reconstruct_surface_voxel(
@@ -706,8 +663,8 @@ def reconstruct_surface_voxel(
         points, voxel_size, padding, dilate, largest_component
     )
     mesh = surface_from_voxel_grid(grid, offset, voxel_size)
-    mesh = clean_mesh(mesh, voxel_size) if clean else mesh
-    return mesh
+    mesh = 
+    return 
 
 
 def reconstruct_surface(
@@ -748,14 +705,13 @@ def reconstruct_surface(
     """
     method = method.lower()
     if method == "alpha":
-        mesh = compute_alpha_shape(points, **kwargs)
+        return compute_alpha_shape(points, **kwargs)
     elif method == "poisson":
-        mesh = reconstruct_surface_poisson(points, **kwargs)
+        return reconstruct_surface_poisson(points, **kwargs)
     elif method == "voxel":
-        mesh = reconstruct_surface_voxel(points, **kwargs)
+        return reconstruct_surface_voxel(points, **kwargs)
     else:
         raise ValueError(f"Unknown reconstruction method: '{method}'")
-    return vd.Mesh(mesh)
 
 
 MAX_DDA_STEPS = 512
@@ -784,7 +740,7 @@ def dda_fixed_steps(start, end, offset, voxel_size, dims):
         return (next_voxel, new_t_max, step, t_delta), curr_voxel
 
     init = (start_vox, t_max, step, t_delta)
-    (_, _, _, _), voxels = lax.scan(body_fn, init, None, length=MAX_DDA_STEPS)
+    (_, _, _, _), voxels = jax.lax.scan(body_fn, init, None, length=MAX_DDA_STEPS)
     voxels = jnp.vstack([start_vox[None, :], voxels])
 
     total_steps = jnp.minimum(
@@ -805,7 +761,7 @@ def trace_lines_to_voxels(starts, ends, offset, voxel_size, dims_tuple):
     num_segments = nz * ny * nx
 
     trace_fn = lambda s, e: dda_fixed_steps(s, e, offset, voxel_size, dims)
-    voxels_all, masks_all = vmap(trace_fn)(starts, ends)
+    voxels_all, masks_all = jax.vmap(trace_fn)(starts, ends)
 
     voxels_flat = voxels_all.reshape(-1, 3)
     masks_flat = masks_all.reshape(-1)
@@ -849,6 +805,4 @@ def voxel_line_intersections(
     ends = jnp.array(line_ends, dtype=jnp.float32)
     offset_j = jnp.array(offset, dtype=jnp.float32)
     dims_tuple = tuple(grid.shape)
-    counts = trace_lines_to_voxels(starts, ends, offset_j, voxel_size, dims_tuple)
-    counts = np.asarray(counts, dtype = int)
-    return counts
+    return trace_lines_to_voxels(starts, ends, offset_j, voxel_size, dims_tuple)
