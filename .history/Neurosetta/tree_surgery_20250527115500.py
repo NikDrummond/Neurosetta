@@ -209,6 +209,9 @@ def g_edge_error(
         g.ep["possible_error"] = eprop_err
     else:
         return eprop_err
+    
+
+
 
 def apply_mask(N:Tree_graph | gt.Graph, mask: str | np.ndarray | gt.VertexPropertyMap, inplace: bool = False) -> Tree_graph | gt.Graph:
     """Apply a boolian mask to verticies in a Tree graph

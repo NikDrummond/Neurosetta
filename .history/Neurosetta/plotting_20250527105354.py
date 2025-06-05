@@ -115,7 +115,7 @@ def _vd_tree_cyl(
 
 
 def _vd_subtree_lns(
-    N: Tree_graph, c1: str = "g", c2: str = "r", lw1=2, lw2=2, **kwargs
+    N: Tree_graph, c1: str = "g", c2: str = "r", lw1**kwargs
 ) -> tuple[vd.Lines, vd.Lines]:
     """Create plotting object for subtree plotting, assuming neuron has
 
@@ -139,44 +139,43 @@ def _vd_subtree_lns(
     ):
         # if we do not have inverted masks, create them:
         if not g_has_property(N, g_property="inv_subtree_mask", t="v") & g_has_property(
-            N, g_property="inv_subtree_mask", t="e"
-        ):
+        N, g_property="inv_subtree_mask", t="e"
+    ):
             # create inverted masks
-            msk = np.array(N.graph.vp["subtree_mask"].a).astype(bool)
+            msk = np.array(N.graph.vp['subtree_mask'].a).astype(bool)
             msk_inv = ~msk
-            N.graph.vp["inv_subtree_mask"] = N.graph.new_vp("bool", msk_inv)
+            N.graph.vp['inv_subtree_mask'] = N .graph.new_vp('bool', msk_inv)
 
-            msk = np.array(N.graph.ep["subtree_mask"].a).astype(bool)
+            msk = np.array(N.graph.ep['subtree_mask'].a).astype(bool)
             msk_inv = ~msk
-            N.graph.ep["inv_subtree_mask"] = N.graph.new_ep("bool", msk_inv)
-
+            N.graph.ep['inv_subtree_mask'] = N.graph.new_ep('bool',msk_inv)
+        
         # get all coordinates
         coords = g_vert_coords(N)
 
+
+
         # get lines in the subtree
         g2 = gt.GraphView(N.graph)
-        g2.set_filters(eprop=g2.ep["subtree_mask"], vprop=g2.vp["subtree_mask"])
+        g2.set_filters(eprop = g2.ep['subtree_mask'], vprop = g2.vp['subtree_mask'])
 
         edges = g2.get_edges()
         # get starts and stops
         start_pnts = coords[edges[:, 0]]
         stop_pnts = coords[edges[:, 1]]
         # create excluded lines
-        lns_in = vd.Lines(
-            start_pts=start_pnts, end_pts=stop_pnts, c=c1, lw=lw1, **kwargs
-        )
-
+        lns_in = vd.Lines(start_pts=start_pnts, end_pts=stop_pnts, c=c1, lw = 3)
+        
         # get lines not in the subtree
         g3 = gt.GraphView(N.graph)
-        g3.set_filters(eprop=g3.ep["inv_subtree_mask"], vprop=g3.vp["inv_subtree_mask"])
+        g3.set_filters(eprop = g3.ep['inv_subtree_mask'], vprop = g3.vp['inv_subtree_mask'])
         edges = g3.get_edges()
         # get starts and stops
         start_pnts = coords[edges[:, 0]]
         stop_pnts = coords[edges[:, 1]]
         # create excluded lines
-        lns_out = vd.Lines(
-            start_pts=start_pnts, end_pts=stop_pnts, c=c2, lw=lw2, **kwargs
-        )
+        lns_out = vd.Lines(start_pts=start_pnts, end_pts=stop_pnts, c="r", lw = 3)
+
 
         # clear filters again
         N.graph.clear_filters()

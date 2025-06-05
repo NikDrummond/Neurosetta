@@ -15,6 +15,7 @@ from numpy import floating
 
 from .core import Tree_graph, Node_table, infer_node_types, g_has_property
 from .sets import Sfamily_intersect, Sfamily_XOR
+from .tree_surgery import simplify_neuron
 
 # function to get node coordinates from a graph
 
@@ -120,7 +121,7 @@ def g_branch_inds(N: Tree_graph | gt.Graph) -> np.ndarray[int]:
 
 
 def g_lb_inds(
-    N: Tree_graph | gt.Graph, return_types: bool = False, root: bool = True
+    N: Tree_graph | gt.Graph, return_types: bool = False, root: bool = False
 ) -> np.ndarray[int]:
     """
     Returns indices of all leaf and branch nodes

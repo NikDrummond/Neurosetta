@@ -8,13 +8,14 @@ import vedo as vd
 import itertools
 import GeoJax
 import vg
-from tqdm import tqdm
+
 
 from numpy import floating
 
 
 from .core import Tree_graph, Node_table, infer_node_types, g_has_property
 from .sets import Sfamily_intersect, Sfamily_XOR
+
 
 # function to get node coordinates from a graph
 
@@ -120,7 +121,7 @@ def g_branch_inds(N: Tree_graph | gt.Graph) -> np.ndarray[int]:
 
 
 def g_lb_inds(
-    N: Tree_graph | gt.Graph, return_types: bool = False, root: bool = True
+    N: Tree_graph | gt.Graph, return_types: bool = False, root: bool = False
 ) -> np.ndarray[int]:
     """
     Returns indices of all leaf and branch nodes
@@ -1730,7 +1731,7 @@ def find_row_indices(
             "Both inputs must be 2D arrays with the same number of columns"
         )
 
-    #
+    # 
 
     # Create a lookup map from unique row tuples in n to their first original index
     n_row_to_first_index_map = {}
@@ -1741,7 +1742,7 @@ def find_row_indices(
         if current_n_row_tuple not in n_row_to_first_index_map:
             n_row_to_first_index_map[current_n_row_tuple] = i
 
-    #
+    # 
     # This array stores the index in 'n' for each row in 'm'.
     # If m_arr is empty, main_indices will be empty.
     main_indices = np.empty(m_arr.shape[0], dtype=int)
@@ -1753,7 +1754,7 @@ def find_row_indices(
     if not return_mask:
         return main_indices
 
-    #
+    # 
     bool_mask_n = np.zeros(n_arr.shape[0], dtype=bool)
     if m_arr.shape[0] > 0:  # Only proceed if m is not empty
         # Create a set of unique row tuples from m for efficient lookup
@@ -1789,7 +1790,7 @@ def g_subtree(N: Tree_graph, root: int) -> tuple[np.ndarray, np.ndarray]:
 
 # make subtree mask
 def g_subtree_mask(
-    N: Tree_graph, root: int, bind: bool = True, return_inv: bool = True
+    N: Tree_graph, root: int, bind: bool = True, return_inv:bool = True
 ) -> tuple[gt.VertexPropertyMap, gt.EdgePropertyMap]:
     """Generate boolian edge and vertex masks for sub tree in N defined by root
 
@@ -1815,7 +1816,7 @@ def g_subtree_mask(
     v_mask = np.zeros(N.graph.num_vertices())
 
     v_mask[v] = 1
-    e_mask[find_row_indices(edges, e, return_mask=True)[1]] = 1
+    e_mask[find_row_indices(edges, e, return_mask = True)[1]] = 1
 
     # convert to bool
     v_mask = v_mask.astype(bool)
@@ -1823,17 +1824,17 @@ def g_subtree_mask(
 
     if return_inv:
         vp_inv = ~v_mask
-        vp_inv = N.graph.new_vp("bool", vp_inv)
+        vp_inv = N.graph.new_vp('bool', vp_inv)
         ep_inv = ~e_mask
-        ep_inv = N.graph.new_ep("bool", ep_inv)
+        ep_inv = N.graph.new_ep('bool', ep_inv)
 
     if bind:
         N.graph.vp["subtree_mask"] = N.graph.new_vp("bool", v_mask)
         N.graph.ep["subtree_mask"] = N.graph.new_ep("bool", e_mask)
         # if we want inverted
         if return_inv:
-            N.graph.vp["inv_subtree_mask"] = N.graph.new_vp("bool", vp_inv)
-            N.graph.ep["inv_subtree_mask"] = N.graph.new_ep("bool", ep_inv)
+            N.graph.vp['inv_subtree_mask'] = N.graph.new_vp('bool', vp_inv)
+            N.graph.ep['inv_subtree_mask'] = N.graph.new_ep('bool',ep_inv)
     else:
         v_mask = N.graph.new_vp("bool", v_mask)
         e_mask = N.graph.new_ep("bool", e_mask)
@@ -1842,14 +1843,7 @@ def g_subtree_mask(
         else:
             return v_mask, e_mask
 
-
-def get_sub_tree_quality(
-    N: Tree_graph,
-    v: int,
-    total_cable: float = None,
-    total_leaves: float = None,
-    l_inds: np.ndarray = None,
-) -> float:
+def get_sub_tree_quality(N: Tree_graph, v: int, total_cable: float = None, total_leaves: float = None, l_inds:np.ndarray = None) -> float:
     """Calculate the sub tree quality
 
     Parameters
@@ -1877,111 +1871,42 @@ def get_sub_tree_quality(
     l_inds = g_leaf_inds(N) if l_inds is None else l_inds
 
     # get edges in sub tree
-    sub_edges = gt.bfs_iterator(N.graph, v, array=True)
+    sub_edges = gt.bfs_iterator(N.graph, v, array = True)
     # get cable length in sub tree
-    sub_cable = sum([N.graph.ep["Path_length"][e] for e in sub_edges])
+    sub_cable = sum([N.graph.ep['Path_length'][e] for e in sub_edges])
     # get leaves in sub tree
     sub_leaves = len(np.intersect1d(l_inds, np.unique(sub_edges)))
 
     return (1 - (sub_cable / total_cable)) + (sub_leaves / total_leaves)
 
-
-def optimal_partition_root(N:Tree_graph) -> int:
+def optimal_partition_root(N):
     """
-    Calculates the dend_r value. note - for full neurons this is a little sloe
-
-    review the implementation, see if we can dump the whole thing on gt
+    Calculates the dend_r value. note - 
 
     Args:
-        N: Neuron
+        N: Input for nr.g_cable_length, nr.leaf_count, nr.g_branch_inds,
+           and nr.get_sub_tree_quality.
+        parallel (bool, optional): If True, runs the scoring loop in parallel
+                                   using joblib. Defaults to False.
+        n_jobs (int, optional): The number of jobs to run in parallel.
+                                -1 means using all processors.
+                                Defaults to -1.
 
     Returns:
         The calculated dend_r value.
     """
-
-    # it is faster to simplify the neuron and then map back to the original!
-    simp_N = simplify_neuron(N)
     # get total cable and number of leaves so we aren't re-calculating them
-    tot_cable = g_cable_length(simp_N)
-    tot_leaves = leaf_count(simp_N)
+    tot_cable = nr.g_cable_length(N)
+    tot_leaves = nr.leaf_count(N)
     # get branch inds
-    b_inds = g_branch_inds(simp_N)
+    b_inds = nr.g_branch_inds(N)
 
     # get score for each branch ind
     scores = np.zeros_like(b_inds, dtype=float)
     for i in tqdm(range(len(b_inds)), desc="Scoring subtrees"):
         b = b_inds[i]
-        scores[i] = get_sub_tree_quality(simp_N, b, tot_cable, tot_leaves)
+        scores[i] = nr.get_sub_tree_quality(N, b, tot_cable, tot_leaves)
 
     # get maximum
-    dend_r = nearest_vertex(N, g_vert_coords(N)[scores.argmax()])
+    dend_r = b_inds[scores.argmax()]
     return dend_r
-
-def simplify_neuron(N: Tree_graph) -> Tree_graph:
-
-        # make sure we have 'Path_length' property
-    if not g_has_property(N,'Path_length',"e"):
-        get_g_distances(N, bind = True)
-        
-
-    # starts are all leaves and branches
-    seg_stops = g_lb_inds(N)
-    # ends are all branches and the root
-    seg_starts = np.hstack((g_root_ind(N),g_branch_inds(N)))
-
-    # initialise edges array
-    # initialise what will become the edges
-    edges = np.zeros((segment_counts(N),2)).astype(int)
-
-    index = 0
-    for e in gt.dfs_iterator(N.graph,g_root_ind(N),array=True):
-        curr_start = e[0]
-        curr_end = e[1]
-
-        # if the source vertex is a start point:
-        if curr_start in seg_starts:
-            edges[index,0] = curr_start
-
-        # if the target vertex is an segment end
-        if curr_end in seg_stops:
-            edges[index,1] = curr_end
-            index += 1        
-
-
-    g = gt.Graph(edges, hashed = True, hash_type = 'int')
-
-
-    coords = np.array([N.graph.vp['coordinates'][i] for i in g.vp['ids'].a])
-    radius = np.array([N.graph.vp['radius'][i] for i in g.vp['ids'].a])
-    g.vp['coordinates'] = g.new_vp("vector<double>", coords)
-    g.vp['radius'] = g.new_vp('double',radius)
-
-    # create Path length edge property map - this preserves the path length of the edge from the original graph
-    eprop_p = g.new_ep('double')
-
-    for i in g.iter_edges():
-        source = g.vp['ids'][i[0]]
-        target = g.vp['ids'][i[1]]
-        eprop_p[i] = path_length(N,source = source, target = target)
-
-    # add this edge property to the graph
-    g.ep['Path_length'] = eprop_p
-
-    # add Euc_dist property - this is the euclidean distance between nodes in the simplified graph
-    get_g_distances(g, bind = True,name = 'Euc_dist')
-
-    # add node types
-    infer_node_types(g)
-
-    # add simplified graph property
-    simp = g.new_gp('bool')
-    simp[g] = True
-    g.gp['simplified'] = simp
-
-    # make sure we keep ID
-    try:
-        g.gp['ID'] = g.new_gp('string', N.graph.gp['ID'])
-    except:
-        g.gp["ID"] = g.new_gp('string', str(N.name))
-
-    return Tree_graph(N.name,g)

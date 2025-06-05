@@ -120,7 +120,7 @@ def g_branch_inds(N: Tree_graph | gt.Graph) -> np.ndarray[int]:
 
 
 def g_lb_inds(
-    N: Tree_graph | gt.Graph, return_types: bool = False, root: bool = True
+    N: Tree_graph | gt.Graph, return_types: bool = False, root: bool = False
 ) -> np.ndarray[int]:
     """
     Returns indices of all leaf and branch nodes

@@ -209,6 +209,74 @@ def g_edge_error(
         g.ep["possible_error"] = eprop_err
     else:
         return eprop_err
+    
+def simplify_neuron(N: Tree_graph) -> Tree_graph:
+
+        # make sure we have 'Path_length' property
+    if not g_has_property(N,'Path_length',"e"):
+        get_g_distances(N, bind = True)
+        
+
+    # starts are all leaves and branches
+    seg_stops = g_lb_inds(N)
+    # ends are all branches and the root
+    seg_starts = np.hstack((g_root_ind(N),g_branch_inds(N)))
+
+    # initialise edges array
+    # initialise what will become the edges
+    edges = np.zeros((segment_counts(N),2)).astype(int)
+
+    index = 0
+    for e in gt.dfs_iterator(N.graph,g_root_ind(N),array=True):
+        curr_start = e[0]
+        curr_end = e[1]
+
+        # if the source vertex is a start point:
+        if curr_start in seg_starts:
+            edges[index,0] = curr_start
+
+        # if the target vertex is an segment end
+        if curr_end in seg_stops:
+            edges[index,1] = curr_end
+            index += 1        
+
+
+    g = gt.Graph(edges, hashed = True, hash_type = 'int')
+
+
+    coords = np.array([N.graph.vp['coordinates'][i] for i in g.vp['ids'].a])
+    radius = np.array([N.graph.vp['radius'][i] for i in g.vp['ids'].a])
+    g.vp['coordinates'] = g.new_vp("vector<double>", coords)
+    g.vp['radius'] = g.new_vp('double',radius)
+
+    # create Path length edge property map - this preserves the path length of the edge from the original graph
+    eprop_p = g.new_ep('double')
+
+    for i in g.iter_edges():
+        source = g.vp['ids'][i[0]]
+        target = g.vp['ids'][i[1]]
+        eprop_p[i] = path_length(N,source = source, target = target)
+
+    # add this edge property to the graph
+    g.ep['Path_length'] = eprop_p
+
+    # add Euc_dist property - this is the euclidean distance between nodes in the simplified graph
+    get_g_distances(g, bind = True,name = 'Euc_dist')
+
+    # add node types
+    infer_node_types(g)
+
+    # add simplified graph property
+    simp = g.new_gp('bool')
+    simp[g] = True
+    g.gp['simplified'] = simp
+
+    # make sure we keep ID
+    try:
+    g.gp['ID'] = g.new_gp('string', N.graph.gp['ID'])
+
+    return Tree_graph(N.name,g)
+
 
 def apply_mask(N:Tree_graph | gt.Graph, mask: str | np.ndarray | gt.VertexPropertyMap, inplace: bool = False) -> Tree_graph | gt.Graph:
     """Apply a boolian mask to verticies in a Tree graph

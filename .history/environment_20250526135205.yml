@@ -14,5 +14,8 @@ dependencies:
   - hdbscan
   - tqdm
   - fastcluster
+  - flybrains
+  - navis
+  - fafbseg
   - jax
   - numba
