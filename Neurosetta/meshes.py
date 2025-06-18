@@ -13,6 +13,8 @@ from scipy.spatial import Delaunay
 from skimage.measure import marching_cubes
 from scipy.ndimage import binary_dilation, label
 from functools import partial
+import matplotlib.pyplot as plt
+
 
 try:
     import open3d as o3d
@@ -283,7 +285,6 @@ def estimate_alpha_threshold(
         alpha = y[np.argmax(dists)]
 
         if plot:
-            import matplotlib.pyplot as plt
 
             plt.figure(figsize=(6, 3))
             plt.plot(sorted_dists, label="Sorted distances")

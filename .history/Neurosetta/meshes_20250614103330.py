@@ -13,6 +13,8 @@ from scipy.spatial import Delaunay
 from skimage.measure import marching_cubes
 from scipy.ndimage import binary_dilation, label
 from functools import partial
+import matplotlib.pyplot as plt
+
 
 try:
     import open3d as o3d
@@ -283,7 +285,6 @@ def estimate_alpha_threshold(
         alpha = y[np.argmax(dists)]
 
         if plot:
-            import matplotlib.pyplot as plt
 
             plt.figure(figsize=(6, 3))
             plt.plot(sorted_dists, label="Sorted distances")
@@ -849,4 +850,6 @@ def voxel_line_intersections(
     ends = jnp.array(line_ends, dtype=jnp.float32)
     offset_j = jnp.array(offset, dtype=jnp.float32)
     dims_tuple = tuple(grid.shape)
-    counts = race_lines_to_voxels(starts, ends, offset_j, voxel_size, dims_tuple)
+    counts = trace_lines_to_voxels(starts, ends, offset_j, voxel_size, dims_tuple)
+    counts = np.asarray(counts, dtype = int)
+    return counts
