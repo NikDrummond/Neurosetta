@@ -1449,7 +1449,7 @@ def get_child_angles(
 
     # ok with v1 and v2, we want to also define a perspective for calculating the signed angle later
     # we will use a vector perpendicular from v1 and v2
-    normals = np.array(GeoJax.cross(v1, v2))
+    normals = np.array(GeoJax.perpendicular(v1, v2))
 
     # get angles
     angles = GeoJax.angle(v1, v2, normals, to_degree=to_degree)
@@ -1556,12 +1556,12 @@ def get_parent_child_angles(
     v2 -= branch_coords
 
     # and turn into unit vectors
-    v1 = GeoJax.normalize(v1)
-    v2 = GeoJax.normalize(v2)
+    v1 = GeoJax.normalise(v1)
+    v2 = GeoJax.normalise(v2)
 
     # ok with v1 and v2, we want to also define a perspective for calculating the signed angle later
     # we will use a vector perpendicular from v1 and v2
-    normals = np.array(GeoJax.cross(v1, v2))
+    normals = np.array(GeoJax.perpendicular(v1, v2))
 
     # this fucks up the sign though, as the directions of the normals will be flipped
     # to fix this lets make sure each pair of normals is aligned
