@@ -1,2 +1,0 @@
-import vedo as vd
-
