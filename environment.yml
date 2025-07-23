@@ -16,3 +16,5 @@ dependencies:
   - fastcluster
   - jax
   - numba
+  - scikit-image
+  - trimesh

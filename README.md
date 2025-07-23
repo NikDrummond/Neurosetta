@@ -93,3 +93,7 @@ If neurosetta doesn't appear:
         Select it
 
 This should do the trick. Or just don't use windows. 
+
+### NOTES
+
+- Currently, plotting functions using vedo seem to crash when running in Windows using WSL
