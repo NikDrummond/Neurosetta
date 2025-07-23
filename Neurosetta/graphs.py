@@ -1389,7 +1389,7 @@ def get_child_angles(
         If True, the angles are returned in degrees; otherwise, they are returned in radians.
         Default is True.
     bind : bool, optional
-        If True, the computed angles are stored in the graph's edge property map (`'Child_angles'`);
+        If True, the computed angles are stored in the graph's edge property map (`'Child_angle'`);
         otherwise, the function returns a NumPy array containing the angles. Default is True.
 
     Returns
@@ -1403,15 +1403,15 @@ def get_child_angles(
     - The function extracts all edges and coordinates from the tree graph.
     - It identifies bifurcation points (nodes with exactly two outgoing edges).
     - The angles are computed using the child branch vectors and a perpendicular normal vector.
-    - If `bind=True`, the computed angles are stored in the tree graph under the edge property `'Child_angles'`.
+    - If `bind=True`, the computed angles are stored in the tree graph under the edge property `'Child_angle'`.
 
     Examples
     --------
     >>> angles = get_child_angles(my_tree_graph, to_degree=False, bind=False)
     >>> print(angles)  # Returns an array of angles in radians
 
-    >>> get_child_angles(my_tree_graph, bind=True)  # Stores angles in 'Child_angles' property
-    >>> print(my_tree_graph.graph.ep['Child_angles'])  # Access stored angles
+    >>> get_child_angles(my_tree_graph, bind=True)  # Stores angles in 'Child_angle' property
+    >>> print(my_tree_graph.graph.ep['Child_angle'])  # Access stored angles
     """
     # get all edges
     edges = get_edges(N)
@@ -1494,7 +1494,7 @@ def get_parent_child_angles(
         If True, the angles are returned in degrees; otherwise, they are returned in radians.
         Default is True.
     bind : bool, optional
-        If True, the computed angles are stored in the graph's edge property map (`'Parent_angles'`);
+        If True, the computed angles are stored in the graph's edge property map (`'Parent_angle'`);
         otherwise, the function returns two NumPy arrays containing the angles for each child branch.
         Default is True.
 
@@ -1504,7 +1504,7 @@ def get_parent_child_angles(
         If `bind` is False, returns a tuple of two NumPy arrays:
         - `angles_even`: Angles corresponding to the first child branch at each bifurcation.
         - `angles_odd`: Angles corresponding to the second child branch at each bifurcation.
-        If `bind` is True, updates the graph's edge property `'Parent_angles'` and returns None.
+        If `bind` is True, updates the graph's edge property `'Parent_angle'` and returns None.
 
     Notes
     -----
@@ -1512,7 +1512,7 @@ def get_parent_child_angles(
     - It identifies bifurcation points (nodes with exactly two outgoing edges).
     - The angles are computed using the parent and child branch vectors and a perpendicular normal vector.
     - To ensure consistent signed angles, the normal vectors are aligned.
-    - If `bind=True`, the computed angles are stored in the tree graph under the edge property `'Parent_angles'`.
+    - If `bind=True`, the computed angles are stored in the tree graph under the edge property `'Parent_angle'`.
 
     Examples
     --------
@@ -1520,8 +1520,8 @@ def get_parent_child_angles(
     >>> print(angles_even)  # Returns an array of angles for the first child branch
     >>> print(angles_odd)   # Returns an array of angles for the second child branch
 
-    >>> get_parent_child_angles(my_tree_graph, bind=True)  # Stores angles in 'Parent_angles' property
-    >>> print(my_tree_graph.graph.ep['Parent_angles'])  # Access stored angles
+    >>> get_parent_child_angles(my_tree_graph, bind=True)  # Stores angles in 'Parent_angle' property
+    >>> print(my_tree_graph.graph.ep['Parent_angle'])  # Access stored angles
     """
     # get all edges
     edges = get_edges(N)

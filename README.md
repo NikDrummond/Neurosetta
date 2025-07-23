@@ -96,4 +96,39 @@ This should do the trick. Or just don't use windows.
 
 ### NOTES
 
-- Currently, plotting functions using vedo seem to crash when running in Windows using WSL
+- Currently, plotting functions using vedo seem to crash when running in Windows using WSL. This is caused by some known bug when opening external windows from VSCode in WSL. A work around it to use the `k3d` backend, which will plot 3D interactive plots inline. I may build this into Neurosetta anyway at some point. 
+
+anyway, install `k3d` in your environment:
+
+```
+pip install k3d
+```
+
+Then import `vedo` and set the backend:
+
+```
+from vedo import settings
+settings.default_backend = 'k3d'
+```
+
+This will render interactive 3D plots inline in a notebook.
+
+Note, this is significantly slower, and allows less objects, than using a new window as we usually do.
+
+
+- Running in Windows and RAM.
+
+Handling large numbers of neurons can use a good chunk of RAM. WSL has a cap on the amount of RAM it can use however, set by default to be half of what is available. In order to get around this you can create a `.wslconfig` file in the root of youre User directory: the path should be something like:
+
+```
+c/Users/<your user name>
+```
+
+Just open notepad and save a file here called `.wslconfig` and add the lines:
+
+```
+[wsl2]
+memory = <however mucg you want to use>GB (eg, 36GB)
+```
+
+Once you restart WSL, this should fix things.
