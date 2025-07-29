@@ -1886,7 +1886,7 @@ def get_sub_tree_quality(
     return (1 - (sub_cable / total_cable)) + (sub_leaves / total_leaves)
 
 
-def optimal_partition_root(N:Tree_graph) -> int:
+def optimal_partition_root(N:Tree_graph, progress = False) -> int:
     """
     Calculates the dend_r value. note - for full neurons this is a little sloe
 
@@ -1909,12 +1909,17 @@ def optimal_partition_root(N:Tree_graph) -> int:
 
     # get score for each branch ind
     scores = np.zeros_like(b_inds, dtype=float)
-    for i in tqdm(range(len(b_inds)), desc="Scoring subtrees"):
-        b = b_inds[i]
-        scores[i] = get_sub_tree_quality(simp_N, b, tot_cable, tot_leaves)
-
+    if progress:
+        for i in tqdm(range(len(b_inds)), desc="Scoring subtrees"):
+            b = b_inds[i]
+            scores[i] = get_sub_tree_quality(simp_N, b, tot_cable, tot_leaves)
+    else:
+        for i in range(len(b_inds)):
+            b = b_inds[i]
+            scores[i] = get_sub_tree_quality(simp_N, b, tot_cable, tot_leaves)
+    simp_dRoot_coord = g_vert_coords(simp_N, subset = b_inds)[scores.argmax()]
     # get maximum
-    dend_r = nearest_vertex(N, g_vert_coords(N)[scores.argmax()])
+    dend_r = nearest_vertex(N, simp_dRoot_coord)
     return dend_r
 
 def simplify_neuron(N: Tree_graph) -> Tree_graph:
