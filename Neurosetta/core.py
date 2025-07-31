@@ -6,7 +6,8 @@ import numpy as np
 import pandas as pd
 from typing import List
 from tqdm import tqdm
-
+from vedo import Mesh
+from vedo import load as mesh_load
 # Main core class
 
 
@@ -594,3 +595,26 @@ def _find_n_type(n_id, edges):
     except:
         t = edges.loc[edges.post == n_id, "Output_type"].values[0]
     return t
+
+
+def load_mesh(fpath: str, colour: str = 'gray', alpha: float = 0.3) -> Mesh:
+    """Load a mesh from file as a vedo.Mesh object
+
+    Parameters
+    ----------
+    fpath : str
+        path to file
+    colour : str, optional
+        mesh colour, by default 'gray'
+    alpha : float, optional
+        mesh alpha, by default 0.3
+
+    Returns
+    -------
+    Mesh
+        mesh from file.
+    """
+    mesh = mesh_load(fpath)
+    mesh.alpha(alpha);
+    mesh.c(colour);
+    return mesh

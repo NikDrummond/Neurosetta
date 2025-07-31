@@ -137,49 +137,28 @@ def _vd_subtree_lns(
     if g_has_property(N, g_property="subtree_mask", t="v") & g_has_property(
         N, g_property="subtree_mask", t="e"
     ):
-        # if we do not have inverted masks, create them:
-        if not g_has_property(N, g_property="inv_subtree_mask", t="v") & g_has_property(
-            N, g_property="inv_subtree_mask", t="e"
-        ):
-            # create inverted masks
-            msk = np.array(N.graph.vp["subtree_mask"].a).astype(bool)
-            msk_inv = ~msk
-            N.graph.vp["inv_subtree_mask"] = N.graph.new_vp("bool", msk_inv)
+        # we will do this without graph masking as there is no need
 
-            msk = np.array(N.graph.ep["subtree_mask"].a).astype(bool)
-            msk_inv = ~msk
-            N.graph.ep["inv_subtree_mask"] = N.graph.new_ep("bool", msk_inv)
-
-        # get all coordinates
-        coords = g_vert_coords(N)
+        # get coordinates, edges and sub-tree mask
+        coords = N.graph.vp['coordinates'].get_2d_array().T
+        edges = N.graph.get_edges()
+        mask = np.array(N.graph.ep['subtree_mask'].a, dtype = bool)
 
         # get lines in the subtree
-        g2 = gt.GraphView(N.graph)
-        g2.set_filters(eprop=g2.ep["subtree_mask"], vprop=g2.vp["subtree_mask"])
+        in_edges = edges[mask]
 
-        edges = g2.get_edges()
-        # get starts and stops
-        start_pnts = coords[edges[:, 0]]
-        stop_pnts = coords[edges[:, 1]]
-        # create excluded lines
-        lns_in = vd.Lines(
-            start_pts=start_pnts, end_pts=stop_pnts, c=c1, lw=lw1, **kwargs
-        )
+        starts = coords[in_edges[:,0]]
+        stops = coords[in_edges[:,1]]
 
-        # get lines not in the subtree
-        g3 = gt.GraphView(N.graph)
-        g3.set_filters(eprop=g3.ep["inv_subtree_mask"], vprop=g3.vp["inv_subtree_mask"])
-        edges = g3.get_edges()
-        # get starts and stops
-        start_pnts = coords[edges[:, 0]]
-        stop_pnts = coords[edges[:, 1]]
-        # create excluded lines
-        lns_out = vd.Lines(
-            start_pts=start_pnts, end_pts=stop_pnts, c=c2, lw=lw2, **kwargs
-        )
+        lns_in = vd.Lines(starts, stops, c = c1, lw = lw1, **kwargs)
 
-        # clear filters again
-        N.graph.clear_filters()
+        # lines not in the subtree
+        out_edges = edges[~mask]
+        starts = coords[out_edges[:,0]]
+        stops = coords[out_edges[:,1]]
+
+        lns_out = vd.Lines(starts, stops, c = c2, lw = lw2, **kwargs)
+
         # return
         return lns_in, lns_out
 
